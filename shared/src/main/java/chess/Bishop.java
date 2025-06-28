@@ -16,28 +16,64 @@ public class Bishop{
     }
 
     public Collection<ChessMove> calculateMoves() {
-//        ArrayList<String> taken;
-//        board.getPieces();
-//        taken = board.pieces;
-//        System.out.println("Starting now.");
+        // get piece color
+        ChessPiece self = board.getPiece(position);
+
+        board.getPieces();
+
+        Collection<ChessPosition> taken;
+        taken = board.positions;
+
         Collection<ChessMove> options = new ArrayList<ChessMove>();
 
         int currRow = position.getRow();
         int currCol = position.getColumn();
 
         for(int i = currRow+1, j = currCol+1; i <= 8 && j <= 8; i++, j++) {
-            options.add(new ChessMove(position, new ChessPosition(i, j), null));
+            if (taken.contains(new ChessPosition(i, j))) {
+                ChessPiece affil = board.getPiece(new ChessPosition(i, j));
+                if (affil.getTeamColor() == self.getTeamColor()) {
+                    break;
+                }
+                options.add(new ChessMove(position, new ChessPosition(i, j), null));
+                break;
             }
-
-        for(int i = currRow-1, j = currCol-1; i > 0 && j > 0; i--, j--) {
             options.add(new ChessMove(position, new ChessPosition(i, j), null));
         }
 
         for(int i = currRow+1, j = currCol-1; i <= 8 && j > 0; i++, j--) {
+            if (taken.contains(new ChessPosition(i, j))) {
+                ChessPiece affil = board.getPiece(new ChessPosition(i, j));
+                if (affil.getTeamColor() == self.getTeamColor()) {
+                    break;
+                }
+                options.add(new ChessMove(position, new ChessPosition(i, j), null));
+                break;
+            }
             options.add(new ChessMove(position, new ChessPosition(i, j), null));
         }
 
         for(int i = currRow-1, j = currCol+1; i > 0 && j <= 8; i--, j++) {
+            if (taken.contains(new ChessPosition(i, j))) {
+                ChessPiece affil = board.getPiece(new ChessPosition(i, j));
+                if (affil.getTeamColor() == self.getTeamColor()) {
+                    break;
+                }
+                options.add(new ChessMove(position, new ChessPosition(i, j), null));
+                break;
+            }
+            options.add(new ChessMove(position, new ChessPosition(i, j), null));
+        }
+
+        for(int i = currRow-1, j = currCol-1; i > 0 && j > 0; i--, j--) {
+            if (taken.contains(new ChessPosition(i, j))) {
+                ChessPiece affil = board.getPiece(new ChessPosition(i, j));
+                if (affil.getTeamColor() == self.getTeamColor()) {
+                    break;
+                }
+                options.add(new ChessMove(position, new ChessPosition(i, j), null));
+                break;
+            }
             options.add(new ChessMove(position, new ChessPosition(i, j), null));
         }
 

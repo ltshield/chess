@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Objects;
  */
 public class ChessBoard {
     private ChessPiece[][] grid = new ChessPiece[8][8];
-    public ArrayList<String> pieces = new ArrayList<String>();
+    public Collection<ChessPosition> positions = new ArrayList<ChessPosition>();
     public ChessBoard() {
         
     }
@@ -22,11 +23,10 @@ public class ChessBoard {
             for (int j = 0; j < 8; j++) {
                 ChessPosition pos = new ChessPosition(i,j);
                 if (getPiece(pos) != null) {
-                    pieces.add(pos.toString());
+                    positions.add(pos);
                 }
             }
         }
-        System.out.println("Done with pieces.");
     }
 
     /**
@@ -49,6 +49,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
+        // TODO: account for chessboards starting at (1,1) not (0,0)?
         return grid[position.getRow()][position.getColumn()];
     }
 
@@ -69,12 +70,12 @@ public class ChessBoard {
             return false;
         }
         ChessBoard that = (ChessBoard) o;
-        return Arrays.equals(grid, that.grid) && Objects.equals(pieces, that.pieces);
+        return Arrays.equals(grid, that.grid) && Objects.equals(positions, that.positions);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(pieces);
+        int result = Objects.hash(positions);
         result = 31 * result + Arrays.hashCode(grid);
         return result;
     }

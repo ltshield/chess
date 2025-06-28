@@ -48,7 +48,6 @@ public class ChessMove {
         return startPosition.toString() + " to " + endPosition.toString();
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
