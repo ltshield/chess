@@ -22,10 +22,13 @@ public class ChessBoard {
     }
 
     public void getPieces() {
+        // Note: you have GOT TO re-initialize this array each time
+        // otherwise stuff will carry over
+        positions = new ArrayList<>();
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition pos = new ChessPosition(i,j);
-                System.out.println((getPiece(pos)));
+//                System.out.println((getPiece(pos)));
                 if (getPiece(pos) != null && !positions.contains(pos)) {
                     positions.add(pos);
                 }
