@@ -24,8 +24,12 @@ public class PieceMovesCalculator {
 //            return rook.calculateMoves();
 //        }
 //        if (type == ChessPiece.PieceType.QUEEN) {
-            Queen queen = new Queen(board, position);
-            return queen.calculateMoves();
+//            Queen queen = new Queen(board, position);
+//            return queen.calculateMoves();
+//        }
+//        if (type == ChessPiece.PieceType.KING) {
+            King king = new King(board, position);
+            return king.calculateMoves();
 //        }
     }
 }

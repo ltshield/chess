@@ -124,7 +124,7 @@ public class Queen {
             }
             options.add(new ChessMove(position, tes, null));
         }
-        
+
         // Southwest
         for (int i = currRow-1, j = currCol-1; i >= 1 && j >= 1; i--, j--) {
             ChessPosition tes = new ChessPosition(i, j);
