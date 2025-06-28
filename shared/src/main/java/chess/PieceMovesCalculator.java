@@ -15,25 +15,32 @@ public class PieceMovesCalculator {
     }
 
     public Collection<ChessMove> calculateMoves() {
-//        if (type == ChessPiece.PieceType.BISHOP) {
-//            Bishop bishop = new Bishop(board, position);
-//            return bishop.calculateMoves();
-//        }
-//        if (type == ChessPiece.PieceType.ROOK) {
-//            Rook rook = new Rook(board, position);
-//            return rook.calculateMoves();
-//        }
-//        if (type == ChessPiece.PieceType.QUEEN) {
-//            Queen queen = new Queen(board, position);
-//            return queen.calculateMoves();
-//        }
-//        if (type == ChessPiece.PieceType.KING) {
-//            King king = new King(board, position);
-//            return king.calculateMoves();
-//        }
-//        if (type == ChessPiece.PieceType.KNIGHT) {
+        if (type == ChessPiece.PieceType.BISHOP) {
+            Bishop bishop = new Bishop(board, position);
+            return bishop.calculateMoves();
+        }
+        if (type == ChessPiece.PieceType.ROOK) {
+            Rook rook = new Rook(board, position);
+            return rook.calculateMoves();
+        }
+        if (type == ChessPiece.PieceType.QUEEN) {
+            Queen queen = new Queen(board, position);
+            return queen.calculateMoves();
+        }
+        if (type == ChessPiece.PieceType.KING) {
+            King king = new King(board, position);
+            return king.calculateMoves();
+        }
+        if (type == ChessPiece.PieceType.KNIGHT) {
             Knight knight = new Knight(board, position);
             return knight.calculateMoves();
-//        }
+        }
+        if (type == ChessPiece.PieceType.PAWN) {
+            Pawn pawn = new Pawn(board, position);
+            return pawn.calculateMoves();
+        }
+        else {
+            throw new RuntimeException("Not implemented");
+        }
     }
 }
