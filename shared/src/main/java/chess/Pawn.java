@@ -185,7 +185,7 @@ public class Pawn {
             }
         }
 
-        System.out.println(self.getTeamColor());
+//        System.out.println(self.getTeamColor());
         return options;
     }
 }

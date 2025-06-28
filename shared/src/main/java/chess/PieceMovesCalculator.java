@@ -40,7 +40,7 @@ public class PieceMovesCalculator {
             return pawn.calculateMoves();
         }
         else {
-            throw new RuntimeException("Not implemented");
+            throw new RuntimeException("Not a piece.");
         }
     }
 }

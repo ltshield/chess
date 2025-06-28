@@ -22,7 +22,7 @@ public class Rook {
 
         Collection<ChessPosition> taken;
         taken = board.positions;
-
+        System.out.println(taken);
         Collection<ChessMove> options = new ArrayList<>();
 
         int currRow = position.getRow();

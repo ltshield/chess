@@ -59,6 +59,10 @@ public class ChessPiece {
         return pieceMovesCalc.calculateMoves();
     }
 
+    public String toString() {
+        return type + " " + pieceColor;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
