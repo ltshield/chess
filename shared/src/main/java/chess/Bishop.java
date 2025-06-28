@@ -41,7 +41,7 @@ public class Bishop{
             options.add(new ChessMove(position, new ChessPosition(i, j), null));
         }
 
-        for(int i = currRow+1, j = currCol-1; i <= 8 && j > 0; i++, j--) {
+        for(int i = currRow+1, j = currCol-1; i <= 8 && j >= 1; i++, j--) {
             if (taken.contains(new ChessPosition(i, j))) {
                 ChessPiece affil = board.getPiece(new ChessPosition(i, j));
                 if (affil.getTeamColor() == self.getTeamColor()) {
@@ -53,7 +53,7 @@ public class Bishop{
             options.add(new ChessMove(position, new ChessPosition(i, j), null));
         }
 
-        for(int i = currRow-1, j = currCol+1; i > 0 && j <= 8; i--, j++) {
+        for(int i = currRow-1, j = currCol+1; i >= 1 && j <= 8; i--, j++) {
             if (taken.contains(new ChessPosition(i, j))) {
                 ChessPiece affil = board.getPiece(new ChessPosition(i, j));
                 if (affil.getTeamColor() == self.getTeamColor()) {
@@ -65,7 +65,7 @@ public class Bishop{
             options.add(new ChessMove(position, new ChessPosition(i, j), null));
         }
 
-        for(int i = currRow-1, j = currCol-1; i > 0 && j > 0; i--, j--) {
+        for(int i = currRow-1, j = currCol-1; i >= 1 && j >= 1; i--, j--) {
             if (taken.contains(new ChessPosition(i, j))) {
                 ChessPiece affil = board.getPiece(new ChessPosition(i, j));
                 if (affil.getTeamColor() == self.getTeamColor()) {

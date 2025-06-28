@@ -16,8 +16,13 @@ public class PieceMovesCalculator {
 
     public Collection<ChessMove> calculateMoves() {
 //        if (type == ChessPiece.PieceType.BISHOP) {
-        Bishop bishop = new Bishop(board, position);
-        return bishop.calculateMoves();
+//            Bishop bishop = new Bishop(board, position);
+//            return bishop.calculateMoves();
 //        }
+//        if (type == ChessPiece.PieceType.ROOK) {
+            Rook rook = new Rook(board, position);
+            return rook.calculateMoves();
+//        }
+
     }
 }

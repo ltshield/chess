@@ -12,15 +12,14 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] grid = new ChessPiece[8][8];
+    private ChessPiece[][] grid = new ChessPiece[8+1][8+1];
     public Collection<ChessPosition> positions = new ArrayList<ChessPosition>();
     public ChessBoard() {
-        
     }
 
     public void getPieces() {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
                 ChessPosition pos = new ChessPosition(i,j);
                 if (getPiece(pos) != null) {
                     positions.add(pos);
@@ -36,7 +35,9 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
+//        ChessPosition ne = new ChessPosition(8,8);
         grid[position.getRow()][position.getColumn()] = piece;
+//        grid[ne.getRow()][ne.getColumn()] = piece;
 //        System.out.println("Placed Piece on Board. " + piece.getPieceType());
 //        System.out.println(piece)
     }
