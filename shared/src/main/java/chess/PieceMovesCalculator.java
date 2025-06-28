@@ -20,9 +20,12 @@ public class PieceMovesCalculator {
 //            return bishop.calculateMoves();
 //        }
 //        if (type == ChessPiece.PieceType.ROOK) {
-            Rook rook = new Rook(board, position);
-            return rook.calculateMoves();
+//            Rook rook = new Rook(board, position);
+//            return rook.calculateMoves();
 //        }
-
+//        if (type == ChessPiece.PieceType.QUEEN) {
+            Queen queen = new Queen(board, position);
+            return queen.calculateMoves();
+//        }
     }
 }
