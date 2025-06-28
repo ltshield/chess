@@ -1,5 +1,9 @@
 package chess;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -7,9 +11,22 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessBoard {
-
+    private ChessPiece[][] grid = new ChessPiece[8][8];
+    public ArrayList<String> pieces = new ArrayList<String>();
     public ChessBoard() {
         
+    }
+
+    public void getPieces() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPosition pos = new ChessPosition(i,j);
+                if (getPiece(pos) != null) {
+                    pieces.add(pos.toString());
+                }
+            }
+        }
+        System.out.println("Done with pieces.");
     }
 
     /**
@@ -19,7 +36,9 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        throw new RuntimeException("Not implemented");
+        grid[position.getRow()][position.getColumn()] = piece;
+//        System.out.println("Placed Piece on Board. " + piece.getPieceType());
+//        System.out.println(piece)
     }
 
     /**
@@ -30,7 +49,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        return grid[position.getRow()][position.getColumn()];
     }
 
     /**
@@ -39,5 +58,24 @@ public class ChessBoard {
      */
     public void resetBoard() {
         throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Arrays.equals(grid, that.grid) && Objects.equals(pieces, that.pieces);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(pieces);
+        result = 31 * result + Arrays.hashCode(grid);
+        return result;
     }
 }
