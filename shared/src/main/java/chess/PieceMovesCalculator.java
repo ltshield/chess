@@ -28,8 +28,12 @@ public class PieceMovesCalculator {
 //            return queen.calculateMoves();
 //        }
 //        if (type == ChessPiece.PieceType.KING) {
-            King king = new King(board, position);
-            return king.calculateMoves();
+//            King king = new King(board, position);
+//            return king.calculateMoves();
+//        }
+//        if (type == ChessPiece.PieceType.KNIGHT) {
+            Knight knight = new Knight(board, position);
+            return knight.calculateMoves();
 //        }
     }
 }
