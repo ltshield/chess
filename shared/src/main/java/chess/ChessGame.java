@@ -123,7 +123,21 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // gonna reuse the opponent moves function
+        TeamColor oppColor = null;
+        if (teamColor == TeamColor.WHITE) {
+            oppColor = TeamColor.BLACK;
+        }
+        if (teamColor == TeamColor.BLACK) {
+            oppColor = TeamColor.WHITE;
+        }
+        if (oppColor != null) {
+            Collection<ChessMove> myMoves = board.getMovesFromOpponent(oppColor);
+            if (myMoves.isEmpty() && !isInCheck(teamColor)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
