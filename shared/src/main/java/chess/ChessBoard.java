@@ -16,7 +16,8 @@ import static java.util.Arrays.deepToString;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] grid = new ChessPiece[8+1][8+1];
+    // TODO: public or private?
+    public ChessPiece[][] grid = new ChessPiece[8+1][8+1];
     public Collection<ChessPosition> positions = new ArrayList<ChessPosition>();
     public ChessBoard() {
     }
