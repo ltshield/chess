@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
+import static chess.ChessPiece.PieceType.KING;
 import static java.util.Arrays.deepToString;
 
 /**
@@ -19,7 +20,64 @@ public class ChessBoard {
     // TODO: public or private?
     public ChessPiece[][] grid = new ChessPiece[8+1][8+1];
     public Collection<ChessPosition> positions = new ArrayList<ChessPosition>();
+
     public ChessBoard() {
+    }
+
+    public Collection<ChessPosition> getColorPositions(ChessGame.TeamColor color) {
+        Collection<ChessPosition> colorPos = new ArrayList<>();
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition pos = new ChessPosition(i,j);
+//                System.out.println((getPiece(pos)));
+                if (getPiece(pos) != null && !colorPos.contains(pos)) {
+                    if (getPiece(pos).getTeamColor() == color) {
+                        colorPos.add(pos);
+                    }
+                }
+            }
+        }
+        return colorPos;
+    }
+
+    public ChessPosition findKingPosition(ChessGame.TeamColor color) {
+        for (ChessPosition pos : positions) {
+            ChessPiece piece = getPiece(pos);
+            if (piece.getPieceType() == KING && piece.getTeamColor() == color) {
+                return pos;
+            }
+        }
+        throw new RuntimeException("No king?");
+    }
+
+    public Collection<ChessMove> getMovesFromOpponent(ChessGame.TeamColor color) {
+        Collection<ChessMove> allOppMoves = new ArrayList<>();
+        if (color == WHITE) {
+            Collection<ChessPosition> oppPos = getColorPositions(BLACK);
+            for (ChessPosition pos : oppPos) {
+                ChessPiece piece = getPiece(pos);
+                // TODO: will this only pass in valid moves??
+                Collection<ChessMove> validMovesForPiece = piece.pieceMoves(this, pos);
+                for (ChessMove move : validMovesForPiece) {
+                    allOppMoves.add(move);
+                }
+            }
+            return allOppMoves;
+        }
+        if (color == BLACK) {
+            Collection<ChessPosition> oppPos = getColorPositions(WHITE);
+            for (ChessPosition pos : oppPos) {
+                ChessPiece piece = getPiece(pos);
+                // TODO: will this only pass in valid moves??
+                Collection<ChessMove> validMovesForPiece = piece.pieceMoves(this, pos);
+                for (ChessMove move : validMovesForPiece) {
+                    allOppMoves.add(move);
+                }
+            }
+            return allOppMoves;
+        } else {
+            throw new RuntimeException("Not a valid color.");
+        }
     }
 
     public void getPieces() {
@@ -131,11 +189,11 @@ public class ChessBoard {
         // kings
         positions = new ArrayList<>();
         positions.add(new ChessPosition(1,5));
-        addPieces(ChessPiece.PieceType.KING, positions, WHITE);
+        addPieces(KING, positions, WHITE);
 
         positions = new ArrayList<>();
         positions.add(new ChessPosition(8,5));
-        addPieces(ChessPiece.PieceType.KING, positions, BLACK);
+        addPieces(KING, positions, BLACK);
     }
 
     public void addPieces(ChessPiece.PieceType type, Collection<ChessPosition> positions, ChessGame.TeamColor color) {

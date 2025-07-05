@@ -15,6 +15,8 @@ public class ChessGame {
 //    private TeamColor starter_color = TeamColor.WHITE;
     private TeamColor turn;
     public ChessBoard board = new ChessBoard();
+    public Collection<ChessPosition> whitePieces = new ArrayList<>();
+    public Collection<ChessPosition> blackPieces = new ArrayList<>();
 
     public ChessGame() {
         board.resetBoard();
@@ -72,6 +74,7 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         // TODO: implement pawn logic for upgrading
         // perform the move
+        // TODO: shouldn't moves that make it here always be valid??
         ChessPosition startPos = move.getStartPosition();
         ChessPosition endPos = move.getEndPosition();
         ChessPiece piece = board.getPiece(startPos);
@@ -91,7 +94,15 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> oppMoves = board.getMovesFromOpponent(teamColor);
+        ChessPosition kingPosition = board.findKingPosition(teamColor);
+        for (ChessMove move : oppMoves) {
+            ChessPosition endPos = move.getEndPosition();
+            if (kingPosition == endPos) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -101,7 +112,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        throw new RuntimeException("Not yet implemented.");
     }
 
     /**
