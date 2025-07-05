@@ -70,7 +70,18 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        // TODO: implement pawn logic for upgrading
+        // perform the move
+        ChessPosition startPos = move.getStartPosition();
+        ChessPosition endPos = move.getEndPosition();
+        ChessPiece piece = board.getPiece(startPos);
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            ChessPiece.PieceType promPiece = move.getPromotionPiece();
+            piece = new ChessPiece(turn, promPiece);
+        }
+//        if (board.getPiece(endPos).getTeamColor() != turn)
+        board.grid[endPos.getRow()][endPos.getColumn()] = piece;
+        board.grid[startPos.getRow()][startPos.getColumn()] = null;
     }
 
     /**
