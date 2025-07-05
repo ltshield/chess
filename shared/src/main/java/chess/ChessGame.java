@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class ChessGame {
 
-//    private TeamColor starter_color = TeamColor.WHITE;
+    //    private TeamColor starter_color = TeamColor.WHITE;
     private TeamColor turn = TeamColor.WHITE;
     public ChessBoard board = new ChessBoard();
     public Collection<ChessPosition> whitePieces = new ArrayList<>();
@@ -54,12 +54,11 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-//        Collection<ChessMove> validOptions = new ArrayList<>();
 
         // if no piece at position, return null
         if (board.getPiece(startPosition) == null) {
             return null;
-        };
+        }
 
         // if valid and would not put king in check or checkmate
         // therefore, king cannot move into danger AND other pieces cannot move to where king would be in danger
@@ -85,61 +84,147 @@ public class ChessGame {
             return validOptions;
         }
 
-        // if other piece is in danger, and king would be in danger if it were to move, cannot move
+        Collection<ChessMove> toDelete = new ArrayList<>();
         ChessPiece query = board.getPiece(startPosition);
-        if (query.getTeamColor() == TeamColor.WHITE) {
-            for (ChessMove enemyMove : board.getMovesFromOpponent(TeamColor.WHITE)) {
-                if (enemyMove.getEndPosition().equals(startPosition)) {
+        if (isInCheck(query.getTeamColor())) {
+            if (query.getTeamColor() == TeamColor.BLACK) {
+                for (ChessMove myMove : validOptions) {
                     ChessBoard newBoard = new ChessBoard();
-                    for (int i=1; i<= 8; i++) {
-                        for (int j=1; j<=8; j++) {
-                            if (board.getPiece(new ChessPosition(i,j)) != null) {
-                                newBoard.grid[i][j] = new ChessPiece(board.getPiece(new ChessPosition(i,j)).getTeamColor(), board.getPiece(new ChessPosition(i,j)).getPieceType());
+                    for (int i = 1; i <= 8; i++) {
+                        for (int j = 1; j <= 8; j++) {
+                            if (board.getPiece(new ChessPosition(i, j)) != null) {
+                                newBoard.grid[i][j] = new ChessPiece(board.getPiece(new ChessPosition(i, j)).getTeamColor(), board.getPiece(new ChessPosition(i, j)).getPieceType());
                             } else {
                                 newBoard.grid[i][j] = null;
                             }
                         }
                     }
-                    newBoard.grid[startPosition.getRow()][startPosition.getColumn()] = null;
-                    Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(TeamColor.WHITE);
-                    ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.WHITE);
-//                    Collection<ChessMove> toDelete = new ArrayList<>();
+                    newBoard.grid[myMove.getStartPosition().getRow()][myMove.getStartPosition().getColumn()] = null;
+                    newBoard.grid[myMove.getEndPosition().getRow()][myMove.getEndPosition().getColumn()] = query;
+
+                    Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(query.getTeamColor());
+                    ChessPosition kingPosition = newBoard.findKingPosition(query.getTeamColor());
+                    boolean inCheck = false;
                     for (ChessMove move : oppMoves) {
                         ChessPosition endPos = move.getEndPosition();
                         if (kingPosition.equals(endPos)) {
-                            validOptions = new ArrayList<>();
-                            return validOptions;
+                            inCheck = true;
                         }
+                    }
+                    if (inCheck) {
+                        toDelete.add(myMove);
+                    }
+                }
+            } else {
+                for (ChessMove myMove : validOptions) {
+                    ChessBoard newBoard = new ChessBoard();
+                    for (int i = 1; i <= 8; i++) {
+                        for (int j = 1; j <= 8; j++) {
+                            if (board.getPiece(new ChessPosition(i, j)) != null) {
+                                newBoard.grid[i][j] = new ChessPiece(board.getPiece(new ChessPosition(i, j)).getTeamColor(), board.getPiece(new ChessPosition(i, j)).getPieceType());
+                            } else {
+                                newBoard.grid[i][j] = null;
+                            }
+                        }
+                    }
+                    newBoard.grid[myMove.getStartPosition().getRow()][myMove.getStartPosition().getColumn()] = null;
+                    newBoard.grid[myMove.getEndPosition().getRow()][myMove.getEndPosition().getColumn()] = query;
+
+                    Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(query.getTeamColor());
+                    ChessPosition kingPosition = newBoard.findKingPosition(query.getTeamColor());
+                    boolean inCheck = false;
+                    for (ChessMove move : oppMoves) {
+                        ChessPosition endPos = move.getEndPosition();
+                        if (kingPosition.equals(endPos)) {
+                            inCheck = true;
+                        }
+                    }
+                    if (inCheck) {
+                        toDelete.add(myMove);
                     }
                 }
             }
+
+            for (ChessMove finalMove : toDelete) {
+                validOptions.remove(finalMove);
+            }
+
+            return validOptions;
+
         } else {
-            for (ChessMove enemyMove : board.getMovesFromOpponent(TeamColor.BLACK)) {
-                if (enemyMove.getEndPosition().equals(startPosition)) {
-                    ChessBoard newBoard = new ChessBoard();
-                    for (int i=1; i<= 8; i++) {
-                        for (int j=1; j<=8; j++) {
-                            if (board.getPiece(new ChessPosition(i,j)) != null) {
-                                newBoard.grid[i][j] = new ChessPiece(board.getPiece(new ChessPosition(i,j)).getTeamColor(), board.getPiece(new ChessPosition(i,j)).getPieceType());
-                            } else {
-                                newBoard.grid[i][j] = null;
+            // if other piece is in danger, and king would be in danger if it were to move, cannot move
+            if (query.getTeamColor() == TeamColor.WHITE) {
+                for (ChessMove enemyMove : board.getMovesFromOpponent(TeamColor.WHITE)) {
+                    if (enemyMove.getEndPosition().equals(startPosition)) {
+                        ChessPiece piece = board.getPiece(startPosition);
+//                        Collection<ChessMove> futureMoves = piece.pieceMoves(board, startPosition);
+                        for (ChessMove testMove : validOptions) {
+                            ChessBoard newBoard = new ChessBoard();
+                            for (int i = 1; i <= 8; i++) {
+                                for (int j = 1; j <= 8; j++) {
+                                    if (board.getPiece(new ChessPosition(i, j)) != null) {
+                                        newBoard.grid[i][j] = new ChessPiece(board.getPiece(new ChessPosition(i, j)).getTeamColor(), board.getPiece(new ChessPosition(i, j)).getPieceType());
+                                    } else {
+                                        newBoard.grid[i][j] = null;
+                                    }
+                                }
+                            }
+                            newBoard.grid[testMove.getStartPosition().getRow()][testMove.getStartPosition().getColumn()] = null;
+                            newBoard.grid[testMove.getEndPosition().getRow()][testMove.getEndPosition().getColumn()] = piece;
+
+                            Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(TeamColor.WHITE);
+                            ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.WHITE);
+
+                            // TODO: we have it so if we remove the piece we can check, what about if we move it towards the
+                            // opponent? Ie. in check cause of bishop, other bishop can still move towards bishop
+                            for (ChessMove move : oppMoves) {
+                                ChessPosition endPos = move.getEndPosition();
+                                if (kingPosition.equals(endPos)) {
+                                    toDelete.add(testMove);
+                                }
                             }
                         }
                     }
-                    newBoard.grid[startPosition.getRow()][startPosition.getColumn()] = null;
-                    Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(TeamColor.BLACK);
-                    ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.BLACK);
-                    for (ChessMove move : oppMoves) {
-                        ChessPosition endPos = move.getEndPosition();
-                        if (kingPosition.equals(endPos)) {
-                            validOptions = new ArrayList<>();
-                            return validOptions;
+                }
+            } else {
+                for (ChessMove enemyMove : board.getMovesFromOpponent(TeamColor.BLACK)) {
+                    if (enemyMove.getEndPosition().equals(startPosition)) {
+                        ChessPiece piece = board.getPiece(startPosition);
+                        Collection<ChessMove> futureMoves = piece.pieceMoves(board, startPosition);
+                        for (ChessMove testMove : futureMoves) {
+                            ChessBoard newBoard = new ChessBoard();
+                            for (int i = 1; i <= 8; i++) {
+                                for (int j = 1; j <= 8; j++) {
+                                    if (board.getPiece(new ChessPosition(i, j)) != null) {
+                                        newBoard.grid[i][j] = new ChessPiece(board.getPiece(new ChessPosition(i, j)).getTeamColor(), board.getPiece(new ChessPosition(i, j)).getPieceType());
+                                    } else {
+                                        newBoard.grid[i][j] = null;
+                                    }
+                                }
+                            }
+                            newBoard.grid[testMove.getStartPosition().getRow()][testMove.getStartPosition().getColumn()] = null;
+                            newBoard.grid[testMove.getEndPosition().getRow()][testMove.getEndPosition().getColumn()] = piece;
+
+                            Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(TeamColor.BLACK);
+                            ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.BLACK);
+
+                            // TODO: we have it so if we remove the piece we can check, what about if we move it towards the
+                            // opponent? Ie. in check cause of bishop, other bishop can still move towards bishop
+                            for (ChessMove move : oppMoves) {
+                                ChessPosition endPos = move.getEndPosition();
+                                if (kingPosition.equals(endPos)) {
+                                    toDelete.add(testMove);
+                                }
+                            }
                         }
                     }
                 }
             }
+            for (ChessMove mov : toDelete) {
+                validOptions.remove(mov);
+            }
+            return validOptions;
         }
-        return validOptions;
     }
 
     /**
@@ -175,7 +260,7 @@ public class ChessGame {
         ChessPosition kingPosition = board.findKingPosition(teamColor);
         for (ChessMove move : oppMoves) {
             ChessPosition endPos = move.getEndPosition();
-            if (kingPosition == endPos) {
+            if (kingPosition.equals(endPos)) {
                 return true;
             }
         }
