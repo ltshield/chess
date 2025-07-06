@@ -321,7 +321,16 @@ public class ChessGame {
             oppColor = TeamColor.WHITE;
         }
         if (oppColor != null) {
-            Collection<ChessMove> myMoves = board.getMovesFromOpponent(oppColor);
+            Collection<ChessMove> myMoves = new ArrayList<>();
+            Collection<ChessPosition> myPositions = board.getColorPositions(teamColor);
+            for (ChessPosition myPiecePosition : myPositions) {
+                Collection<ChessMove> validMovesForPiece = validMoves(myPiecePosition);
+                ChessPiece piece = board.getPiece(myPiecePosition);
+//                Collection<ChessMove> totalMovesForPiece = piece.pieceMoves(board, myPiecePosition);
+                for (ChessMove move : validMovesForPiece) {
+                    myMoves.add(move);
+                }
+            }
             if (myMoves.isEmpty() && !isInCheck(teamColor)) {
                 return true;
             } else {
