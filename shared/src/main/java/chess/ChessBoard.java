@@ -40,8 +40,10 @@ public class ChessBoard {
         return colorPos;
     }
 
-    public ChessPosition findKingPosition(ChessGame.TeamColor color) {
-        for (ChessPosition pos : positions) {
+    public ChessPosition findKingPosition(ChessGame.TeamColor color, ChessBoard board) {
+        board.getPieces();
+        Collection<ChessPosition> posits = board.positions;
+        for (ChessPosition pos : posits) {
             ChessPiece piece = getPiece(pos);
             if (piece.getPieceType() == KING && piece.getTeamColor() == color) {
                 return pos;

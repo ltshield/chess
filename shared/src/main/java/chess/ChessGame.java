@@ -65,19 +65,49 @@ public class ChessGame {
         Collection<ChessMove> validOptions = board.getPiece(startPosition).pieceMoves(board, startPosition);
         // king cannot move into danger
         if (board.getPiece(startPosition).getPieceType() == ChessPiece.PieceType.KING) {
-            Collection<ChessMove> oppMoves = board.getMovesFromOpponent(board.getPiece(startPosition).getTeamColor());
             Collection<ChessMove> toDelete = new ArrayList<>();
-            for (ChessMove move : validOptions) {
-                ChessPosition finalPos = move.getEndPosition();
-                for (ChessMove enemyMove : oppMoves) {
-                    ChessPosition finalEnemyPos = enemyMove.getEndPosition();
-                    if (finalPos.equals(finalEnemyPos)) {
-                        if (!toDelete.contains(enemyMove)) {
-                            toDelete.add(move);
+            ChessPiece query = board.getPiece(startPosition);
+            for (ChessMove myMove : validOptions) {
+                ChessBoard newBoard = new ChessBoard();
+                for (int i = 1; i <= 8; i++) {
+                    for (int j = 1; j <= 8; j++) {
+                        if (board.getPiece(new ChessPosition(i, j)) != null) {
+                            newBoard.grid[i][j] = new ChessPiece(board.getPiece(new ChessPosition(i, j)).getTeamColor(), board.getPiece(new ChessPosition(i, j)).getPieceType());
+                        } else {
+                            newBoard.grid[i][j] = null;
                         }
                     }
                 }
+                newBoard.grid[myMove.getStartPosition().getRow()][myMove.getStartPosition().getColumn()] = null;
+                newBoard.grid[myMove.getEndPosition().getRow()][myMove.getEndPosition().getColumn()] = query;
+                Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(query.getTeamColor());
+                boolean inCheck = false;
+                for (ChessMove move : oppMoves) {
+                    ChessPosition endPos = move.getEndPosition();
+                    if (myMove.getEndPosition().equals(endPos)) {
+                        inCheck = true;
+                    }
+                }
+                if (inCheck) {
+                    toDelete.add(myMove);
+                }
             }
+
+//            Collection<ChessMove> oppMoves = board.getMovesFromOpponent(board.getPiece(startPosition).getTeamColor());
+//            Collection<ChessMove> toDelete = new ArrayList<>();
+//            // TODO: make sure to check the FUTURE moves of the king so that pawn behavior can be accounted before
+//            // same thing as below
+//            for (ChessMove move : validOptions) {
+//                ChessPosition finalPos = move.getEndPosition();
+//                for (ChessMove enemyMove : oppMoves) {
+//                    ChessPosition finalEnemyPos = enemyMove.getEndPosition();
+//                    if (finalPos.equals(finalEnemyPos)) {
+//                        if (!toDelete.contains(enemyMove)) {
+//                            toDelete.add(move);
+//                        }
+//                    }
+//                }
+//            }
             for (ChessMove move : toDelete) {
                 validOptions.remove(move);
             }
@@ -103,7 +133,7 @@ public class ChessGame {
                     newBoard.grid[myMove.getEndPosition().getRow()][myMove.getEndPosition().getColumn()] = query;
 
                     Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(query.getTeamColor());
-                    ChessPosition kingPosition = newBoard.findKingPosition(query.getTeamColor());
+                    ChessPosition kingPosition = newBoard.findKingPosition(query.getTeamColor(), newBoard);
                     boolean inCheck = false;
                     for (ChessMove move : oppMoves) {
                         ChessPosition endPos = move.getEndPosition();
@@ -131,7 +161,7 @@ public class ChessGame {
                     newBoard.grid[myMove.getEndPosition().getRow()][myMove.getEndPosition().getColumn()] = query;
 
                     Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(query.getTeamColor());
-                    ChessPosition kingPosition = newBoard.findKingPosition(query.getTeamColor());
+                    ChessPosition kingPosition = newBoard.findKingPosition(query.getTeamColor(), newBoard);
                     boolean inCheck = false;
                     for (ChessMove move : oppMoves) {
                         ChessPosition endPos = move.getEndPosition();
@@ -173,7 +203,7 @@ public class ChessGame {
                             newBoard.grid[testMove.getEndPosition().getRow()][testMove.getEndPosition().getColumn()] = piece;
 
                             Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(TeamColor.WHITE);
-                            ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.WHITE);
+                            ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.WHITE, newBoard);
 
                             // TODO: we have it so if we remove the piece we can check, what about if we move it towards the
                             // opponent? Ie. in check cause of bishop, other bishop can still move towards bishop
@@ -206,7 +236,7 @@ public class ChessGame {
                             newBoard.grid[testMove.getEndPosition().getRow()][testMove.getEndPosition().getColumn()] = piece;
 
                             Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(TeamColor.BLACK);
-                            ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.BLACK);
+                            ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.BLACK, newBoard);
 
                             // TODO: we have it so if we remove the piece we can check, what about if we move it towards the
                             // opponent? Ie. in check cause of bishop, other bishop can still move towards bishop
@@ -270,7 +300,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         Collection<ChessMove> oppMoves = board.getMovesFromOpponent(teamColor);
-        ChessPosition kingPosition = board.findKingPosition(teamColor);
+        ChessPosition kingPosition = board.findKingPosition(teamColor, board);
         for (ChessMove move : oppMoves) {
             ChessPosition endPos = move.getEndPosition();
             if (kingPosition.equals(endPos)) {
@@ -288,18 +318,29 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         // if in check and cannot move king
-        if (isInCheck(teamColor)) {
-            ChessPosition kingPos = board.findKingPosition(teamColor);
-            // cannot move king
-            Collection<ChessMove> kingMoves = board.getPiece(kingPos).pieceMoves(board, kingPos);
-            if (kingMoves.isEmpty()) {
-                return true;
+//        if (isInCheck(teamColor)) {
+//            ChessPosition kingPos = board.findKingPosition(teamColor);
+//            // cannot move king
+//            Collection<ChessMove> kingMoves = board.getPiece(kingPos).pieceMoves(board, kingPos);
+//            if (kingMoves.isEmpty()) {
+//                return true;
+//            }
+//            // can move king to escape check
+//
+//            // can move other pieces in between king and opp
+//
+//            // can move other piece to capture opp piece
+//        }
+        Collection<ChessMove> myMoves = new ArrayList<>();
+        Collection<ChessPosition> myPositions = board.getColorPositions(teamColor);
+        for (ChessPosition myPiecePosition : myPositions) {
+            Collection<ChessMove> validMovesForPiece = validMoves(myPiecePosition);
+            for (ChessMove move : validMovesForPiece) {
+                myMoves.add(move);
             }
-            // can move king to escape check
-
-            // can move other pieces in between king and opp
-
-            // can move other piece to capture opp piece
+        }
+        if (myMoves.isEmpty() && isInCheck(teamColor)) {
+            return true;
         }
         return false;
     }
