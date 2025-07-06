@@ -234,19 +234,32 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        // TODO: implement pawn logic for upgrading
         // perform the move
         // TODO: shouldn't moves that make it here always be valid??
         ChessPosition startPos = move.getStartPosition();
+        if (board.getPiece(startPos) == null) {
+            throw new InvalidMoveException();
+        }
         ChessPosition endPos = move.getEndPosition();
         ChessPiece piece = board.getPiece(startPos);
-        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-            ChessPiece.PieceType promPiece = move.getPromotionPiece();
-            piece = new ChessPiece(turn, promPiece);
+        if (piece.getTeamColor() != turn) {
+            throw new InvalidMoveException();
         }
-//        if (board.getPiece(endPos).getTeamColor() != turn)
-        board.grid[endPos.getRow()][endPos.getColumn()] = piece;
-        board.grid[startPos.getRow()][startPos.getColumn()] = null;
+        if (validMoves(move.getStartPosition()).contains(move)) {
+            TeamColor nextColor = TeamColor.BLACK;
+            if (piece.getTeamColor() == TeamColor.BLACK) {
+                nextColor = TeamColor.WHITE;
+            }
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
+                ChessPiece.PieceType promPiece = move.getPromotionPiece();
+                piece = new ChessPiece(turn, promPiece);
+            }
+            board.grid[endPos.getRow()][endPos.getColumn()] = piece;
+            board.grid[startPos.getRow()][startPos.getColumn()] = null;
+            turn = nextColor;
+        } else {
+            throw new InvalidMoveException();
+        }
     }
 
     /**

@@ -3,7 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Objects;
+
 
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
@@ -19,7 +19,7 @@ import static java.util.Arrays.deepToString;
 public class ChessBoard {
     // TODO: public or private?
     public ChessPiece[][] grid = new ChessPiece[8+1][8+1];
-    public Collection<ChessPosition> positions = new ArrayList<ChessPosition>();
+    public Collection<ChessPosition> positions = new ArrayList<>();
 
     public ChessBoard() {
     }
