@@ -7,6 +7,6 @@ public class Main {
 //        System.out.println("♕ 240 Chess Server: " + piece);
         Server server = new Server();
         server.run(8080);
-        System.out.println(server.db.authDataDAO.currentUsers);
+//        System.out.println(server.db.authDataDAO.currentUsers);
     }
 }
