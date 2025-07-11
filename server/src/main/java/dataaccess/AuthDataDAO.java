@@ -4,17 +4,43 @@ import model.AuthData;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
-public class AuthDataDAO extends DataAccessObject {
+public class AuthDataDAO{
 
-    private Collection<AuthData> currentUsers = new ArrayList<>();
+    public Collection<AuthData> currentUsers = new ArrayList<>();
+
+    public static String generateToken() {
+        return UUID.randomUUID().toString();
+    }
 
     //CRUD
-    void createAuth(AuthData authData) throws DataAccessException{}
+    public String createAuth(String username) throws DataAccessException{
+        AuthData newAuth = new AuthData(generateToken(), username);
+        currentUsers.add(newAuth);
+        if (!currentUsers.contains(newAuth)) {
+            throw new DataAccessException("Something went wrong making new auth.");
+        }
+        return newAuth.authToken();
+    }
 
-    void getAuth() throws DataAccessException{}
+    public AuthData getAuth(String authToken) throws DataAccessException{
+        for (AuthData data : currentUsers) {
+            if (data.authToken().equals(authToken)) {
+                return data;
+            }
+        }
+        throw new DataAccessException("Not a valid AuthToken");
+    }
 
-    void deleteAuth() throws DataAccessException{}
+    public void deleteAuth(AuthData data) throws DataAccessException{
+        for (AuthData query : currentUsers) {
+            if (query.authToken().equals(data.authToken())) {
+                currentUsers.remove(data);
+            }
+        }
+        throw new DataAccessException("Something went wrong.");
+    }
 
-    void clear(){currentUsers = new ArrayList<>();}
+    public void clear(){currentUsers = new ArrayList<>();}
 }
