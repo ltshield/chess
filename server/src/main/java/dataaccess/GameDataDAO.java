@@ -36,7 +36,17 @@ public class GameDataDAO{
                     throw new DataAccessException("Game name taken");
                 }
             }
-            GameData newGame = new GameData(Integer.parseInt(generateToken()), null, null, gameName, new ChessGame());
+            int i = 0;
+            for (int j = 0; j < 100; j++) {
+                for (GameData game : currentGameData) {
+                    if (game.gameID() == i) {
+                        i++;
+                        break;
+                    }
+                }
+                break;
+            }
+            GameData newGame = new GameData(i, null, null, gameName, new ChessGame());
             currentGameData.add(newGame);
             return newGame.gameID();
         } catch (DataAccessException e) {
@@ -94,7 +104,8 @@ public class GameDataDAO{
                     inCollection = true;
                     GameData newGame = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
                     if (playerColor.equals("White")) {
-                        if (game.whiteUsername() == null && !game.blackUsername().equals(user.username())) {
+                        if (game.whiteUsername() == null) {
+                            // && game.blackUsername() != null && !game.blackUsername().equals(user.username())) {
                             currentGameData.remove(game);
                             currentGameData.add(new GameData(newGame.gameID(), user.username(), newGame.blackUsername(), newGame.gameName(), newGame.game()));
                             break;
@@ -102,7 +113,8 @@ public class GameDataDAO{
                     }
                     // TODO: you cannot be both users in a game
                     if (playerColor.equals("Black")) {
-                        if (game.blackUsername() == null && !game.whiteUsername().equals(user.username())) {
+                        if (game.blackUsername() == null) {
+                            // && !game.whiteUsername().equals(user.username()))
                             currentGameData.remove(game);
                             currentGameData.add(new GameData(newGame.gameID(), newGame.whiteUsername(), user.username(), newGame.gameName(), newGame.game()));
                             break;

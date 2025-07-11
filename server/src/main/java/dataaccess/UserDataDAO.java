@@ -12,6 +12,15 @@ public class UserDataDAO{
 
     //CRUD
     public void insertUser(UserData u) throws DataAccessException{
+        if (u.username() == null) {
+            throw new DataAccessException("You need a username.");
+        }
+        if (u.password() == null) {
+            throw new DataAccessException("You need a password.");
+        }
+        if (u.email() == null) {
+            throw new DataAccessException("You need an email");
+        }
         users.add(u);
         if (!users.contains(u)) {
             throw new DataAccessException("Something went wrong adding the user");

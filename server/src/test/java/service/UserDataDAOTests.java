@@ -44,4 +44,30 @@ public class UserDataDAOTests {
         System.out.println(userDataDAO.users);
         assertTrue(userDataDAO.users.isEmpty());
     }
+
+    @Test
+    void addUserWithoutUsername() {
+        UserDataDAO userDataDAO = new UserDataDAO();
+        UserData user = new UserData(null, "password", "email");
+
+        assertThrows(DataAccessException.class, () -> userDataDAO.insertUser(user));
+    }
+
+    @Test
+    void addUserWithoutPassword() {
+        UserDataDAO userDataDAO = new UserDataDAO();
+        UserData user = new UserData("username", null, "email");
+
+        assertThrows(DataAccessException.class, () -> userDataDAO.insertUser(user));
+    }
+
+    @Test
+    void addUserWithoutEmail() {
+        UserDataDAO userDataDAO = new UserDataDAO();
+        UserData user = new UserData("username", "password", null);
+
+        assertThrows(DataAccessException.class, () -> userDataDAO.insertUser(user));
+    }
+
+
 }
