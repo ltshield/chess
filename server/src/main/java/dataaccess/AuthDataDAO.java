@@ -40,18 +40,16 @@ public class AuthDataDAO{
     }
 
     public void deleteAuth(AuthData data) throws DataAccessException{
-        boolean deleted = false;
         for (AuthData query : currentUsers) {
             if (query.authToken().equals(data.authToken())) {
                 currentUsers.remove(data);
-                deleted=true;
                 break;
             }
         }
-        if (deleted) {
-            ;
-        } else {
-            throw new DataAccessException("Error: something went wrong");
+        for (AuthData query : currentUsers) {
+            if (query.authToken().equals(data.authToken())) {
+                throw new DataAccessException("Still here?");
+            }
         }
     }
 

@@ -28,7 +28,7 @@ public class LogoutHandler implements Route {
             res.type("application/json");
             return new Gson().toJson(new HashMap<String, Object>());
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("Error: unauthorized")) {
+            if (e.getMessage().equals("Error: not authorized")) {
                 var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
                 res.type("application/json");
                 res.status(401);

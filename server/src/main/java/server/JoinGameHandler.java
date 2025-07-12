@@ -2,12 +2,9 @@ package server;
 
 import dataaccess.DataAccessException;
 import model.GameData;
-import service.CreateGameRequest;
-import service.CreateGameResponse;
-import service.LoginRequest;
+import service.*;
 import spark.Request;
 import spark.Response;
-import service.UserService;
 import com.google.gson.Gson;
 import spark.Route;
 
@@ -26,11 +23,14 @@ public class JoinGameHandler implements Route {
         UserService userService = new UserService(server);
 
         try {
-            userService.joinGame(req);
+            String authToken = req.headers("Authorization");
+            var request = new Gson().fromJson(req.body(), JoinGameRequest.class);
+            userService.joinGame(authToken, request);
             res.type("application/json");
             return new Gson().toJson(new HashMap<String, Object>());
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("Error: unauthorized")) {
+            System.out.println(e);
+            if (e.getMessage().equals("Error: not authorized")) {
                 var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
                 res.type("application/json");
                 res.status(401);

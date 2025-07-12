@@ -1,8 +1,11 @@
 package server;
 
+import com.google.gson.GsonBuilder;
 import dataaccess.DataAccessException;
 import model.GameData;
 import service.ClearRequest;
+import service.ListGameResponse;
+import service.ListGamesResponse;
 import spark.Request;
 import spark.Response;
 import service.UserService;
@@ -25,11 +28,14 @@ public class ListGamesHandler implements Route {
 
         try {
             String authToken = req.headers("Authorization");
-            Collection<GameData> games = userService.listGames(authToken);
+            Object games = userService.listGames(authToken);
+            // need to use this method in order to serialize any null values (like blackUsername or whiteUsername)
+            Gson gson = new GsonBuilder().serializeNulls().create();
             res.type("application/json");
-            return new Gson().toJson(games);
+            System.out.println(gson.toJson(games));
+            return gson.toJson(games);
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("Error: unauthorized")) {
+            if (e.getMessage().equals("Error: not authorized")) {
                 var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
                 res.type("application/json");
                 res.status(401);

@@ -97,7 +97,31 @@ public class GameDataDAO{
 
     public void addUserToGame(String authToken, int gameID, String playerColor) throws DataAccessException{
         try {
+            Collection<String> availableColors = new ArrayList<>();
+            availableColors.add("WHITE");
+            availableColors.add("BLACK");
             AuthData user = server.db.authDataDAO.getAuth(authToken);
+            // cannot join more than one game at a time?
+//            for (GameData game : currentGameData) {
+//                if (game.blackUsername() != null && game.whiteUsername() != null) {
+//                    if (game.blackUsername().equals(user.username()) || game.whiteUsername().equals(user.username())) {
+//                        throw new DataAccessException("Error: bad request");
+//                    }
+//                }
+//                if (game.blackUsername() == null && game.whiteUsername() != null) {
+//                    if(game.whiteUsername().equals(user.username())) {
+//                        throw new DataAccessException("Error: bad request");
+//                    }
+//                }
+//                if (game.whiteUsername() == null && game.blackUsername() != null) {
+//                    if (game.blackUsername().equals(user.username())) {
+//                        throw new DataAccessException("Error: bad request");
+//                    }
+//                }
+//            }
+            if (playerColor == null || !availableColors.contains(playerColor)) {
+                throw new DataAccessException("Error: bad request");
+            }
             boolean inCollection = false;
             for (GameData game : currentGameData) {
                 if (game.gameID() == gameID) {
@@ -105,10 +129,17 @@ public class GameDataDAO{
                     GameData newGame = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
                     if (playerColor.equals("WHITE")) {
                         if (game.whiteUsername() == null) {
-                            // && game.blackUsername() != null && !game.blackUsername().equals(user.username())) {
-                            currentGameData.remove(game);
-                            currentGameData.add(new GameData(newGame.gameID(), user.username(), newGame.blackUsername(), newGame.gameName(), newGame.game()));
-                            break;
+                            if (game.blackUsername() == null) {
+                                currentGameData.remove(game);
+                                currentGameData.add(new GameData(newGame.gameID(), user.username(), newGame.blackUsername(), newGame.gameName(), newGame.game()));
+                                break;
+                            } else {
+                                if (!game.blackUsername().equals(user.username())) {
+                                    currentGameData.remove(game);
+                                    currentGameData.add(new GameData(newGame.gameID(), user.username(), newGame.blackUsername(), newGame.gameName(), newGame.game()));
+                                    break;
+                                }
+                            }
                         } else {
                             throw new DataAccessException("Error: already taken");
                         }
@@ -116,23 +147,29 @@ public class GameDataDAO{
                     // TODO: you cannot be both users in a game
                     if (playerColor.equals("BLACK")) {
                         if (game.blackUsername() == null) {
-                            // && !game.whiteUsername().equals(user.username()))
-                            currentGameData.remove(game);
-                            currentGameData.add(new GameData(newGame.gameID(), newGame.whiteUsername(), user.username(), newGame.gameName(), newGame.game()));
-                            break;
-                        } else {
-                            throw new DataAccessException("Error: already taken");
+                            if (game.whiteUsername() == null) {
+                                currentGameData.remove(game);
+                                currentGameData.add(new GameData(newGame.gameID(), newGame.whiteUsername(), user.username(), newGame.gameName(), newGame.game()));
+                                break;
+                            } else {
+                                if (!game.whiteUsername().equals(user.username())) {
+                                    // && !game.whiteUsername().equals(user.username()))
+                                    currentGameData.remove(game);
+                                    currentGameData.add(new GameData(newGame.gameID(), newGame.whiteUsername(), user.username(), newGame.gameName(), newGame.game()));
+                                    break;
+                                }
+                            }
                         }
-                    }
-                    else {
-                        throw new DataAccessException("Error: something went wrong");
+                    } else {
+                        throw new DataAccessException("Error: already taken");
                     }
                 }
             }
             if (!inCollection) {
-                throw new DataAccessException("Error: something went wrong");
+                throw new DataAccessException("Error: bad request");
             }
-        } catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             throw e;
         }
     }

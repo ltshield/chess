@@ -25,11 +25,13 @@ public class CreateGameHandler implements Route {
         UserService userService = new UserService(server);
 
         try {
-            CreateGameResponse result = userService.createGame(req);
+            String authToken = req.headers("Authorization");
+            var request = new Gson().fromJson(req.body(), CreateGameRequest.class);
+            CreateGameResponse result = userService.createGame(authToken, request);
             res.type("application/json");
             return new Gson().toJson(result);
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("Error: unauthorized")) {
+            if (e.getMessage().equals("Error: not authorized")) {
                 var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
                 res.type("application/json");
                 res.status(401);

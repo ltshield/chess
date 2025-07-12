@@ -46,7 +46,7 @@ public class UserDataDAO{
             throw new DataAccessException("Error: bad request");
         }
         if (!query.password().equals(password)) {
-            throw new DataAccessException("Error: unauthorized");
+            throw new DataAccessException("Error: bad request");
         }
     }
 

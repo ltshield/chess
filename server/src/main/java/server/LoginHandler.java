@@ -25,9 +25,10 @@ public class LoginHandler implements Route {
         try {
             LoginResult result = userService.login(request);
             res.type("application/json");
+//            res.status(200);
             return new Gson().toJson(result);
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("Error: unauthorized")) {
+            if (e.getMessage().equals("Error: not authorized")) {
                 var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
                 res.type("application/json");
                 res.status(401);

@@ -1,6 +1,7 @@
 package service;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
@@ -9,7 +10,7 @@ import server.Server;
 import spark.Request;
 
 import javax.xml.crypto.Data;
-import java.util.Collection;
+import java.util.*;
 
 public class UserService {
     public final Server server;
@@ -30,6 +31,7 @@ public class UserService {
         } catch (DataAccessException e) {
             throw e;
         }
+        // are they supposed to be logged in immediately after registering?
         try {
             String authToken = server.db.authDataDAO.createAuth(user.username());
             return new RegisterResult(user.username(), authToken);
@@ -67,18 +69,39 @@ public class UserService {
 //        }
     }
 
-    public Collection<GameData> listGames(String authToken) throws DataAccessException {
+//    public void validRequest(Request req, Class requestFormat, boolean needsAuth) throws DataAccessException{
+//        if (needsAuth) {
+//            if (req.headers("Authorization") == null) {
+//                throw new DataAccessException("Error: unauthorized");
+//            }
+//        }
+//        for ()
+//        if (!) {
+//            throw new DataAccessException("Error: bad request");
+//        }
+//    }
+
+    public ListGamesResponse listGames(String authToken) throws DataAccessException {
         try {
-            return server.db.gameDataDAO.listGames(authToken);
+            Collection<GameData> games = server.db.gameDataDAO.listGames(authToken);
+            Collection<ListGameResponse> gamesList = new ArrayList<>();
+            for (GameData game : games) {
+                gamesList.add(new ListGameResponse(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()));
+            }
+            ListGamesResponse gameList = new ListGamesResponse(gamesList);
+//            Map<String, Object> namedList = new HashMap<>();
+//            namedList.put("games:", gameList);
+            for (ListGameResponse resp : gamesList) {
+                System.out.println(resp);
+            }
+            return gameList;
         } catch (DataAccessException e){
             throw e;
         }
     }
 
-    public CreateGameResponse createGame(Request gameRequest) throws DataAccessException {
+    public CreateGameResponse createGame(String authToken, CreateGameRequest request) throws DataAccessException {
         try {
-            String authToken = gameRequest.headers("Authorization");
-            var request = new Gson().fromJson(gameRequest.body(), CreateGameRequest.class);
             int result = server.db.gameDataDAO.createGame(request.gameName(), authToken);
             return new CreateGameResponse(result);
         } catch (DataAccessException e) {
@@ -86,12 +109,11 @@ public class UserService {
         }
     }
 
-    public void joinGame(Request gameRequest) throws DataAccessException {
+    public void joinGame(String authToken, JoinGameRequest gameRequest) throws DataAccessException {
         try {
-            String authToken = gameRequest.headers("Authorization");
-            var request = new Gson().fromJson(gameRequest.body(), JoinGameRequest.class);
-            server.db.gameDataDAO.addUserToGame(authToken, request.gameID(), request.playerColor());
+            server.db.gameDataDAO.addUserToGame(authToken, gameRequest.gameID(), gameRequest.playerColor());
         } catch (DataAccessException e) {
+            System.out.println("HERE I AM");
             throw e;
         }
     }
