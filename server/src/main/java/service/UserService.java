@@ -16,20 +16,17 @@ public class UserService {
         try {
             server.db.userDataDAO.getUser(user.username());
         } catch (DataAccessException e) {
-            // return 403 {"message": "Error: already taken"}
             throw e;
         }
         try {
             server.db.userDataDAO.insertUser(user);
         } catch (DataAccessException e) {
-            // return 400 {"message": "Error: bad request"}
             throw e;
         }
         try {
             String authToken = server.db.authDataDAO.createAuth(user.username());
             return new RegisterResult(user.username(), authToken);
         } catch (DataAccessException e) {
-            // return 400 {"message": "Error: bad request"}
             throw e;
         }
     }
