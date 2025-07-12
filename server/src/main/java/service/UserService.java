@@ -1,10 +1,12 @@
 package service;
 
+import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 import server.Server;
+import spark.Request;
 
 import javax.xml.crypto.Data;
 import java.util.Collection;
@@ -69,6 +71,17 @@ public class UserService {
         try {
             return server.db.gameDataDAO.listGames(authToken);
         } catch (DataAccessException e){
+            throw e;
+        }
+    }
+
+    public CreateGameResponse createGame(Request gameRequest) throws DataAccessException {
+        try {
+            String authToken = gameRequest.headers("Authorization");
+            var request = new Gson().fromJson(gameRequest.body(), CreateGameRequest.class);
+            int result = server.db.gameDataDAO.createGame(request.gameName(), authToken);
+            return new CreateGameResponse(result);
+        } catch (DataAccessException e) {
             throw e;
         }
     }
