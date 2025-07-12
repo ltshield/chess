@@ -85,4 +85,14 @@ public class UserService {
             throw e;
         }
     }
+
+    public void joinGame(Request gameRequest) throws DataAccessException {
+        try {
+            String authToken = gameRequest.headers("Authorization");
+            var request = new Gson().fromJson(gameRequest.body(), JoinGameRequest.class);
+            server.db.gameDataDAO.addUserToGame(authToken, request.gameID(), request.playerColor());
+        } catch (DataAccessException e) {
+            throw e;
+        }
+    }
 }

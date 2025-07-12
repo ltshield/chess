@@ -21,7 +21,7 @@ public class Server {
         Spark.get("/game", new ListGamesHandler(this));
 
         Spark.post("/game", new CreateGameHandler(this));
-//        Spark.put("/game", new JoinGameHandler(this));
+        Spark.put("/game", new JoinGameHandler(this));
 
         Spark.awaitInitialization();
         return Spark.port();

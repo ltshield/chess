@@ -103,30 +103,34 @@ public class GameDataDAO{
                 if (game.gameID() == gameID) {
                     inCollection = true;
                     GameData newGame = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
-                    if (playerColor.equals("White")) {
+                    if (playerColor.equals("WHITE")) {
                         if (game.whiteUsername() == null) {
                             // && game.blackUsername() != null && !game.blackUsername().equals(user.username())) {
                             currentGameData.remove(game);
                             currentGameData.add(new GameData(newGame.gameID(), user.username(), newGame.blackUsername(), newGame.gameName(), newGame.game()));
                             break;
+                        } else {
+                            throw new DataAccessException("Error: already taken");
                         }
                     }
                     // TODO: you cannot be both users in a game
-                    if (playerColor.equals("Black")) {
+                    if (playerColor.equals("BLACK")) {
                         if (game.blackUsername() == null) {
                             // && !game.whiteUsername().equals(user.username()))
                             currentGameData.remove(game);
                             currentGameData.add(new GameData(newGame.gameID(), newGame.whiteUsername(), user.username(), newGame.gameName(), newGame.game()));
                             break;
+                        } else {
+                            throw new DataAccessException("Error: already taken");
                         }
                     }
                     else {
-                        throw new DataAccessException("Something went wrong.");
+                        throw new DataAccessException("Error: something went wrong");
                     }
                 }
             }
             if (!inCollection) {
-                throw new DataAccessException("Not valid?");
+                throw new DataAccessException("Error: something went wrong");
             }
         } catch (DataAccessException e) {
             throw e;
