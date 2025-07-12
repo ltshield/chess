@@ -35,6 +35,21 @@ public class UserDataDAO{
         }
     }
 
+    public void checkUsernameAndPassword(String username, String password) throws DataAccessException{
+        UserData query = null;
+        for (UserData user : users) {
+            if (user.username().equals(username)) {
+                query = user;
+                }
+            }
+        if (query == null) {
+            throw new DataAccessException("Error: bad request");
+        }
+        if (!query.password().equals(password)) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+    }
+
     // idk if I actually need this one...
     public void deleteUser() throws DataAccessException{}
     public void clear(){users = new ArrayList<>();}

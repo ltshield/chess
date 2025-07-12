@@ -16,6 +16,12 @@ public class AuthDataDAO{
 
     //CRUD
     public String createAuth(String username) throws DataAccessException{
+        // TODO: if already logged in cannot log in again?
+        for (AuthData user : currentUsers) {
+            if (user.username().equals(username)) {
+                throw new DataAccessException("Error: bad request");
+            }
+        }
         AuthData newAuth = new AuthData(generateToken(), username);
         currentUsers.add(newAuth);
         if (!currentUsers.contains(newAuth)) {

@@ -1,44 +1,37 @@
 package server;
 
 import dataaccess.DataAccessException;
+import service.LogoutRequest;
 import spark.Request;
 import spark.Response;
-import service.RegisterRequest;
-import service.RegisterResult;
 import service.UserService;
 import com.google.gson.Gson;
 import spark.Route;
 
 import java.util.Map;
 
-public class RegisterHandler implements Route {
+public class LogoutHandler implements Route {
     public Server server;
-    public RegisterHandler(Server server) {
+    public LogoutHandler(Server server) {
         this.server = server;
     }
 
     public Object handle(Request req, Response res) {
-//        System.out.println(req);
-        var request = new Gson().fromJson(req.body(), RegisterRequest.class);
-//        System.out.println(request);
+        var request = new Gson().fromJson(req.body(), LogoutRequest.class);
         UserService userService = new UserService(server);
 
         try {
-            RegisterResult result = userService.register(request);
+            userService.logout(request);
+            var body = new Gson();
             res.type("application/json");
-            return new Gson().toJson(result);
+            res.status(200);
+            res.body();
+            return body;
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("Error: already taken")) {
+            if (e.getMessage().equals("Error: unauthorized")) {
                 var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
                 res.type("application/json");
-                res.status(403);
-                res.body(body);
-                return body;
-            }
-            if (e.getMessage().equals("Error: bad request")) {
-                var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
-                res.type("application/json");
-                res.status(400);
+                res.status(401);
                 res.body(body);
                 return body;
             }

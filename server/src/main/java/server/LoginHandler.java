@@ -3,35 +3,34 @@ package server;
 import dataaccess.DataAccessException;
 import spark.Request;
 import spark.Response;
-import service.RegisterRequest;
-import service.RegisterResult;
+import service.LoginRequest;
+import service.LoginResult;
 import service.UserService;
 import com.google.gson.Gson;
 import spark.Route;
 
 import java.util.Map;
 
-public class RegisterHandler implements Route {
+public class LoginHandler implements Route {
     public Server server;
-    public RegisterHandler(Server server) {
+    public LoginHandler(Server server) {
         this.server = server;
     }
 
     public Object handle(Request req, Response res) {
-//        System.out.println(req);
-        var request = new Gson().fromJson(req.body(), RegisterRequest.class);
-//        System.out.println(request);
+
+        var request = new Gson().fromJson(req.body(), LoginRequest.class);
         UserService userService = new UserService(server);
 
         try {
-            RegisterResult result = userService.register(request);
+            LoginResult result = userService.login(request);
             res.type("application/json");
             return new Gson().toJson(result);
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("Error: already taken")) {
+            if (e.getMessage().equals("Error: unauthorized")) {
                 var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
                 res.type("application/json");
-                res.status(403);
+                res.status(401);
                 res.body(body);
                 return body;
             }

@@ -15,6 +15,8 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         //This line initializes the server and can be removed once you have a functioning endpoint
         Spark.post("/user", new RegisterHandler(this));
+        Spark.post("/session", new LoginHandler(this));
+        Spark.delete("/session", new LogoutHandler(this));
         Spark.awaitInitialization();
         return Spark.port();
     }
@@ -22,14 +24,6 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
-    }
-
-    public static <T> T getBody(Request request, Class<T> clazz) {
-        var body = new Gson().fromJson(request.body(), clazz);
-        if (body == null) {
-            throw new RuntimeException("missing required body");
-        }
-        return body;
     }
 
 }
