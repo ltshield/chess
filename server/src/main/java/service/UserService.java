@@ -2,10 +2,12 @@ package service;
 
 import dataaccess.DataAccessException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import server.Server;
 
 import javax.xml.crypto.Data;
+import java.util.Collection;
 
 public class UserService {
     public final Server server;
@@ -44,12 +46,29 @@ public class UserService {
         }
     }
 
-    public void logout(LogoutRequest logoutRequest) throws DataAccessException{
+    public void logout(String authToken) throws DataAccessException{
         try {
-            String authToken = logoutRequest.authToken();
+//            String authToken = logoutRequest.authToken();
             AuthData authData = server.db.authDataDAO.getAuth(authToken);
             server.db.authDataDAO.deleteAuth(authData);
         } catch (DataAccessException e) {
+            throw e;
+        }
+    }
+
+    public void clear() {
+//        try {
+//            server.db.authDataDAO.getAuth(clearRequest.authToken());
+            server.db.clear();
+//        } catch (DataAccessException e) {
+//            throw e;
+//        }
+    }
+
+    public Collection<GameData> listGames(String authToken) throws DataAccessException {
+        try {
+            return server.db.gameDataDAO.listGames(authToken);
+        } catch (DataAccessException e){
             throw e;
         }
     }

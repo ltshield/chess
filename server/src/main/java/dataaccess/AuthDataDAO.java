@@ -36,16 +36,23 @@ public class AuthDataDAO{
                 return data;
             }
         }
-        throw new DataAccessException("Not a valid AuthToken");
+        throw new DataAccessException("Error: not authorized");
     }
 
     public void deleteAuth(AuthData data) throws DataAccessException{
+        boolean deleted = false;
         for (AuthData query : currentUsers) {
             if (query.authToken().equals(data.authToken())) {
                 currentUsers.remove(data);
+                deleted=true;
+                break;
             }
         }
-        throw new DataAccessException("Something went wrong.");
+        if (deleted) {
+            ;
+        } else {
+            throw new DataAccessException("Error: something went wrong");
+        }
     }
 
     public void clear(){currentUsers = new ArrayList<>();}
