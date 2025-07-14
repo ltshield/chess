@@ -36,17 +36,25 @@ public class UserDataDAO{
     }
 
     public void checkUsernameAndPassword(String username, String password) throws DataAccessException{
-        UserData query = null;
-        for (UserData user : users) {
-            if (user.username().equals(username)) {
-                query = user;
-                }
-            }
-        if (query == null) {
+        if (username == null || password == null) {
             throw new DataAccessException("Error: bad request");
         }
-        if (!query.password().equals(password)) {
-            throw new DataAccessException("Error: bad request");
+        boolean validUsername = false;
+        System.out.println(users);
+        for (UserData user : users) {
+            if (user.username().equals(username)) {
+//                UserData query = user;
+                validUsername = true;
+                if (!user.password().equals(password)) {
+                    System.out.println("here");
+                    throw new DataAccessException("Error: unauthorized");
+                }
+                break;
+            }
+        }
+//        System.out.println(query);
+        if (!validUsername) {
+            throw new DataAccessException("Error: unauthorized");
         }
     }
 
