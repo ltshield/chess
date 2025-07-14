@@ -56,7 +56,6 @@ public class ChessBoard {
             Collection<ChessPosition> oppPos = getColorPositions(BLACK);
             for (ChessPosition pos : oppPos) {
                 ChessPiece piece = getPiece(pos);
-                // TODO: will this only pass in valid moves??
                 Collection<ChessMove> validMovesForPiece = piece.pieceMoves(this, pos);
                 for (ChessMove move : validMovesForPiece) {
                     allOppMoves.add(move);

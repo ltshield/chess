@@ -16,8 +16,6 @@ public class ChessPosition {
     public ChessPosition(int row, int col) {
         this.row = row;
         this.col = col;
-//        this.rowPrint = row;
-//        this.colPrint = col;
     }
 
     /**
@@ -37,7 +35,6 @@ public class ChessPosition {
     }
 
     public String toString() {
-        // TODO: how to account for pieces not starting at (0,0)
         return "(" + row + "," + col + ")";
     }
 

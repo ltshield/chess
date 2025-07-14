@@ -1,15 +1,10 @@
 package service;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 import server.Server;
-import spark.Request;
-
-import javax.xml.crypto.Data;
 import java.util.*;
 
 public class UserService {
@@ -52,7 +47,6 @@ public class UserService {
 
     public void logout(String authToken) throws DataAccessException{
         try {
-//            String authToken = logoutRequest.authToken();
             AuthData authData = server.db.authDataDAO.getAuth(authToken);
             server.db.authDataDAO.deleteAuth(authData);
         } catch (DataAccessException e) {
@@ -61,25 +55,8 @@ public class UserService {
     }
 
     public void clear() {
-//        try {
-//            server.db.authDataDAO.getAuth(clearRequest.authToken());
             server.db.clear();
-//        } catch (DataAccessException e) {
-//            throw e;
-//        }
     }
-
-//    public void validRequest(Request req, Class requestFormat, boolean needsAuth) throws DataAccessException{
-//        if (needsAuth) {
-//            if (req.headers("Authorization") == null) {
-//                throw new DataAccessException("Error: unauthorized");
-//            }
-//        }
-//        for ()
-//        if (!) {
-//            throw new DataAccessException("Error: bad request");
-//        }
-//    }
 
     public ListGamesResponse listGames(String authToken) throws DataAccessException {
         try {
@@ -89,8 +66,6 @@ public class UserService {
                 gamesList.add(new ListGameResponse(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()));
             }
             ListGamesResponse gameList = new ListGamesResponse(gamesList);
-//            Map<String, Object> namedList = new HashMap<>();
-//            namedList.put("games:", gameList);
             for (ListGameResponse resp : gamesList) {
                 System.out.println(resp);
             }

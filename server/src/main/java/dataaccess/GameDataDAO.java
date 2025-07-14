@@ -64,11 +64,15 @@ public class GameDataDAO{
             for (GameData gameTest : currentGameData) {
                 if (gameTest.gameID() == gameID) {
                     inCollection = true;
-                    GameData newGame = new GameData(gameTest.gameID(), gameTest.whiteUsername(), gameTest.blackUsername(), gameTest.gameName(), gameTest.game());
+                    int ogID = gameTest.gameID();
+                    String ogWhite = gameTest.whiteUsername();
+                    String ogBlack = gameTest.blackUsername();
+                    String ogName = gameTest.gameName();
+                    ChessGame ogGame = gameTest.game();
                     if (playerColor.equals("WHITE")) {
                         if (gameTest.whiteUsername() == null) {
                                 currentGameData.remove(gameTest);
-                                currentGameData.add(new GameData(newGame.gameID(), user.username(), newGame.blackUsername(), newGame.gameName(), newGame.game()));
+                                currentGameData.add(new GameData(ogID, user.username(), ogBlack, ogName, ogGame));
                                 break;
                             }
                             else {
@@ -78,7 +82,7 @@ public class GameDataDAO{
                     if (playerColor.equals("BLACK")) {
                         if (gameTest.blackUsername() == null) {
                                 currentGameData.remove(gameTest);
-                                currentGameData.add(new GameData(newGame.gameID(), newGame.whiteUsername(), user.username(), newGame.gameName(), newGame.game()));
+                                currentGameData.add(new GameData(ogID, ogWhite, user.username(), ogName, ogGame));
                                 break;
                             } else {
                                 throw new DataAccessException("Error: already taken");
