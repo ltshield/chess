@@ -131,7 +131,7 @@ public class UserServiceTests {
             String auth = authToken.authToken();
             userService.createGame(auth, new CreateGameRequest(auth,"game"));
             userService.createGame(auth, new CreateGameRequest(auth,"game1"));
-            userService.joinGame(auth, new JoinGameRequest("WHITE", 0));
+            userService.joinGame(auth, new JoinGameRequest("WHITE", 1));
             userService.createGame(auth, new CreateGameRequest(auth,"game2"));
             assertTrue(server.db.gameDataDAO.currentGameData.size() == 3);
         } catch (DataAccessException e) {
@@ -160,7 +160,7 @@ public class UserServiceTests {
             String auth = authToken.authToken();
             userService.createGame(auth, new CreateGameRequest(auth,"game"));
             userService.createGame(auth, new CreateGameRequest(auth,"game1"));
-            assertThrows(DataAccessException.class, () -> userService.joinGame("FAKEAUTH", new JoinGameRequest("WHITE", 0)));
+            assertThrows(DataAccessException.class, () -> userService.joinGame("FAKEAUTH", new JoinGameRequest("WHITE", 1)));
         } catch (DataAccessException e) {
             fail();
         }
@@ -175,7 +175,7 @@ public class UserServiceTests {
             String auth = authToken.authToken();
             userService.createGame(auth, new CreateGameRequest(auth,"game"));
             userService.createGame(auth, new CreateGameRequest(auth,"game1"));
-            userService.joinGame(auth, new JoinGameRequest("WHITE", 0));
+            userService.joinGame(auth, new JoinGameRequest("WHITE", 1));
             boolean bool = false;
             for (GameData game : server.db.gameDataDAO.currentGameData) {
                 if (game.whiteUsername() == "user") {
