@@ -101,7 +101,6 @@ public class Pawn {
                     }
 
                     // can capture diagonal to left
-                    // TODO: if you capture into the enemy backline you can promote
                     query = new ChessPosition(currRow-1, currCol-1);
                     if (taken.contains(query)) {
                         ChessPiece enemy = board.getPiece(query);
@@ -123,7 +122,7 @@ public class Pawn {
         }
 
         if (self.getTeamColor() == WHITE) {
-// PROMOTION
+            // PROMOTION
             if (canPromote && self.getTeamColor() == WHITE) {
                 ChessPosition query = new ChessPosition(currRow+1, currCol);
                 if (!taken.contains(query)) {
@@ -164,7 +163,6 @@ public class Pawn {
 
                 if (self.getTeamColor() == WHITE) {
                     // can capture diagonal to left
-                    // TODO: if you capture into the enemy backline you can promote
                     query = new ChessPosition(currRow+1, currCol-1);
                     if (taken.contains(query)) {
                         ChessPiece enemy = board.getPiece(query);
@@ -185,7 +183,6 @@ public class Pawn {
             }
         }
 
-//        System.out.println(self.getTeamColor());
         return options;
     }
 }

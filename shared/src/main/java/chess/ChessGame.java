@@ -93,21 +93,6 @@ public class ChessGame {
                 }
             }
 
-//            Collection<ChessMove> oppMoves = board.getMovesFromOpponent(board.getPiece(startPosition).getTeamColor());
-//            Collection<ChessMove> toDelete = new ArrayList<>();
-//            // TODO: make sure to check the FUTURE moves of the king so that pawn behavior can be accounted before
-//            // same thing as below
-//            for (ChessMove move : validOptions) {
-//                ChessPosition finalPos = move.getEndPosition();
-//                for (ChessMove enemyMove : oppMoves) {
-//                    ChessPosition finalEnemyPos = enemyMove.getEndPosition();
-//                    if (finalPos.equals(finalEnemyPos)) {
-//                        if (!toDelete.contains(enemyMove)) {
-//                            toDelete.add(move);
-//                        }
-//                    }
-//                }
-//            }
             for (ChessMove move : toDelete) {
                 validOptions.remove(move);
             }
@@ -187,7 +172,6 @@ public class ChessGame {
                 for (ChessMove enemyMove : board.getMovesFromOpponent(TeamColor.WHITE)) {
                     if (enemyMove.getEndPosition().equals(startPosition)) {
                         ChessPiece piece = board.getPiece(startPosition);
-//                        Collection<ChessMove> futureMoves = piece.pieceMoves(board, startPosition);
                         for (ChessMove testMove : validOptions) {
                             ChessBoard newBoard = new ChessBoard();
                             for (int i = 1; i <= 8; i++) {
@@ -205,7 +189,6 @@ public class ChessGame {
                             Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(TeamColor.WHITE);
                             ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.WHITE, newBoard);
 
-                            // TODO: we have it so if we remove the piece we can check, what about if we move it towards the
                             // opponent? Ie. in check cause of bishop, other bishop can still move towards bishop
                             for (ChessMove move : oppMoves) {
                                 ChessPosition endPos = move.getEndPosition();
@@ -238,7 +221,6 @@ public class ChessGame {
                             Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(TeamColor.BLACK);
                             ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.BLACK, newBoard);
 
-                            // TODO: we have it so if we remove the piece we can check, what about if we move it towards the
                             // opponent? Ie. in check cause of bishop, other bishop can still move towards bishop
                             for (ChessMove move : oppMoves) {
                                 ChessPosition endPos = move.getEndPosition();
@@ -265,7 +247,6 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         // perform the move
-        // TODO: shouldn't moves that make it here always be valid??
         ChessPosition startPos = move.getStartPosition();
         if (board.getPiece(startPos) == null) {
             throw new InvalidMoveException();
@@ -318,19 +299,6 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         // if in check and cannot move king
-//        if (isInCheck(teamColor)) {
-//            ChessPosition kingPos = board.findKingPosition(teamColor);
-//            // cannot move king
-//            Collection<ChessMove> kingMoves = board.getPiece(kingPos).pieceMoves(board, kingPos);
-//            if (kingMoves.isEmpty()) {
-//                return true;
-//            }
-//            // can move king to escape check
-//
-//            // can move other pieces in between king and opp
-//
-//            // can move other piece to capture opp piece
-//        }
         Collection<ChessMove> myMoves = new ArrayList<>();
         Collection<ChessPosition> myPositions = board.getColorPositions(teamColor);
         for (ChessPosition myPiecePosition : myPositions) {

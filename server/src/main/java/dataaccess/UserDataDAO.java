@@ -1,6 +1,5 @@
 package dataaccess;
 
-import model.AuthData;
 import model.UserData;
 
 import java.util.ArrayList;
@@ -40,26 +39,19 @@ public class UserDataDAO{
             throw new DataAccessException("Error: bad request");
         }
         boolean validUsername = false;
-        System.out.println(users);
         for (UserData user : users) {
             if (user.username().equals(username)) {
-//                UserData query = user;
                 validUsername = true;
                 if (!user.password().equals(password)) {
-                    System.out.println("here");
                     throw new DataAccessException("Error: unauthorized");
                 }
                 break;
             }
         }
-//        System.out.println(query);
         if (!validUsername) {
             throw new DataAccessException("Error: unauthorized");
         }
     }
-
-    // idk if I actually need this one...
-    public void deleteUser() throws DataAccessException{}
     public void clear(){users = new ArrayList<>();}
 
 }

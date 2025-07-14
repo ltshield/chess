@@ -17,7 +17,6 @@ import static java.util.Arrays.deepToString;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    // TODO: public or private?
     public ChessPiece[][] grid = new ChessPiece[8+1][8+1];
     public Collection<ChessPosition> positions = new ArrayList<>();
 
@@ -29,7 +28,6 @@ public class ChessBoard {
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition pos = new ChessPosition(i,j);
-//                System.out.println((getPiece(pos)));
                 if (getPiece(pos) != null && !colorPos.contains(pos)) {
                     if (getPiece(pos).getTeamColor() == color) {
                         colorPos.add(pos);
@@ -70,7 +68,6 @@ public class ChessBoard {
             Collection<ChessPosition> oppPos = getColorPositions(WHITE);
             for (ChessPosition pos : oppPos) {
                 ChessPiece piece = getPiece(pos);
-                // TODO: will this only pass in valid moves??
                 Collection<ChessMove> validMovesForPiece = piece.pieceMoves(this, pos);
                 for (ChessMove move : validMovesForPiece) {
                     allOppMoves.add(move);
@@ -89,7 +86,6 @@ public class ChessBoard {
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition pos = new ChessPosition(i,j);
-//                System.out.println((getPiece(pos)));
                 if (getPiece(pos) != null && !positions.contains(pos)) {
                     positions.add(pos);
                 }
@@ -104,11 +100,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-//        ChessPosition ne = new ChessPosition(8,8);
         grid[position.getRow()][position.getColumn()] = piece;
-//        grid[ne.getRow()][ne.getColumn()] = piece;
-//        System.out.println("Placed Piece on Board. " + piece.getPieceType());
-//        System.out.println(piece)
     }
 
     /**
@@ -119,7 +111,6 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        // TODO: account for chessboards starting at (1,1) not (0,0)?
         return grid[position.getRow()][position.getColumn()];
     }
 
