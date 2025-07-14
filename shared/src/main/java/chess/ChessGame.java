@@ -65,29 +65,8 @@ public class ChessGame {
             Collection<ChessMove> toDelete = new ArrayList<>();
             ChessPiece query = board.getPiece(startPosition);
             for (ChessMove myMove : validOptions) {
-                ChessBoard newBoard = new ChessBoard();
-                for (int i = 1; i <= 8; i++) {
-                    for (int j = 1; j <= 8; j++) {
-                        if (board.getPiece(new ChessPosition(i, j)) != null) {
-                            ChessPosition newPos = new ChessPosition(i,j);
-                            ChessPiece oldPiece = board.getPiece(newPos);
-                            ChessPiece newPiece = new ChessPiece(oldPiece.getTeamColor(), oldPiece.getPieceType());
-                            newBoard.grid[i][j] = newPiece;
-                        } else {
-                            newBoard.grid[i][j] = null;
-                        }
-                    }
-                }
-
-                int startRow = myMove.getStartPosition().getRow();
-                int startCol = myMove.getStartPosition().getColumn();
-                int endRow = myMove.getEndPosition().getRow();
-                int endCol = myMove.getEndPosition().getColumn();
-
-                newBoard.grid[startRow][startCol] = null;
-                newBoard.grid[endRow][endCol] = query;
-
-                Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(query.getTeamColor());
+                ChessBoard newBoard = copyBoard(board);
+                Collection<ChessMove> oppMoves = checkFutureBoardState(newBoard, myMove, query);
                 boolean inCheck = false;
                 for (ChessMove move : oppMoves) {
                     ChessPosition endPos = move.getEndPosition();
@@ -111,29 +90,8 @@ public class ChessGame {
         if (isInCheck(query.getTeamColor())) {
             if (query.getTeamColor() == TeamColor.BLACK) {
                 for (ChessMove myMove : validOptions) {
-                    ChessBoard newBoard = new ChessBoard();
-                    for (int i = 1; i <= 8; i++) {
-                        for (int j = 1; j <= 8; j++) {
-                            if (board.getPiece(new ChessPosition(i, j)) != null) {
-                                ChessPosition newPos = new ChessPosition(i,j);
-                                ChessPiece oldPiece = board.getPiece(newPos);
-                                ChessPiece newPiece = new ChessPiece(oldPiece.getTeamColor(), oldPiece.getPieceType());
-                                newBoard.grid[i][j] = newPiece;
-                            } else {
-                                newBoard.grid[i][j] = null;
-                            }
-                        }
-                    }
-
-                    int startRow = myMove.getStartPosition().getRow();
-                    int startCol = myMove.getStartPosition().getColumn();
-                    int endRow = myMove.getEndPosition().getRow();
-                    int endCol = myMove.getEndPosition().getColumn();
-
-                    newBoard.grid[startRow][startCol] = null;
-                    newBoard.grid[endRow][endCol] = query;
-
-                    Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(query.getTeamColor());
+                    ChessBoard newBoard = copyBoard(board);
+                    Collection<ChessMove> oppMoves = checkFutureBoardState(newBoard, myMove, query);
                     ChessPosition kingPosition = newBoard.findKingPosition(query.getTeamColor(), newBoard);
                     boolean inCheck = false;
                     for (ChessMove move : oppMoves) {
@@ -148,29 +106,8 @@ public class ChessGame {
                 }
             } else {
                 for (ChessMove myMove : validOptions) {
-                    ChessBoard newBoard = new ChessBoard();
-                    for (int i = 1; i <= 8; i++) {
-                        for (int j = 1; j <= 8; j++) {
-                            if (board.getPiece(new ChessPosition(i, j)) != null) {
-                                ChessPosition newPos = new ChessPosition(i,j);
-                                ChessPiece oldPiece = board.getPiece(newPos);
-                                ChessPiece newPiece = new ChessPiece(oldPiece.getTeamColor(), oldPiece.getPieceType());
-                                newBoard.grid[i][j] = newPiece;
-                            } else {
-                                newBoard.grid[i][j] = null;
-                            }
-                        }
-                    }
-
-                    int startRow = myMove.getStartPosition().getRow();
-                    int startCol = myMove.getStartPosition().getColumn();
-                    int endRow = myMove.getEndPosition().getRow();
-                    int endCol = myMove.getEndPosition().getColumn();
-
-                    newBoard.grid[startRow][startCol] = null;
-                    newBoard.grid[endRow][endCol] = query;
-
-                    Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(query.getTeamColor());
+                    ChessBoard newBoard = copyBoard(board);
+                    Collection<ChessMove> oppMoves = checkFutureBoardState(newBoard, myMove, query);
                     ChessPosition kingPosition = newBoard.findKingPosition(query.getTeamColor(), newBoard);
                     boolean inCheck = false;
                     for (ChessMove move : oppMoves) {
@@ -198,29 +135,8 @@ public class ChessGame {
                     if (enemyMove.getEndPosition().equals(startPosition)) {
                         ChessPiece piece = board.getPiece(startPosition);
                         for (ChessMove testMove : validOptions) {
-                            ChessBoard newBoard = new ChessBoard();
-                            for (int i = 1; i <= 8; i++) {
-                                for (int j = 1; j <= 8; j++) {
-                                    if (board.getPiece(new ChessPosition(i, j)) != null) {
-                                        ChessPosition newPos = new ChessPosition(i,j);
-                                        ChessPiece oldPiece = board.getPiece(newPos);
-                                        ChessPiece newPiece = new ChessPiece(oldPiece.getTeamColor(), oldPiece.getPieceType());
-                                        newBoard.grid[i][j] = newPiece;
-                                    } else {
-                                        newBoard.grid[i][j] = null;
-                                    }
-                                }
-                            }
-
-                            int startRow = testMove.getStartPosition().getRow();
-                            int startCol = testMove.getStartPosition().getColumn();
-                            int endRow = testMove.getEndPosition().getRow();
-                            int endCol = testMove.getEndPosition().getColumn();
-
-                            newBoard.grid[startRow][startCol] = null;
-                            newBoard.grid[endRow][endCol] = piece;
-
-                            Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(TeamColor.WHITE);
+                            ChessBoard newBoard = copyBoard(board);
+                            Collection<ChessMove> oppMoves = checkFutureBoardState(newBoard, testMove, query);
                             ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.WHITE, newBoard);
 
                             // opponent? Ie. in check cause of bishop, other bishop can still move towards bishop
@@ -239,28 +155,8 @@ public class ChessGame {
                         ChessPiece piece = board.getPiece(startPosition);
                         Collection<ChessMove> futureMoves = piece.pieceMoves(board, startPosition);
                         for (ChessMove testMove : futureMoves) {
-                            ChessBoard newBoard = new ChessBoard();
-                            for (int i = 1; i <= 8; i++) {
-                                for (int j = 1; j <= 8; j++) {
-                                    if (board.getPiece(new ChessPosition(i, j)) != null) {
-                                        ChessPosition newPos = new ChessPosition(i,j);
-                                        ChessPiece oldPiece = board.getPiece(newPos);
-                                        ChessPiece newPiece = new ChessPiece(oldPiece.getTeamColor(), oldPiece.getPieceType());
-                                        newBoard.grid[i][j] = newPiece;
-                                    } else {
-                                        newBoard.grid[i][j] = null;
-                                    }
-                                }
-                            }
-                            int startRow = testMove.getStartPosition().getRow();
-                            int startCol = testMove.getStartPosition().getColumn();
-                            int endRow = testMove.getEndPosition().getRow();
-                            int endCol = testMove.getEndPosition().getColumn();
-
-                            newBoard.grid[startRow][startCol] = null;
-                            newBoard.grid[endRow][endCol] = piece;
-
-                            Collection<ChessMove> oppMoves = newBoard.getMovesFromOpponent(TeamColor.BLACK);
+                            ChessBoard newBoard = copyBoard(board);
+                            Collection<ChessMove> oppMoves = checkFutureBoardState(newBoard, testMove, query);
                             ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.BLACK, newBoard);
 
                             // opponent? Ie. in check cause of bishop, other bishop can still move towards bishop
@@ -405,6 +301,36 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    public Collection<ChessMove> checkFutureBoardState(ChessBoard board, ChessMove move, ChessPiece query) {
+        ChessBoard newBoard = board;
+        int startRow = move.getStartPosition().getRow();
+        int startCol = move.getStartPosition().getColumn();
+        int endRow = move.getEndPosition().getRow();
+        int endCol = move.getEndPosition().getColumn();
+
+        newBoard.grid[startRow][startCol] = null;
+        newBoard.grid[endRow][endCol] = query;
+
+        return newBoard.getMovesFromOpponent(query.getTeamColor());
+    }
+
+    public ChessBoard copyBoard(ChessBoard board) {
+        ChessBoard newBoard = new ChessBoard();
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                if (board.getPiece(new ChessPosition(i, j)) != null) {
+                    ChessPosition newPos = new ChessPosition(i,j);
+                    ChessPiece oldPiece = board.getPiece(newPos);
+                    ChessPiece newPiece = new ChessPiece(oldPiece.getTeamColor(), oldPiece.getPieceType());
+                    newBoard.grid[i][j] = newPiece;
+                } else {
+                    newBoard.grid[i][j] = null;
+                }
+            }
+        }
+        return newBoard;
     }
 
     @Override
