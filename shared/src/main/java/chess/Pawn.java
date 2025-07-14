@@ -87,10 +87,8 @@ public class Pawn {
                     if (hasMoved == false) {
                         ChessPosition firstSquare = new ChessPosition(currRow-1, currCol);
                         ChessPosition secondSquare = new ChessPosition(currRow-2, currCol);
-                        if (!taken.contains(firstSquare)) {
-                            if (!taken.contains(secondSquare)) {
+                        if (!taken.contains(firstSquare) && !taken.contains(secondSquare)) {
                                 options.add(new ChessMove(position, secondSquare, null));
-                            }
                         }
                     }
 
@@ -122,7 +120,7 @@ public class Pawn {
         }
 
         if (self.getTeamColor() == WHITE) {
-            // PROMOTION
+        // PROMOTION
             if (canPromote && self.getTeamColor() == WHITE) {
                 ChessPosition query = new ChessPosition(currRow+1, currCol);
                 if (!taken.contains(query)) {
@@ -148,10 +146,8 @@ public class Pawn {
                 if (hasMoved == false && self.getTeamColor() == WHITE) {
                     ChessPosition firstSquare = new ChessPosition(currRow+1, currCol);
                     ChessPosition secondSquare = new ChessPosition(currRow+2, currCol);
-                    if (!taken.contains(firstSquare)) {
-                        if (!taken.contains(secondSquare)) {
+                    if (!taken.contains(firstSquare) && !taken.contains(secondSquare)) {
                             options.add(new ChessMove(position, secondSquare, null));
-                        }
                     }
                 }
 

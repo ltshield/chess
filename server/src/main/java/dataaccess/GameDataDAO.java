@@ -69,25 +69,16 @@ public class GameDataDAO{
                     String ogBlack = gameTest.blackUsername();
                     String ogName = gameTest.gameName();
                     ChessGame ogGame = gameTest.game();
-                    if (playerColor.equals("WHITE")) {
-                        if (gameTest.whiteUsername() == null) {
-                                currentGameData.remove(gameTest);
-                                currentGameData.add(new GameData(ogID, user.username(), ogBlack, ogName, ogGame));
-                                break;
-                            }
-                            else {
-                                throw new DataAccessException("Error: already taken");
-                            }
+                    if (playerColor.equals("WHITE") && gameTest.whiteUsername() == null) {
+                            currentGameData.remove(gameTest);
+                            currentGameData.add(new GameData(ogID, user.username(), ogBlack, ogName, ogGame));
+                            break;
                     }
-                    if (playerColor.equals("BLACK")) {
-                        if (gameTest.blackUsername() == null) {
+                    if (playerColor.equals("BLACK") && gameTest.blackUsername() == null) {
                                 currentGameData.remove(gameTest);
                                 currentGameData.add(new GameData(ogID, ogWhite, user.username(), ogName, ogGame));
-                                break;
-                            } else {
-                                throw new DataAccessException("Error: already taken");
                         }
-                    } else {
+                    else {
                         throw new DataAccessException("Error: already taken");
                     }
                 }

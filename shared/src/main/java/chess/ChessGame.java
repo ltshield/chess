@@ -12,11 +12,8 @@ import java.util.Objects;
  */
 public class ChessGame {
 
-    //    private TeamColor starter_color = TeamColor.WHITE;
     private TeamColor turn = TeamColor.WHITE;
     public ChessBoard board = new ChessBoard();
-    public Collection<ChessPosition> whitePieces = new ArrayList<>();
-    public Collection<ChessPosition> blackPieces = new ArrayList<>();
 
     public ChessGame() {
         board.resetBoard();
