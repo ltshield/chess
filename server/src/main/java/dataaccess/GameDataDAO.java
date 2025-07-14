@@ -18,6 +18,7 @@ public class GameDataDAO{
     public Server server;
     public Collection<GameData> currentGameData = new ArrayList<>();
 
+    private int id = 0;
 
     public GameDataDAO(Server server) {
         this.server = server;
@@ -36,17 +37,19 @@ public class GameDataDAO{
                     throw new DataAccessException("Game name taken");
                 }
             }
-            int i = 0;
-            for (int j = 0; j < 100; j++) {
-                for (GameData game : currentGameData) {
-                    if (game.gameID() == i) {
-                        i++;
-                        break;
-                    }
-                }
-                break;
-            }
-            GameData newGame = new GameData(i, null, null, gameName, new ChessGame());
+//            int i = 0;
+//            for (int j = 0; j < 100; j++) {
+//                for (GameData game : currentGameData) {
+//                    if (game.gameID() == i) {
+//                        i++;
+//                        break;
+//                    }
+//                }
+//                break;
+//            }
+
+            GameData newGame = new GameData(id, null, null, gameName, new ChessGame());
+            id++;
             currentGameData.add(newGame);
             return newGame.gameID();
         } catch (DataAccessException e) {
@@ -123,42 +126,37 @@ public class GameDataDAO{
                 throw new DataAccessException("Error: bad request");
             }
             boolean inCollection = false;
-            for (GameData game : currentGameData) {
-                if (game.gameID() == gameID) {
+            for (GameData gameTest : currentGameData) {
+                if (gameTest.gameID() == gameID) {
                     inCollection = true;
-                    GameData newGame = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+                    System.out.println(gameTest);
+                    GameData newGame = new GameData(gameTest.gameID(), gameTest.whiteUsername(), gameTest.blackUsername(), gameTest.gameName(), gameTest.game());
+                    System.out.println(newGame);
                     if (playerColor.equals("WHITE")) {
-                        if (game.whiteUsername() == null) {
-                            if (game.blackUsername() == null) {
-                                currentGameData.remove(game);
-                                currentGameData.add(new GameData(newGame.gameID(), user.username(), newGame.blackUsername(), newGame.gameName(), newGame.game()));
+//                        if (gameTest.whiteUsername() == null) {
+                            if (gameTest.blackUsername() == null) {
+                                currentGameData.remove(gameTest);
+                                currentGameData.add(new GameData(newGame.gameID(), user.username(), null, newGame.gameName(), newGame.game()));
                                 break;
-                            } else {
-                                if (!game.blackUsername().equals(user.username())) {
-                                    currentGameData.remove(game);
+                            }
+                            else {
+                                    currentGameData.remove(gameTest);
                                     currentGameData.add(new GameData(newGame.gameID(), user.username(), newGame.blackUsername(), newGame.gameName(), newGame.game()));
                                     break;
-                                }
                             }
-                        } else {
-                            throw new DataAccessException("Error: already taken");
-                        }
                     }
                     // TODO: you cannot be both users in a game
                     if (playerColor.equals("BLACK")) {
-                        if (game.blackUsername() == null) {
-                            if (game.whiteUsername() == null) {
-                                currentGameData.remove(game);
-                                currentGameData.add(new GameData(newGame.gameID(), newGame.whiteUsername(), user.username(), newGame.gameName(), newGame.game()));
+//                        if (gameTest.blackUsername() == null) {
+                            if (gameTest.whiteUsername() == null) {
+                                currentGameData.remove(gameTest);
+                                currentGameData.add(new GameData(newGame.gameID(), null, user.username(), newGame.gameName(), newGame.game()));
                                 break;
                             } else {
-                                if (!game.whiteUsername().equals(user.username())) {
                                     // && !game.whiteUsername().equals(user.username()))
-                                    currentGameData.remove(game);
+                                    currentGameData.remove(gameTest);
                                     currentGameData.add(new GameData(newGame.gameID(), newGame.whiteUsername(), user.username(), newGame.gameName(), newGame.game()));
                                     break;
-                                }
-                            }
                         }
                     } else {
                         throw new DataAccessException("Error: already taken");

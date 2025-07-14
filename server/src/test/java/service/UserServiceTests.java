@@ -189,4 +189,19 @@ public class UserServiceTests {
             fail();
         }
     }
+
+    @Test
+    void loginLogoutloginAuthTokensDiff() {
+        Server server = new Server();
+        UserService userService = new UserService(server);
+        try {
+            RegisterResult authToken = userService.register(new RegisterRequest("user", "pass", "email"));
+            String auth = authToken.authToken();
+            userService.logout(auth);
+            LoginResult loginResult = userService.login(new LoginRequest("user", "pass"));
+            assertTrue(!auth.equals(loginResult.authToken()));
+        } catch (DataAccessException e) {
+            fail();
+        }
+    }
 }
