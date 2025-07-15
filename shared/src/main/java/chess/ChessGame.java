@@ -89,37 +89,9 @@ public class ChessGame {
         ChessPiece query = board.getPiece(startPosition);
         if (isInCheck(query.getTeamColor())) {
             if (query.getTeamColor() == TeamColor.BLACK) {
-                for (ChessMove myMove : validOptions) {
-                    ChessBoard newBoard = copyBoard(board);
-                    Collection<ChessMove> oppMoves = checkFutureBoardState(newBoard, myMove, query);
-                    ChessPosition kingPosition = newBoard.findKingPosition(query.getTeamColor(), newBoard);
-                    boolean inCheck = false;
-                    for (ChessMove move : oppMoves) {
-                        ChessPosition endPos = move.getEndPosition();
-                        if (kingPosition.equals(endPos)) {
-                            inCheck = true;
-                        }
-                    }
-                    if (inCheck) {
-                        toDelete.add(myMove);
-                    }
-                }
+                futureKingCheck(validOptions, toDelete, query);
             } else {
-                for (ChessMove myMove : validOptions) {
-                    ChessBoard newBoard = copyBoard(board);
-                    Collection<ChessMove> oppMoves = checkFutureBoardState(newBoard, myMove, query);
-                    ChessPosition kingPosition = newBoard.findKingPosition(query.getTeamColor(), newBoard);
-                    boolean inCheck = false;
-                    for (ChessMove move : oppMoves) {
-                        ChessPosition endPos = move.getEndPosition();
-                        if (kingPosition.equals(endPos)) {
-                            inCheck = true;
-                        }
-                    }
-                    if (inCheck) {
-                        toDelete.add(myMove);
-                    }
-                }
+                futureKingCheck(validOptions, toDelete, query);
             }
 
             for (ChessMove finalMove : toDelete) {
@@ -174,6 +146,24 @@ public class ChessGame {
                 validOptions.remove(mov);
             }
             return validOptions;
+        }
+    }
+
+    public void futureKingCheck(Collection<ChessMove> validOptions, Collection<ChessMove> toDelete, ChessPiece query) {
+        for (ChessMove myMove : validOptions) {
+            ChessBoard newBoard = copyBoard(board);
+            Collection<ChessMove> oppMoves = checkFutureBoardState(newBoard, myMove, query);
+            ChessPosition kingPosition = newBoard.findKingPosition(query.getTeamColor(), newBoard);
+            boolean inCheck = false;
+            for (ChessMove move : oppMoves) {
+                ChessPosition endPos = move.getEndPosition();
+                if (kingPosition.equals(endPos)) {
+                    inCheck = true;
+                }
+            }
+            if (inCheck) {
+                toDelete.add(myMove);
+            }
         }
     }
 

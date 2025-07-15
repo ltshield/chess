@@ -11,7 +11,7 @@ import spark.Route;
 
 import java.util.Map;
 
-public class LoginHandler implements Route {
+public class LoginHandler extends GenericHandler implements Route {
     public Server server;
     public LoginHandler(Server server) {
         this.server = server;
@@ -25,29 +25,16 @@ public class LoginHandler implements Route {
         try {
             LoginResult result = userService.login(request);
             res.type("application/json");
-//            res.status(200);
             return new Gson().toJson(result);
         } catch (DataAccessException e) {
             if (e.getMessage().equals("Error: unauthorized")) {
-                var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
-                res.type("application/json");
-                res.status(401);
-                res.body(body);
-                return body;
+                return notAuthorized(e, res);
             }
             if (e.getMessage().equals("Error: bad request")) {
-                var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
-                res.type("application/json");
-                res.status(400);
-                res.body(body);
-                return body;
+                return badRequest(e, res);
             }
             else {
-                var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
-                res.type("application/json");
-                res.status(500);
-                res.body(body);
-                return body;
+                return otherError(e, res);
             }
         }
     }

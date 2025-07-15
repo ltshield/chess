@@ -53,29 +53,25 @@ public class ChessBoard {
     public Collection<ChessMove> getMovesFromOpponent(ChessGame.TeamColor color) {
         Collection<ChessMove> allOppMoves = new ArrayList<>();
         if (color == WHITE) {
-            Collection<ChessPosition> oppPos = getColorPositions(BLACK);
-            for (ChessPosition pos : oppPos) {
-                ChessPiece piece = getPiece(pos);
-                Collection<ChessMove> validMovesForPiece = piece.pieceMoves(this, pos);
-                for (ChessMove move : validMovesForPiece) {
-                    allOppMoves.add(move);
-                }
-            }
-            return allOppMoves;
+            return getChessMoves(allOppMoves, BLACK);
         }
         if (color == BLACK) {
-            Collection<ChessPosition> oppPos = getColorPositions(WHITE);
-            for (ChessPosition pos : oppPos) {
-                ChessPiece piece = getPiece(pos);
-                Collection<ChessMove> validMovesForPiece = piece.pieceMoves(this, pos);
-                for (ChessMove move : validMovesForPiece) {
-                    allOppMoves.add(move);
-                }
-            }
-            return allOppMoves;
+            return getChessMoves(allOppMoves, WHITE);
         } else {
             throw new RuntimeException("Not a valid color.");
         }
+    }
+
+    public Collection<ChessMove> getChessMoves(Collection<ChessMove> allOppMoves, ChessGame.TeamColor teamColor) {
+        Collection<ChessPosition> oppPos = getColorPositions(teamColor);
+        for (ChessPosition pos : oppPos) {
+            ChessPiece piece = getPiece(pos);
+            Collection<ChessMove> validMovesForPiece = piece.pieceMoves(this, pos);
+            for (ChessMove move : validMovesForPiece) {
+                allOppMoves.add(move);
+            }
+        }
+        return allOppMoves;
     }
 
     public void getPieces() {

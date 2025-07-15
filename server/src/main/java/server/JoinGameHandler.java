@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JoinGameHandler implements Route {
+public class JoinGameHandler extends GenericHandler implements Route  {
     public Server server;
     public JoinGameHandler(Server server) {
         this.server = server;
@@ -30,32 +30,16 @@ public class JoinGameHandler implements Route {
             return new Gson().toJson(new HashMap<String, Object>());
         } catch (DataAccessException e) {
             if (e.getMessage().equals("Error: not authorized")) {
-                var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
-                res.type("application/json");
-                res.status(401);
-                res.body(body);
-                return body;
+                return notAuthorized(e, res);
             }
             if (e.getMessage().equals("Error: bad request")) {
-                var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
-                res.type("application/json");
-                res.status(400);
-                res.body(body);
-                return body;
+                return badRequest(e, res);
             }
             if (e.getMessage().equals("Error: already taken")) {
-                var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
-                res.type("application/json");
-                res.status(403);
-                res.body(body);
-                return body;
+                return alreadyTaken(e, res);
             }
             else {
-                var body = new Gson().toJson(Map.of("message", String.format(e.getMessage()), "success", false));
-                res.type("application/json");
-                res.status(500);
-                res.body(body);
-                return body;
+                return otherError(e, res);
             }
         }
     }
