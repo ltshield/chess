@@ -106,19 +106,8 @@ public class ChessGame {
                 for (ChessMove enemyMove : board.getMovesFromOpponent(TeamColor.WHITE)) {
                     if (enemyMove.getEndPosition().equals(startPosition)) {
                         ChessPiece piece = board.getPiece(startPosition);
-                        for (ChessMove testMove : validOptions) {
-                            ChessBoard newBoard = copyBoard(board);
-                            Collection<ChessMove> oppMoves = checkFutureBoardState(newBoard, testMove, query);
-                            ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.WHITE, newBoard);
-
-                            // opponent? Ie. in check cause of bishop, other bishop can still move towards bishop
-                            for (ChessMove move : oppMoves) {
-                                ChessPosition endPos = move.getEndPosition();
-                                if (kingPosition.equals(endPos)) {
-                                    toDelete.add(testMove);
-                                }
-                            }
-                        }
+                        Collection<ChessMove> futureMoves = piece.pieceMoves(board, startPosition);
+                        checkFutureMove(TeamColor.WHITE, futureMoves, query, toDelete);
                     }
                 }
             } else {
@@ -126,19 +115,7 @@ public class ChessGame {
                     if (enemyMove.getEndPosition().equals(startPosition)) {
                         ChessPiece piece = board.getPiece(startPosition);
                         Collection<ChessMove> futureMoves = piece.pieceMoves(board, startPosition);
-                        for (ChessMove testMove : futureMoves) {
-                            ChessBoard newBoard = copyBoard(board);
-                            Collection<ChessMove> oppMoves = checkFutureBoardState(newBoard, testMove, query);
-                            ChessPosition kingPosition = newBoard.findKingPosition(TeamColor.BLACK, newBoard);
-
-                            // opponent? Ie. in check cause of bishop, other bishop can still move towards bishop
-                            for (ChessMove move : oppMoves) {
-                                ChessPosition endPos = move.getEndPosition();
-                                if (kingPosition.equals(endPos)) {
-                                    toDelete.add(testMove);
-                                }
-                            }
-                        }
+                        checkFutureMove(TeamColor.BLACK, futureMoves, query, toDelete);
                     }
                 }
             }
@@ -146,6 +123,22 @@ public class ChessGame {
                 validOptions.remove(mov);
             }
             return validOptions;
+        }
+    }
+
+    public void checkFutureMove(TeamColor color, Collection<ChessMove> futureMoves, ChessPiece query, Collection<ChessMove> toDelete) {
+        for (ChessMove testMove : futureMoves) {
+            ChessBoard newBoard = copyBoard(board);
+            Collection<ChessMove> oppMoves = checkFutureBoardState(newBoard, testMove, query);
+            ChessPosition kingPosition = newBoard.findKingPosition(color, newBoard);
+
+            // opponent? Ie. in check cause of bishop, other bishop can still move towards bishop
+            for (ChessMove move : oppMoves) {
+                ChessPosition endPos = move.getEndPosition();
+                if (kingPosition.equals(endPos)) {
+                    toDelete.add(testMove);
+                }
+            }
         }
     }
 
