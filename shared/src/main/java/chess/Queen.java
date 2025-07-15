@@ -17,13 +17,8 @@ public class Queen extends PieceMoveLogic{
     public Collection<ChessMove> calculateMoves() {
         ChessPiece self = board.getPiece(position);
 
-        board.getPieces();
-
-        Collection<ChessPosition> taken;
-        taken = board.positions;
-
-        Collection<ChessMove> options = toRightLeftUpDown(board, self, taken, position);
-        Collection<ChessMove> otherOps = diagonals(board, self, taken, position);
+        Collection<ChessMove> options = toRightLeftUpDown(board, self, position);
+        Collection<ChessMove> otherOps = diagonals(board, self, position);
         for (ChessMove mov : otherOps) {
             options.add(mov);
         }

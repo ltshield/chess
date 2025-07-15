@@ -13,13 +13,25 @@ public class King {
         this.moves = calculateMoves();
     }
 
-    public Collection<ChessMove> calculateMoves() {
-        ChessPiece self = board.getPiece(position);
-
+    public void checkIfInTaken(ChessPiece self, ChessBoard board, ChessPosition query, Collection<ChessMove> options) {
         board.getPieces();
 
         Collection<ChessPosition> taken;
         taken = board.positions;
+
+        if (taken.contains(query)) {
+            ChessPiece affil = board.getPiece(query);
+            if (affil.getTeamColor() != self.getTeamColor()) {
+                options.add(new ChessMove(position, query, null));
+            }
+        } else {
+            options.add(new ChessMove(position, query, null));
+        }
+//        return options;
+    }
+
+    public Collection<ChessMove> calculateMoves() {
+        ChessPiece self = board.getPiece(position);
 
         Collection<ChessMove> options = new ArrayList<ChessMove>();
 
@@ -29,109 +41,49 @@ public class King {
         // Northeast
         if (currRow+1 <= 8 && currCol+1 <= 8) {
             ChessPosition query = new ChessPosition(currRow + 1, currCol + 1);
-            if (taken.contains(query)) {
-                ChessPiece affil = board.getPiece(query);
-                if (affil.getTeamColor() != self.getTeamColor()) {
-                    options.add(new ChessMove(position, query, null));
-                }
-            } else {
-                options.add(new ChessMove(position, query, null));
-            }
+            checkIfInTaken(self, board, query, options);
         }
 
         // Northwest
         if (currRow+1 <= 8 && currCol-1 >= 1) {
             ChessPosition query = new ChessPosition(currRow + 1, currCol - 1);
-            if (taken.contains(query)) {
-                ChessPiece affil = board.getPiece(query);
-                if (affil.getTeamColor() != self.getTeamColor()) {
-                    options.add(new ChessMove(position, query, null));
-                }
-            } else {
-                options.add(new ChessMove(position, query, null));
-            }
+            checkIfInTaken(self, board, query, options);
         }
 
         // Southwest
         if (currRow-1 >= 0 && currCol-1 >= 1) {
             ChessPosition query = new ChessPosition(currRow - 1, currCol - 1);
-            if (taken.contains(query)) {
-                ChessPiece affil = board.getPiece(query);
-                if (affil.getTeamColor() != self.getTeamColor()) {
-                    options.add(new ChessMove(position, query, null));
-                }
-            } else {
-                options.add(new ChessMove(position, query, null));
-            }
+            checkIfInTaken(self, board, query, options);
         }
 
         // Southeast
         if (currRow-1 >= 1 && currCol+1 <= 8) {
             ChessPosition query = new ChessPosition(currRow - 1, currCol + 1);
-            if (taken.contains(query)) {
-                ChessPiece affil = board.getPiece(query);
-                if (affil.getTeamColor() != self.getTeamColor()) {
-                    options.add(new ChessMove(position, query, null));
-                }
-            } else {
-                options.add(new ChessMove(position, query, null));
-            }
+            checkIfInTaken(self, board, query, options);
         }
 
         // Down
         if (currRow-1 >= 1) {
             ChessPosition query = new ChessPosition(currRow-1, currCol);
-            if (taken.contains(query)) {
-                ChessPiece affil = board.getPiece(query);
-                if (affil.getTeamColor() != self.getTeamColor()) {
-                    options.add(new ChessMove(position, query, null));
-                }
-            }
-            else {
-                options.add(new ChessMove(position, query, null));
-            }
+            checkIfInTaken(self, board, query, options);
         }
 
         // Up
         if (currRow+1 <= 8) {
             ChessPosition query = new ChessPosition(currRow+1, currCol);
-            if (taken.contains(query)) {
-                ChessPiece affil = board.getPiece(query);
-                if (affil.getTeamColor() != self.getTeamColor()) {
-                    options.add(new ChessMove(position, query, null));
-                }
-            }
-            else {
-                options.add(new ChessMove(position, query, null));
-            }
+            checkIfInTaken(self, board, query, options);
         }
 
         // Left
         if (currCol-1 >= 1) {
             ChessPosition query = new ChessPosition(currRow, currCol-1);
-            if (taken.contains(query)) {
-                ChessPiece affil = board.getPiece(query);
-                if (affil.getTeamColor() != self.getTeamColor()) {
-                    options.add(new ChessMove(position, query, null));
-                }
-            }
-            else {
-                options.add(new ChessMove(position, query, null));
-            }
+            checkIfInTaken(self, board, query, options);
         }
 
         // Right
         if (currCol+1 <= 8) {
             ChessPosition query = new ChessPosition(currRow, currCol+1);
-            if (taken.contains(query)) {
-                ChessPiece affil = board.getPiece(query);
-                if (affil.getTeamColor() != self.getTeamColor()) {
-                    options.add(new ChessMove(position, query, null));
-                }
-            }
-            else {
-                options.add(new ChessMove(position, query, null));
-            }
+            checkIfInTaken(self, board, query, options);
         }
 
         return options;

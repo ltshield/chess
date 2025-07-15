@@ -5,7 +5,11 @@ import java.util.Collection;
 
 public class PieceMoveLogic {
 
-    public Collection<ChessMove> diagonals(ChessBoard board, ChessPiece piece, Collection<ChessPosition> taken, ChessPosition pos) {
+    public Collection<ChessMove> diagonals(ChessBoard board, ChessPiece piece, ChessPosition pos) {
+
+        board.getPieces();
+
+        Collection<ChessPosition> taken = board.positions;
 
         ChessPosition position = pos;
         ChessPiece self = piece;
@@ -58,12 +62,17 @@ public class PieceMoveLogic {
         return false;
     }
 
-    public Collection<ChessMove> toRightLeftUpDown(ChessBoard board, ChessPiece piece, Collection<ChessPosition> taken, ChessPosition pos) {
+    public Collection<ChessMove> toRightLeftUpDown(ChessBoard board, ChessPiece piece, ChessPosition pos) {
 
         ChessPosition position = pos;
         ChessPiece self = piece;
 
         Collection<ChessMove> options = new ArrayList<>();
+
+        board.getPieces();
+
+        Collection<ChessPosition> taken = board.positions;
+
         int currRow = position.getRow();
         int currCol = position.getColumn();
 

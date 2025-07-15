@@ -24,7 +24,7 @@ public class Bishop extends PieceMoveLogic{
         Collection<ChessPosition> taken;
         taken = board.positions;
 
-        return diagonals(board, self, taken, position);
+        return diagonals(board, self, position);
     }
 
 }

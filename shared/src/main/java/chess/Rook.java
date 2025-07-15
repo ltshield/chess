@@ -18,11 +18,6 @@ public class Rook extends PieceMoveLogic{
     public Collection<ChessMove> calculateMoves() {
         ChessPiece self = board.getPiece(position);
 
-        board.getPieces();
-
-        Collection<ChessPosition> taken;
-        taken = board.positions;
-
-        return toRightLeftUpDown(board, self, taken, position);
+        return toRightLeftUpDown(board, self, position);
     }
 }

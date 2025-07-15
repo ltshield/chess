@@ -60,125 +60,271 @@ public class Pawn {
             canPromote = true;
         }
 
-        if (self.getTeamColor() == BLACK) {
-            if (canPromote) {
-                ChessPosition query = new ChessPosition(currRow-1, currCol);
-                if (!taken.contains(query)) {
-                    for (chess.ChessPiece.PieceType promPiece : promPieces) {
-                        options.add(new ChessMove(position, query, promPiece));
-                    }
-                }
-                // capture to right
-                query = new ChessPosition(currRow-1, currCol-1);
-                if (taken.contains(query) && board.getPiece(query).getTeamColor() == WHITE) {
-                    for (chess.ChessPiece.PieceType promPiece : promPieces) {
-                        options.add(new ChessMove(position, query, promPiece));
-                    }
-                }
-                query = new ChessPosition(currRow-1, currCol+1);
-                if (taken.contains(query) && board.getPiece(query).getTeamColor() == WHITE) {
-                    for (chess.ChessPiece.PieceType promPiece : promPieces) {
-                        options.add(new ChessMove(position, query, promPiece));
-                    }
-                }
-            } else {
-                if (self.getTeamColor() == BLACK) {
-                    // can move two initially
-                    if (hasMoved == false) {
-                        ChessPosition firstSquare = new ChessPosition(currRow-1, currCol);
-                        ChessPosition secondSquare = new ChessPosition(currRow-2, currCol);
-                        if (!taken.contains(firstSquare) && !taken.contains(secondSquare)) {
-                                options.add(new ChessMove(position, secondSquare, null));
-                        }
-                    }
-
-                    // can move one
-                    ChessPosition query = new ChessPosition(currRow-1, currCol);
-                    if (!taken.contains(query)) {
-                        options.add(new ChessMove(position, query, null));
-                    }
-
-                    // can capture diagonal to left
-                    query = new ChessPosition(currRow-1, currCol-1);
-                    if (taken.contains(query)) {
-                        ChessPiece enemy = board.getPiece(query);
-                        if (enemy.getTeamColor() != self.getTeamColor()) {
-                            options.add(new ChessMove(position, query, null));
-                        }
-                    }
-
-                    // capture to the right
-                    query = new ChessPosition(currRow-1, currCol+1);
-                    if (taken.contains(query)) {
-                        ChessPiece enemy = board.getPiece(query);
-                        if (enemy.getTeamColor() != self.getTeamColor()) {
-                            options.add(new ChessMove(position, query, null));
-                        }
-                    }
-                }
-            }
+        if (self.getTeamColor() == WHITE) {
+            return calculateWhite(self.getTeamColor(), canPromote, hasMoved, self);
+        } else {
+            return calculateBlack(self.getTeamColor(), canPromote, hasMoved, self);
         }
 
-        if (self.getTeamColor() == WHITE) {
-        // PROMOTION
-            if (canPromote && self.getTeamColor() == WHITE) {
-                ChessPosition query = new ChessPosition(currRow+1, currCol);
-                if (!taken.contains(query)) {
-                    for (chess.ChessPiece.PieceType promPiece : promPieces) {
-                        options.add(new ChessMove(position, query, promPiece));
-                    }
+//        if (self.getTeamColor() == BLACK) {
+//            if (canPromote) {
+//                ChessPosition query = new ChessPosition(currRow-1, currCol);
+//                if (!taken.contains(query)) {
+//                    for (chess.ChessPiece.PieceType promPiece : promPieces) {
+//                        options.add(new ChessMove(position, query, promPiece));
+//                    }
+//                }
+//                // capture to right
+//                query = new ChessPosition(currRow-1, currCol-1);
+//                if (taken.contains(query) && board.getPiece(query).getTeamColor() == WHITE) {
+//                    for (chess.ChessPiece.PieceType promPiece : promPieces) {
+//                        options.add(new ChessMove(position, query, promPiece));
+//                    }
+//                }
+//                query = new ChessPosition(currRow-1, currCol+1);
+//                if (taken.contains(query) && board.getPiece(query).getTeamColor() == WHITE) {
+//                    for (chess.ChessPiece.PieceType promPiece : promPieces) {
+//                        options.add(new ChessMove(position, query, promPiece));
+//                    }
+//                }
+//            } else {
+//                if (self.getTeamColor() == BLACK) {
+//                    // can move two initially
+//                    if (hasMoved == false) {
+//                        ChessPosition firstSquare = new ChessPosition(currRow-1, currCol);
+//                        ChessPosition secondSquare = new ChessPosition(currRow-2, currCol);
+//                        if (!taken.contains(firstSquare) && !taken.contains(secondSquare)) {
+//                                options.add(new ChessMove(position, secondSquare, null));
+//                        }
+//                    }
+//
+//                    // can move one
+//                    ChessPosition query = new ChessPosition(currRow-1, currCol);
+//                    if (!taken.contains(query)) {
+//                        options.add(new ChessMove(position, query, null));
+//                    }
+//
+//                    // can capture diagonal to left
+//                    query = new ChessPosition(currRow-1, currCol-1);
+//                    if (taken.contains(query)) {
+//                        ChessPiece enemy = board.getPiece(query);
+//                        if (enemy.getTeamColor() != self.getTeamColor()) {
+//                            options.add(new ChessMove(position, query, null));
+//                        }
+//                    }
+//
+//                    // capture to the right
+//                    query = new ChessPosition(currRow-1, currCol+1);
+//                    if (taken.contains(query)) {
+//                        ChessPiece enemy = board.getPiece(query);
+//                        if (enemy.getTeamColor() != self.getTeamColor()) {
+//                            options.add(new ChessMove(position, query, null));
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        if (self.getTeamColor() == WHITE) {
+//        // PROMOTION
+//            if (canPromote && self.getTeamColor() == WHITE) {
+//                ChessPosition query = new ChessPosition(currRow+1, currCol);
+//                if (!taken.contains(query)) {
+//                    for (chess.ChessPiece.PieceType promPiece : promPieces) {
+//                        options.add(new ChessMove(position, query, promPiece));
+//                    }
+//                }
+//                // capture to right
+//                query = new ChessPosition(currRow+1, currCol+1);
+//                if (taken.contains(query) && board.getPiece(query).getTeamColor() == BLACK) {
+//                    for (chess.ChessPiece.PieceType promPiece : promPieces) {
+//                        options.add(new ChessMove(position, query, promPiece));
+//                    }
+//                }
+//                query = new ChessPosition(currRow+1, currCol-1);
+//                if (taken.contains(query) && board.getPiece(query).getTeamColor() == BLACK) {
+//                    for (chess.ChessPiece.PieceType promPiece : promPieces) {
+//                        options.add(new ChessMove(position, query, promPiece));
+//                    }
+//                }
+//            } else {
+//                // can move two initially
+//                if (hasMoved == false && self.getTeamColor() == WHITE) {
+//                    ChessPosition firstSquare = new ChessPosition(currRow+1, currCol);
+//                    ChessPosition secondSquare = new ChessPosition(currRow+2, currCol);
+//                    if (!taken.contains(firstSquare) && !taken.contains(secondSquare)) {
+//                            options.add(new ChessMove(position, secondSquare, null));
+//                    }
+//                }
+//
+//                // can move one
+//                ChessPosition query = new ChessPosition(currRow+1, currCol);
+//                if (!taken.contains(query)) {
+//                    options.add(new ChessMove(position, query, null));
+//                }
+//
+//                if (self.getTeamColor() == WHITE) {
+//                    // can capture diagonal to left
+//                    query = new ChessPosition(currRow+1, currCol-1);
+//                    if (taken.contains(query)) {
+//                        ChessPiece enemy = board.getPiece(query);
+//                        if (enemy.getTeamColor() != self.getTeamColor()) {
+//                            options.add(new ChessMove(position, query, null));
+//                        }
+//                    }
+//
+//                    // capture to the right
+//                    query = new ChessPosition(currRow+1, currCol+1);
+//                    if (taken.contains(query)) {
+//                        ChessPiece enemy = board.getPiece(query);
+//                        if (enemy.getTeamColor() != self.getTeamColor()) {
+//                            options.add(new ChessMove(position, query, null));
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+//        return options;
+    }
+
+    public Collection<ChessMove> calculateBlack(ChessGame.TeamColor color, boolean canPromote, boolean hasMoved, ChessPiece self) {
+        Collection<ChessPosition> taken;
+        taken = board.positions;
+
+        Collection<ChessMove> options = new ArrayList<ChessMove>();
+
+        int currRow = position.getRow();
+        int currCol = position.getColumn();
+
+        ChessGame.TeamColor oppColor = WHITE;
+
+        if (canPromote) {
+            ChessPosition query = new ChessPosition(currRow-1, currCol);
+            if (!taken.contains(query)) {
+                for (chess.ChessPiece.PieceType promPiece : promPieces) {
+                    options.add(new ChessMove(position, query, promPiece));
                 }
-                // capture to right
-                query = new ChessPosition(currRow+1, currCol+1);
-                if (taken.contains(query) && board.getPiece(query).getTeamColor() == BLACK) {
-                    for (chess.ChessPiece.PieceType promPiece : promPieces) {
-                        options.add(new ChessMove(position, query, promPiece));
-                    }
+            }
+            // capture to right
+            query = new ChessPosition(currRow-1, currCol-1);
+            if (taken.contains(query) && board.getPiece(query).getTeamColor() == oppColor) {
+                for (chess.ChessPiece.PieceType promPiece : promPieces) {
+                    options.add(new ChessMove(position, query, promPiece));
                 }
-                query = new ChessPosition(currRow+1, currCol-1);
-                if (taken.contains(query) && board.getPiece(query).getTeamColor() == BLACK) {
-                    for (chess.ChessPiece.PieceType promPiece : promPieces) {
-                        options.add(new ChessMove(position, query, promPiece));
-                    }
+            }
+            query = new ChessPosition(currRow-1, currCol+1);
+            if (taken.contains(query) && board.getPiece(query).getTeamColor() == oppColor) {
+                for (chess.ChessPiece.PieceType promPiece : promPieces) {
+                    options.add(new ChessMove(position, query, promPiece));
                 }
-            } else {
+            }
+        } else {
+            if (self.getTeamColor() == BLACK) {
                 // can move two initially
-                if (hasMoved == false && self.getTeamColor() == WHITE) {
-                    ChessPosition firstSquare = new ChessPosition(currRow+1, currCol);
-                    ChessPosition secondSquare = new ChessPosition(currRow+2, currCol);
+                if (hasMoved == false) {
+                    ChessPosition firstSquare = new ChessPosition(currRow-1, currCol);
+                    ChessPosition secondSquare = new ChessPosition(currRow-2, currCol);
                     if (!taken.contains(firstSquare) && !taken.contains(secondSquare)) {
-                            options.add(new ChessMove(position, secondSquare, null));
+                        options.add(new ChessMove(position, secondSquare, null));
                     }
                 }
 
                 // can move one
-                ChessPosition query = new ChessPosition(currRow+1, currCol);
+                ChessPosition query = new ChessPosition(currRow-1, currCol);
                 if (!taken.contains(query)) {
                     options.add(new ChessMove(position, query, null));
                 }
 
-                if (self.getTeamColor() == WHITE) {
-                    // can capture diagonal to left
-                    query = new ChessPosition(currRow+1, currCol-1);
-                    if (taken.contains(query)) {
-                        ChessPiece enemy = board.getPiece(query);
-                        if (enemy.getTeamColor() != self.getTeamColor()) {
-                            options.add(new ChessMove(position, query, null));
-                        }
+                // can capture diagonal to left
+                query = new ChessPosition(currRow-1, currCol-1);
+                if (taken.contains(query)) {
+                    ChessPiece enemy = board.getPiece(query);
+                    if (enemy.getTeamColor() != self.getTeamColor()) {
+                        options.add(new ChessMove(position, query, null));
                     }
+                }
 
-                    // capture to the right
-                    query = new ChessPosition(currRow+1, currCol+1);
-                    if (taken.contains(query)) {
-                        ChessPiece enemy = board.getPiece(query);
-                        if (enemy.getTeamColor() != self.getTeamColor()) {
-                            options.add(new ChessMove(position, query, null));
-                        }
+                // capture to the right
+                query = new ChessPosition(currRow-1, currCol+1);
+                if (taken.contains(query)) {
+                    ChessPiece enemy = board.getPiece(query);
+                    if (enemy.getTeamColor() != self.getTeamColor()) {
+                        options.add(new ChessMove(position, query, null));
                     }
                 }
             }
         }
+        return options;
+    }
 
+    public Collection<ChessMove> calculateWhite(ChessGame.TeamColor color, boolean canPromote, boolean hasMoved, ChessPiece self) {
+        Collection<ChessPosition> taken;
+        taken = board.positions;
+
+        Collection<ChessMove> options = new ArrayList<ChessMove>();
+
+        int currRow = position.getRow();
+        int currCol = position.getColumn();
+
+        ChessGame.TeamColor oppColor = BLACK;
+
+        if (canPromote && self.getTeamColor() == WHITE) {
+            ChessPosition query = new ChessPosition(currRow+1, currCol);
+            if (!taken.contains(query)) {
+                for (chess.ChessPiece.PieceType promPiece : promPieces) {
+                    options.add(new ChessMove(position, query, promPiece));
+                }
+            }
+            // capture to right
+            query = new ChessPosition(currRow+1, currCol+1);
+            if (taken.contains(query) && board.getPiece(query).getTeamColor() == BLACK) {
+                for (chess.ChessPiece.PieceType promPiece : promPieces) {
+                    options.add(new ChessMove(position, query, promPiece));
+                }
+            }
+            query = new ChessPosition(currRow+1, currCol-1);
+            if (taken.contains(query) && board.getPiece(query).getTeamColor() == BLACK) {
+                for (chess.ChessPiece.PieceType promPiece : promPieces) {
+                    options.add(new ChessMove(position, query, promPiece));
+                }
+            }
+        } else {
+            // can move two initially
+            if (hasMoved == false && self.getTeamColor() == WHITE) {
+                ChessPosition firstSquare = new ChessPosition(currRow+1, currCol);
+                ChessPosition secondSquare = new ChessPosition(currRow+2, currCol);
+                if (!taken.contains(firstSquare) && !taken.contains(secondSquare)) {
+                        options.add(new ChessMove(position, secondSquare, null));
+                }
+            }
+
+            // can move one
+            ChessPosition query = new ChessPosition(currRow+1, currCol);
+            if (!taken.contains(query)) {
+                options.add(new ChessMove(position, query, null));
+            }
+
+            if (self.getTeamColor() == WHITE) {
+                // can capture diagonal to left
+                query = new ChessPosition(currRow+1, currCol-1);
+                if (taken.contains(query)) {
+                    ChessPiece enemy = board.getPiece(query);
+                    if (enemy.getTeamColor() != self.getTeamColor()) {
+                        options.add(new ChessMove(position, query, null));
+                    }
+                }
+
+                // capture to the right
+                query = new ChessPosition(currRow+1, currCol+1);
+                if (taken.contains(query)) {
+                    ChessPiece enemy = board.getPiece(query);
+                    if (enemy.getTeamColor() != self.getTeamColor()) {
+                        options.add(new ChessMove(position, query, null));
+                    }
+                }
+            }
+        }
         return options;
     }
 }
