@@ -29,13 +29,31 @@ public class SQLUserData {
         }
     }
 
-    public UserData addUser(UserData user) throws DataAccessException{
+    public UserData addUser(String username, String password, String email) throws DataAccessException{
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
         try {
-            executeUpdate(statement, user.username(), user.password(), user.email());
+            executeUpdate(statement, username, password, email);
         } catch (DataAccessException e) {
             throw e;
         }
-        return new UserData(user.username(), user.password(), user.email());
+        return new UserData(username, password, email);
+    }
+
+    public boolean checkUsernameAndPassword(String username, String password) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, password FROM user WHERE username=? AND password=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                ps.setString(2, password);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Whoops.");
+        }
+        return false;
     }
 }

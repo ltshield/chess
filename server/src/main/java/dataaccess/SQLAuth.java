@@ -3,10 +3,14 @@ package dataaccess;
 import model.AuthData;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class SQLAuth {
+    public static String generateToken() {
+        return UUID.randomUUID().toString();
+    }
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
@@ -28,13 +32,14 @@ public class SQLAuth {
         }
     }
 
-    public AuthData addAuth(AuthData user) throws DataAccessException{
+    public AuthData addAuth(String username) throws DataAccessException{
         var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
+        String authToken = generateToken();
         try {
-            executeUpdate(statement, user.authToken(), user.username());
+            executeUpdate(statement, authToken, username);
         } catch (DataAccessException e) {
             throw e;
         }
-        return new AuthData(user.authToken(), user.username());
+        return new AuthData(authToken, username);
     }
 }

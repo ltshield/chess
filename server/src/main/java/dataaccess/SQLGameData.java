@@ -35,12 +35,13 @@ public class SQLGameData {
         }
     }
 
-    public GameData createGame(GameData user) throws DataAccessException{
+    public GameData createGame(String gameName) throws DataAccessException{
         var statement = "INSERT INTO game (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
-        var json = new Gson().toJson(user.game());
+        ChessGame game = new ChessGame();
+        var json = new Gson().toJson(game);
         try {
-            int id = executeUpdate(statement, user.whiteUsername(), user.blackUsername(), user.gameName(), json);
-            return new GameData(id, user.whiteUsername(), user.blackUsername(), user.gameName(), user.game());
+            int id = executeUpdate(statement, null, null, gameName, json);
+            return new GameData(id, null, null, gameName, game);
         } catch (DataAccessException e) {
             throw e;
         }

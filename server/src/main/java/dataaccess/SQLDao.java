@@ -49,7 +49,7 @@ public class SQLDao {
         CREATE TABLE IF NOT EXISTS auth (
           `authToken` varchar(256) NOT NULL,
           `username` varchar(256),
-          PRIMARY KEY (`username`),
+          PRIMARY KEY (`authToken`),
           INDEX(username),
           INDEX(authToken)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
