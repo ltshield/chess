@@ -15,7 +15,8 @@ public class DatabaseTests {
     void createUserTableTest() {
         try {
             SQLDao sqlDao = new SQLDao();
-            sqlDao.sqlUserData.addUser("user", "pass", "email");
+//            sqlDao.sqlUserData.addUser("user5", "pase", "email");
+            assertTrue(sqlDao.sqlUserData.checkUsernameAndPassword("user5", "pase"));
         } catch (DataAccessException e) {
             System.out.println("Whoops");
         }
