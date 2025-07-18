@@ -9,11 +9,15 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class SQLDao {
 
+    public SQLUserData sqlUserData = new SQLUserData();
+    public SQLGameData sqlGameData = new SQLGameData();
+    public SQLAuth sqlAuth = new SQLAuth();
+
     public SQLDao() throws DataAccessException {
         configureDatabase();
     }
 
-    private final String[] createStatements = {
+    private final String[] createUserStatements = {
             """
             CREATE TABLE IF NOT EXISTS user (
               `username` varchar(256) NOT NULL,
@@ -26,41 +30,53 @@ public class SQLDao {
             """
     };
 
+    private final String[] createGameStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS game (
+              `id` int NOT NULL AUTO_INCREMENT,
+              `whiteUsername` varchar(256) NULL,
+              `blackUsername` varchar(256) NULL,
+              `gameName` varchar(256) NOT NULL,
+              `game` TEXT DEFAULT NULL,
+              PRIMARY KEY (`id`),
+              INDEX(id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+    };
+
+    private final String[] createAuthStatements = {
+        """
+        CREATE TABLE IF NOT EXISTS auth (
+          `authToken` varchar(256) NOT NULL,
+          `username` varchar(256),
+          PRIMARY KEY (`username`),
+          INDEX(username),
+          INDEX(authToken)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+        """
+    };
+
     private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var connection = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
+            for (var statement : createUserStatements) {
                 try (var preparedStatement = connection.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }
-        } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
-    }
-
-    public UserData addUser(UserData user) throws DataAccessException {
-        var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        executeUpdate(statement, user.username(), user.password(), user.email());
-        return new UserData(user.username(), user.password(), user.email());
-    }
-
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
+            System.out.println("Finished.");
+            for (var statement : createGameStatements) {
+                try (var preparedStatement = connection.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
                 }
-                ps.executeUpdate();
-
-                var rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-
-                return 0;
             }
+            System.out.println("Finished.");
+            for (var statement : createAuthStatements) {
+                try (var preparedStatement = connection.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+            System.out.println("Finished.");
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
