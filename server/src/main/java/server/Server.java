@@ -1,11 +1,20 @@
 package server;
-import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.DataAccessObject;
+import dataaccess.SQLDao;
 import spark.*;
 
 public class Server {
 
     public DataAccessObject db = new DataAccessObject(this);
+
+//    public Server() {
+//        try {
+//            this.db = new SQLDao();
+//        } catch (DataAccessException e) {
+//            throw new DataAccessException(e.getMessage());
+//        }
+//    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);

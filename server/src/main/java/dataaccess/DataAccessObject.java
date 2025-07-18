@@ -1,6 +1,4 @@
 package dataaccess;
-import model.GameData;
-import org.eclipse.jetty.server.Authentication;
 import server.Server;
 
 public class DataAccessObject {
