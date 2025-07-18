@@ -91,23 +91,6 @@ public class GameDataDAO{
             throw e;
         }
     }
-    public void deleteGame(String authToken, int gameID) throws DataAccessException{
-        try {
-            server.db.authDataDAO.getAuth(authToken);
-            boolean inCollection = false;
-            for (GameData game : currentGameData) {
-                if (game.gameID() == gameID) {
-                    inCollection = true;
-                    currentGameData.remove(game);
-                }
-            }
-            if (!inCollection) {
-                throw new DataAccessException("Something went wrong.");
-            }
-        } catch (DataAccessException e) {
-            throw e;
-        }
-    }
 
     public void clear() {currentGameData = new ArrayList<>();}
 }
