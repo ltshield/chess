@@ -48,7 +48,7 @@ public class SQLUserData {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException("Error: bad request");
+            throw new DataAccessException("Error: already taken");
         }
     }
 
@@ -84,10 +84,13 @@ public class SQLUserData {
                             throw new DataAccessException("Error: unauthorized");
                         }
                     }
+                    else {
+                        throw new DataAccessException("Error: unauthorized");
+                    }
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException("Error: bad request");
+            throw new DataAccessException("Error: unauthorized");
         }
     }
 

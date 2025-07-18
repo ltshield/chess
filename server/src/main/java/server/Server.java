@@ -8,12 +8,12 @@ import javax.xml.crypto.Data;
 
 public class Server {
 
-    public DataAccessObject db = new DataAccessObject(this);
-//    public SQLDao db;
+//    public DataAccessObject db = new DataAccessObject(this);
+    public SQLDao db;
     public Server() {
         try {
-//            this.db = new SQLDao(this);
-            this.db = new DataAccessObject(this);
+            this.db = new SQLDao(this);
+//            this.db = new DataAccessObject(this);
         } catch (Exception e) {
             System.out.println("Unable to start server.");
         }

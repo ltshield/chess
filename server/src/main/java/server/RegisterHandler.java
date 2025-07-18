@@ -24,6 +24,7 @@ public class RegisterHandler extends GenericHandler implements Route {
         try {
             RegisterResult result = userService.register(request);
             res.type("application/json");
+            res.status(200);
             return new Gson().toJson(result);
         } catch (DataAccessException e) {
             if (e.getMessage().equals("Error: already taken")) {

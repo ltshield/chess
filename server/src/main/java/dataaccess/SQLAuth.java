@@ -61,7 +61,7 @@ public class SQLAuth {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException("Error: bad request");
+            throw new DataAccessException("Error: not authorized");
         }
     }
 

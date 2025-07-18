@@ -12,38 +12,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class DatabaseTests {
-//    @Test
-//    void createUserTableTest() {
-//        try {
-//            SQLDao sqlDao = new SQLDao();
-//            sqlDao.sqlUserData.deleteAllUsers();
-//            sqlDao.sqlUserData.addUser("user5", "pase", "email");
-////            sqlDao.sqlUserData.addUser("user5", "pase", "email");
-//            sqlDao.sqlUserData.checkUsernameAndPassword("user5", "pase");
-//        } catch (DataAccessException e) {
-//            fail();
-//        }
-//    }
-//
-//    @Test
-//    void addAuthTableTest() {
-//        try {
-//            SQLDao sqlDao = new SQLDao();
-////            sqlDao.Auth.addAuth("username");
-//        } catch (DataAccessException e) {
-//            System.out.println("Whoops");
-//        }
-//    }
-//
-//    @Test
-//    void addGameTableTest() {
-//        try {
-//            SQLDao sqlDao = new SQLDao();
-//            sqlDao.sqlGameData.createGame("NameGame");
-//            System.out.println("Here");
-//        } catch (DataAccessException e) {
-//            System.out.println("Whoops");
-//        }
-//    }
-
+    @Test
+    void clearDBTest() {
+        try {
+            Server server = new Server();
+            UserData user = new UserData("use", "pass", "em");
+            server.db.userDataDAO.insertUser(user);
+            String authToken = server.db.authDataDAO.createAuth("use");
+            server.db.gameDataDAO.createGame("nameGame", authToken);
+            server.db.clear();
+        } catch (DataAccessException e) {
+            fail();
+        }
+    }
 }

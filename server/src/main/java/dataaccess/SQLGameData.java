@@ -77,7 +77,7 @@ public class SQLGameData {
             try (var ps = conn.prepareStatement(statement)) {
                 try (var rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        int gameID = rs.getInt("gameID");
+                        int gameID = rs.getInt("id");
                         String whiteUsername = rs.getString("whiteUsername");
                         String blackUsername = rs.getString("blackUsername");
                         String gameName = rs.getString("gameName");
@@ -112,7 +112,7 @@ public class SQLGameData {
 
             var finalStatement = "";
             try (var conn = DatabaseManager.getConnection()) {
-                var statement = "SELECT whiteUsername, blackUsername FROM game WHERE gameID=?";
+                var statement = "SELECT whiteUsername, blackUsername FROM game WHERE id=?";
                 try (var ps = conn.prepareStatement(statement)) {
                     ps.setInt(1, gameID);
                     try (var rs = ps.executeQuery()) {
@@ -120,20 +120,23 @@ public class SQLGameData {
                             String whiteUser = rs.getString("whiteUsername");
                             String blackUser = rs.getString("blackUsername");
                             if (playerColor.equals("WHITE") && whiteUser == null) {
-                                finalStatement = "UPDATE user SET whiteUsername=? WHERE gameID=?";
+                                finalStatement = "UPDATE game SET whiteUsername=? WHERE id=?";
                             }
-                            if (playerColor.equals("BLACK") && blackUser == null) {
-                                finalStatement = "UPDATE user SET blackUsername=? WHERE gameID=?";
+                            else if (playerColor.equals("BLACK") && blackUser == null) {
+                                finalStatement = "UPDATE game SET blackUsername=? WHERE id=?";
                             } else {throw new DataAccessException("Error: already taken");}
                         }
                     }
                 }
             } catch (Exception e) {
-                throw new DataAccessException("Error: bad request");
+                throw e;
             }
             executeUpdate(finalStatement, user.username(), gameID);
-            } catch (Exception e) {
-                throw new DataAccessException("Error: bad request");
+            } catch (DataAccessException e) {
+                throw e;
+        }
+        catch (SQLException e) {
+            throw new DataAccessException("Error: bad request");
         }
     }
 
