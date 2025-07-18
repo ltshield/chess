@@ -126,6 +126,9 @@ public class SQLGameData {
                                 finalStatement = "UPDATE game SET blackUsername=? WHERE id=?";
                             } else {throw new DataAccessException("Error: already taken");}
                         }
+                        else {
+                            throw new DataAccessException("Error: bad request");
+                        }
                     }
                 }
             } catch (Exception e) {
