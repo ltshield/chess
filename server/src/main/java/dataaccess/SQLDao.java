@@ -1,20 +1,20 @@
 package dataaccess;
-
-import com.google.gson.Gson;
-import model.UserData;
-
+import server.Server;
 import java.sql.SQLException;
-
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class SQLDao {
 
-    public SQLUserData sqlUserData = new SQLUserData();
-    public SQLGameData sqlGameData = new SQLGameData();
-    public SQLAuth sqlAuth = new SQLAuth();
+    public Server server;
+    public SQLUserData userDataDAO;
+    public SQLGameData gameDataDAO;
+    public SQLAuth authDataDAO;
 
-    public SQLDao() throws DataAccessException {
+    public SQLDao(Server server) throws DataAccessException {
         configureDatabase();
+        this.server = server;
+        this.userDataDAO = new SQLUserData();
+        this.gameDataDAO = new SQLGameData(server);
+        this.authDataDAO = new SQLAuth();
     }
 
     private final String[] createUserStatements = {
@@ -82,4 +82,13 @@ public class SQLDao {
         }
     }
 
+    public void clear() {
+        try {
+            userDataDAO.deleteAllUsers();
+            authDataDAO.deleteAllAuth();
+            gameDataDAO.deleteAllGames();
+        } catch (Exception e) {
+            System.out.println("Uhoh.");
+        }
+    }
 }

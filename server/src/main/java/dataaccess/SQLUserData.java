@@ -1,6 +1,7 @@
 package dataaccess;
 
 import com.google.gson.Gson;
+import model.AuthData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -32,41 +33,67 @@ public class SQLUserData {
         }
     }
 
-    public UserData addUser(String username, String password, String email) throws DataAccessException{
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-        var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        try {
-            executeUpdate(statement, username, hashedPassword, email);
-        } catch (DataAccessException e) {
-            throw e;
+    public void getUser(String username) throws DataAccessException {
+        if (username == null) {
+            throw new DataAccessException("Error: bad request");
         }
-        return new UserData(username, password, email);
-    }
-
-    public boolean checkUsernameAndPassword(String username, String password) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT password FROM user WHERE username=?";
+            var statement = "SELECT username FROM user WHERE username=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
-//                ps.setString(2, password);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        var hashedPassword = rs.getString("password");
-                        System.out.println(password);
-                        System.out.println(hashedPassword);
-                        return BCrypt.checkpw(password, hashedPassword);
+                        throw new DataAccessException("Error: already taken");
                     }
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException("Whoops.");
+            throw new DataAccessException("Error: bad request");
         }
-        return false;
     }
 
-//    private UserData readUser(ResultSet rs) throws SQLException {
-//        var username = rs.getString("username");
-//        var password = rs.getString("password");
-//        var email = rs.getString("email");
-//        return pet.setId(id);
+    public UserData insertUser(UserData user) throws DataAccessException{
+        if (user.username() == null || user.password() == null || user.email() == null) {
+            throw new DataAccessException("Error: bad request");
+        }
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+        var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
+        try {
+            executeUpdate(statement, user.username(), hashedPassword, user.email());
+        } catch (DataAccessException e) {
+            if (e.getMessage().contains("Duplicate entry")) {
+                throw new DataAccessException("Error: already taken");
+            }
+            throw e;
+        }
+        return new UserData(user.username(), user.password(), user.email());
+    }
+
+    public void checkUsernameAndPassword(String username, String password) throws DataAccessException {
+        if (username == null || password == null) {
+            throw new DataAccessException("Error: bad request");
+        }
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT password FROM user WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        var hashedPassword = rs.getString("password");
+                        if(!BCrypt.checkpw(password, hashedPassword)) {
+                            throw new DataAccessException("Error: unauthorized");
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: bad request");
+        }
+    }
+
+    public void deleteAllUsers() throws DataAccessException {
+        var statement = "TRUNCATE user";
+        executeUpdate(statement);
+    }
+
 }
