@@ -1,6 +1,8 @@
 package dataaccess;
 
 import model.AuthData;
+
+import javax.xml.crypto.Data;
 import java.util.UUID;
 
 public class SQLAuth extends SQLBase {
@@ -9,6 +11,9 @@ public class SQLAuth extends SQLBase {
     }
 
     public String createAuth(String username) throws DataAccessException{
+        if (username == null) {
+            throw new DataAccessException("Error: bad request.");
+        }
         var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
         String authToken = generateToken();
         try {
