@@ -7,6 +7,8 @@ import model.GameData;
 import server.Server;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -40,15 +42,98 @@ public class SQLGameData {
         }
     }
 
-    public GameData createGame(String gameName) throws DataAccessException{
+    public int createGame(String gameName, String authToken) throws DataAccessException{
+        if (gameName == null || authToken == null) {
+            throw new DataAccessException("Error: bad request");
+        }
+        AuthData currUser = null;
+        try {
+            currUser = server.db.authDataDAO.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw e;
+        }
+        if (currUser == null) {
+            throw new DataAccessException("Error: not authorized");
+        }
         var statement = "INSERT INTO game (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
         ChessGame game = new ChessGame();
         var json = new Gson().toJson(game);
         try {
-            int id = executeUpdate(statement, null, null, gameName, json);
-            return new GameData(id, null, null, gameName, game);
+            return executeUpdate(statement, null, null, gameName, json);
         } catch (DataAccessException e) {
             throw e;
+        }
+    }
+
+    public Collection<GameData> listGames(String authToken) throws DataAccessException {
+        try {
+            AuthData currUser = server.db.authDataDAO.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error: not authorized");
+        }
+        Collection<GameData> games = new ArrayList<>();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM game";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        int gameID = rs.getInt("gameID");
+                        String whiteUsername = rs.getString("whiteUsername");
+                        String blackUsername = rs.getString("blackUsername");
+                        String gameName = rs.getString("gameName");
+                        String game = rs.getString("game");
+                        ChessGame newGame = new Gson().fromJson(game, ChessGame.class);
+                        games.add(new GameData(gameID, whiteUsername, blackUsername, gameName, newGame));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: bad request");
+        }
+        return games;
+    }
+
+    public void addUserToGame(String authToken, int gameID, String playerColor) throws DataAccessException {
+        try {
+            Collection<String> availableColors = new ArrayList<>();
+            availableColors.add("WHITE");
+            availableColors.add("BLACK");
+            AuthData user = null;
+            try {
+                user = server.db.authDataDAO.getAuth(authToken);
+            } catch(DataAccessException e) {
+                throw new DataAccessException("Error: not authorized");
+            }
+
+            // cannot join more than one game at a time?
+            if (playerColor == null || !availableColors.contains(playerColor)) {
+                throw new DataAccessException("Error: bad request");
+            }
+
+            var finalStatement = "";
+            try (var conn = DatabaseManager.getConnection()) {
+                var statement = "SELECT whiteUsername, blackUsername FROM game WHERE gameID=?";
+                try (var ps = conn.prepareStatement(statement)) {
+                    ps.setInt(1, gameID);
+                    try (var rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            String whiteUser = rs.getString("whiteUsername");
+                            String blackUser = rs.getString("blackUsername");
+                            if (playerColor.equals("WHITE") && whiteUser == null) {
+                                finalStatement = "UPDATE user SET whiteUsername=? WHERE gameID=?";
+                            }
+                            if (playerColor.equals("BLACK") && blackUser == null) {
+                                finalStatement = "UPDATE user SET blackUsername=? WHERE gameID=?";
+                            } else {throw new DataAccessException("Error: already taken");}
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                throw new DataAccessException("Error: bad request");
+            }
+            executeUpdate(finalStatement, user.username(), gameID);
+            } catch (Exception e) {
+                throw new DataAccessException("Error: bad request");
         }
     }
 

@@ -58,38 +58,38 @@ public class UserService {
             server.db.clear();
     }
 
-//    public ListGamesResponse listGames(String authToken) throws DataAccessException {
-//        try {
-//            Collection<GameData> games = server.db.gameDataDAO.listGames(authToken);
-//            Collection<ListGameResponse> gamesList = new ArrayList<>();
-//            for (GameData game : games) {
-//                gamesList.add(new ListGameResponse(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()));
-//            }
-//            ListGamesResponse gameList = new ListGamesResponse(gamesList);
-//            for (ListGameResponse resp : gamesList) {
-//                System.out.println(resp);
-//            }
-//            return gameList;
-//        } catch (DataAccessException e){
-//            throw e;
-//        }
-//    }
-//
-//    public CreateGameResponse createGame(String authToken, CreateGameRequest request) throws DataAccessException {
-//        try {
-//            int result = server.db.gameDataDAO.createGame(request.gameName(), authToken);
-//            return new CreateGameResponse(result);
-//        } catch (DataAccessException e) {
-//            throw e;
-//        }
-//    }
-//
-//    public void joinGame(String authToken, JoinGameRequest gameRequest) throws DataAccessException {
-//        try {
-//            server.db.gameDataDAO.addUserToGame(authToken, gameRequest.gameID(), gameRequest.playerColor());
-//        } catch (DataAccessException e) {
-//            System.out.println("HERE I AM");
-//            throw e;
-//        }
-//    }
+    public ListGamesResponse listGames(String authToken) throws DataAccessException {
+        try {
+            Collection<GameData> games = server.db.gameDataDAO.listGames(authToken);
+            Collection<ListGameResponse> gamesList = new ArrayList<>();
+            for (GameData game : games) {
+                gamesList.add(new ListGameResponse(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()));
+            }
+            ListGamesResponse gameList = new ListGamesResponse(gamesList);
+            for (ListGameResponse resp : gamesList) {
+                System.out.println(resp);
+            }
+            return gameList;
+        } catch (DataAccessException e){
+            throw e;
+        }
+    }
+
+    public CreateGameResponse createGame(String authToken, CreateGameRequest request) throws DataAccessException {
+        try {
+            int result = server.db.gameDataDAO.createGame(request.gameName(), authToken);
+            return new CreateGameResponse(result);
+        } catch (DataAccessException e) {
+            throw e;
+        }
+    }
+
+    public void joinGame(String authToken, JoinGameRequest gameRequest) throws DataAccessException {
+        try {
+            server.db.gameDataDAO.addUserToGame(authToken, gameRequest.gameID(), gameRequest.playerColor());
+        } catch (DataAccessException e) {
+            System.out.println("HERE I AM");
+            throw e;
+        }
+    }
 }
