@@ -88,7 +88,6 @@ public class UserService {
         try {
             server.db.gameDataDAO.addUserToGame(authToken, gameRequest.gameID(), gameRequest.playerColor());
         } catch (DataAccessException e) {
-            System.out.println("HERE I AM");
             throw e;
         }
     }

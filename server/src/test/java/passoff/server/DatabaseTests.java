@@ -125,7 +125,6 @@ public class DatabaseTests {
 
         try {
             for (Supplier<TestResult> operation : operations) {
-                System.out.println(operation);
                 TestResult result = operation.get();
                 Assertions.assertEquals(500, serverFacade.getStatusCode(),
                         "Server response code was not 500 Internal Error");
