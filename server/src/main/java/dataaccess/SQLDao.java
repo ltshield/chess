@@ -63,31 +63,28 @@ public class SQLDao {
                     preparedStatement.executeUpdate();
                 }
             }
-            System.out.println("Finished.");
             for (var statement : createGameStatements) {
                 try (var preparedStatement = connection.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }
-            System.out.println("Finished.");
             for (var statement : createAuthStatements) {
                 try (var preparedStatement = connection.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }
-            System.out.println("Finished.");
         } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException("Error: internal error");
         }
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException{
         try {
             userDataDAO.deleteAllUsers();
             authDataDAO.deleteAllAuth();
             gameDataDAO.deleteAllGames();
         } catch (Exception e) {
-            System.out.println("Uhoh.");
+            throw new DataAccessException("Error: internal error");
         }
     }
 }

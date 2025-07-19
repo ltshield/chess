@@ -38,7 +38,7 @@ public class SQLGameData {
                 return 0;
             }
         } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException("Error: internal error");
         }
     }
 
@@ -69,7 +69,7 @@ public class SQLGameData {
         try {
             AuthData currUser = server.db.authDataDAO.getAuth(authToken);
         } catch (DataAccessException e) {
-            throw new DataAccessException("Error: not authorized");
+            throw e;
         }
         Collection<GameData> games = new ArrayList<>();
         try (var conn = DatabaseManager.getConnection()) {
@@ -87,8 +87,10 @@ public class SQLGameData {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new DataAccessException("Error: bad request");
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: internal error");
         }
         return games;
     }
@@ -102,7 +104,7 @@ public class SQLGameData {
             try {
                 user = server.db.authDataDAO.getAuth(authToken);
             } catch(DataAccessException e) {
-                throw new DataAccessException("Error: not authorized");
+                throw e;
             }
 
             // cannot join more than one game at a time?
@@ -139,7 +141,7 @@ public class SQLGameData {
                 throw e;
         }
         catch (SQLException e) {
-            throw new DataAccessException("Error: bad request");
+            throw new DataAccessException("Error: internal error");
         }
     }
 

@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SQLUserTests {
     @Test
-    public void positiveInsert() {
+    public void positiveInsert() throws DataAccessException{
         Server server = new Server();
         server.db.clear();
         try {server.db.userDataDAO.insertUser(new UserData("user", "pass", "ema"));}
@@ -34,14 +34,14 @@ public class SQLUserTests {
     }
 
     @Test
-    public void negativeInsert() {
+    public void negativeInsert() throws DataAccessException{
         Server server = new Server();
         server.db.clear();
         assertThrows(DataAccessException.class, () -> server.db.userDataDAO.insertUser(new UserData(null, "pass", "ema")));
     }
 
     @Test
-    public void positiveCheckPass() {
+    public void positiveCheckPass() throws DataAccessException{
         Server server = new Server();
         server.db.clear();
         boolean noError = true;
@@ -53,7 +53,7 @@ public class SQLUserTests {
     }
 
     @Test
-    public void negativeCheckPass() {
+    public void negativeCheckPass() throws DataAccessException{
         Server server = new Server();
         server.db.clear();
         try {server.db.userDataDAO.insertUser(new UserData("user", "pass", "ema"));}
@@ -62,7 +62,7 @@ public class SQLUserTests {
     }
 
     @Test
-    public void positiveGetUser() {
+    public void positiveGetUser() throws DataAccessException{
         Server server = new Server();
         server.db.clear();
 
@@ -83,7 +83,7 @@ public class SQLUserTests {
     }
 
     @Test
-    public void negativeGetUser() {
+    public void negativeGetUser() throws DataAccessException{
         Server server = new Server();
         server.db.clear();
 

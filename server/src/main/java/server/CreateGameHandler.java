@@ -38,7 +38,7 @@ public class CreateGameHandler extends GenericHandler implements Route {
                 return badRequest(e, res);
             }
             else {
-                return otherError(e, res);
+                return otherError(new DataAccessException("Error: internal error"), res);
             }
         }
     }

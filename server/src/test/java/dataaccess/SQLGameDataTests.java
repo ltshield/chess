@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SQLGameDataTests {
 
     @Test
-    public void posCreate() {
+    public void posCreate() throws DataAccessException{
         Server server = new Server();
         server.db.clear();
         boolean inIt = false;
@@ -45,7 +45,7 @@ public class SQLGameDataTests {
         assertTrue(inIt);
     }
     @Test
-    public void negCreate() {
+    public void negCreate() throws DataAccessException{
         Server server = new Server();
         server.db.clear();
         boolean inIt = false;
@@ -58,7 +58,7 @@ public class SQLGameDataTests {
         }
     }
     @Test
-    public void posAdd() {
+    public void posAdd() throws DataAccessException{
         Server server = new Server();
         server.db.clear();
         try {
@@ -84,7 +84,7 @@ public class SQLGameDataTests {
         }
     }
     @Test
-    public void negAdd() {
+    public void negAdd() throws DataAccessException{
         Server server = new Server();
         server.db.clear();
         try {
@@ -98,7 +98,7 @@ public class SQLGameDataTests {
         }
     }
     @Test
-    public void posList() {
+    public void posList() throws DataAccessException {
         Server server = new Server();
         server.db.clear();
         try {
@@ -115,7 +115,7 @@ public class SQLGameDataTests {
         }
     }
     @Test
-    public void negList() {
+    public void negList() throws DataAccessException {
         Server server = new Server();
         server.db.clear();
         try {

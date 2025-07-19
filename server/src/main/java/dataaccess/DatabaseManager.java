@@ -48,7 +48,8 @@ public class DatabaseManager {
             conn.setCatalog(databaseName);
             return conn;
         } catch (SQLException ex) {
-            throw new DataAccessException("failed to get connection", ex);
+            // are we supposed to change this line to include error?
+            throw new DataAccessException("Error: internal error", ex);
         }
     }
 

@@ -3,6 +3,8 @@ package dataaccess;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.sql.SQLException;
+
 public class SQLUserData extends SQLBase {
 
     public void getUser(String username) throws DataAccessException {
@@ -19,8 +21,10 @@ public class SQLUserData extends SQLBase {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new DataAccessException("Error: already taken");
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: internal error");
         }
     }
 
@@ -36,7 +40,7 @@ public class SQLUserData extends SQLBase {
             if (e.getMessage().contains("Duplicate entry")) {
                 throw new DataAccessException("Error: already taken");
             }
-            throw e;
+            throw new DataAccessException("Error: internal error");
         }
         return new UserData(user.username(), user.password(), user.email());
     }
@@ -61,8 +65,10 @@ public class SQLUserData extends SQLBase {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new DataAccessException("Error: unauthorized");
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: internal error");
         }
     }
 

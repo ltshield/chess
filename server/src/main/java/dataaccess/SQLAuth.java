@@ -2,7 +2,7 @@ package dataaccess;
 
 import model.AuthData;
 
-import javax.xml.crypto.Data;
+import java.sql.SQLException;
 import java.util.UUID;
 
 public class SQLAuth extends SQLBase {
@@ -41,8 +41,10 @@ public class SQLAuth extends SQLBase {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new DataAccessException("Error: not authorized");
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: internal error");
         }
     }
 
@@ -52,7 +54,7 @@ public class SQLAuth extends SQLBase {
             AuthData existingAuth = getAuth(authData.authToken());
             var statement = "DELETE FROM auth WHERE authToken=?";
             executeUpdate(statement, authData.authToken());
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             throw new DataAccessException("Error: not authorized");
         }
     }

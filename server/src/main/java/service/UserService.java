@@ -54,7 +54,7 @@ public class UserService {
         }
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException{
             server.db.clear();
     }
 

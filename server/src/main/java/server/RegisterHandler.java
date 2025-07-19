@@ -34,7 +34,8 @@ public class RegisterHandler extends GenericHandler implements Route {
                 return badRequest(e, res);
             }
             else {
-                return otherError(e, res);
+//                System.out.println(e);
+                return otherError(new DataAccessException("Error: internal error"), res);
             }
         }
     }

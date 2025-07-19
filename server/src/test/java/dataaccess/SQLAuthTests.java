@@ -42,7 +42,7 @@ public class SQLAuthTests {
     }
 
     @Test
-    void invalidAuthTest() {
+    void invalidAuthTest() throws DataAccessException{
         Server server = new Server();
         server.db.clear();
 

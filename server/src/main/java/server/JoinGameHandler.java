@@ -39,7 +39,7 @@ public class JoinGameHandler extends GenericHandler implements Route  {
                 return alreadyTaken(e, res);
             }
             else {
-                return otherError(e, res);
+                return otherError(new DataAccessException("Error: internal error"), res);
             }
         }
     }

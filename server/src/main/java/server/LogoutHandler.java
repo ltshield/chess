@@ -32,7 +32,7 @@ public class LogoutHandler extends GenericHandler implements Route {
                 return notAuthorized(e, res);
             }
             else {
-                return otherError(e, res);
+                return otherError(new DataAccessException("Error: internal error"), res);
             }
         }
     }
