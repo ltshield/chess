@@ -1,0 +1,132 @@
+package dataaccess;
+
+import chess.ChessGame;
+import model.GameData;
+import model.UserData;
+import org.junit.jupiter.api.Test;
+import server.Server;
+
+import javax.xml.crypto.Data;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class SQLGameDataTests {
+
+    @Test
+    public void posCreate() {
+        Server server = new Server();
+        server.db.clear();
+        boolean inIt = false;
+        try {
+            server.db.userDataDAO.insertUser(new UserData("user", "pass", "ema"));
+            String authToken = server.db.authDataDAO.createAuth("user");
+            server.db.gameDataDAO.createGame("gameName", authToken);
+
+            try (var conn = DatabaseManager.getConnection()) {
+                var statement = "SELECT gameName FROM game WHERE gameName=?";
+                try (var ps = conn.prepareStatement(statement)) {
+                    ps.setString(1, "gameName");
+                    try (var rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            inIt = true;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                fail();
+            }
+
+        } catch (DataAccessException e) {
+            fail();
+        }
+        assertTrue(inIt);
+    }
+    @Test
+    public void negCreate() {
+        Server server = new Server();
+        server.db.clear();
+        boolean inIt = false;
+        try {
+            server.db.userDataDAO.insertUser(new UserData("user", "pass", "ema"));
+            String authToken = server.db.authDataDAO.createAuth("user");
+            assertThrows(DataAccessException.class, () -> server.db.gameDataDAO.createGame("gameName", "fakeAuthToken"));
+        } catch (DataAccessException e) {
+            fail();
+        }
+    }
+    @Test
+    public void posAdd() {
+        Server server = new Server();
+        server.db.clear();
+        try {
+            server.db.userDataDAO.insertUser(new UserData("user", "pass", "ema"));
+            String authToken = server.db.authDataDAO.createAuth("user");
+            server.db.gameDataDAO.createGame("gameName", authToken);
+            server.db.gameDataDAO.addUserToGame(authToken, 1, "WHITE");
+            try (var conn = DatabaseManager.getConnection()) {
+                var statement = "SELECT whiteUsername FROM game WHERE gameName=?";
+                try (var ps = conn.prepareStatement(statement)) {
+                    ps.setString(1, "gameName");
+                    try (var rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            assertTrue(rs.getString("whiteUsername").equals("user"));
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                fail();
+            }
+        } catch (DataAccessException e) {
+            fail();
+        }
+    }
+    @Test
+    public void negAdd() {
+        Server server = new Server();
+        server.db.clear();
+        try {
+            server.db.userDataDAO.insertUser(new UserData("user", "pass", "ema"));
+            String authToken = server.db.authDataDAO.createAuth("user");
+            server.db.gameDataDAO.createGame("gameName", authToken);
+            server.db.gameDataDAO.addUserToGame(authToken, 1, "WHITE");
+            assertThrows(DataAccessException.class, () -> server.db.gameDataDAO.addUserToGame(authToken, 1, "WHITE"));
+        } catch (DataAccessException e) {
+            fail();
+        }
+    }
+    @Test
+    public void posList() {
+        Server server = new Server();
+        server.db.clear();
+        try {
+            server.db.userDataDAO.insertUser(new UserData("user", "pass", "ema"));
+            String authToken = server.db.authDataDAO.createAuth("user");
+            server.db.gameDataDAO.createGame("gameName", authToken);
+            server.db.gameDataDAO.addUserToGame(authToken, 1, "WHITE");
+            Collection<GameData> collGames = server.db.gameDataDAO.listGames(authToken);
+            Collection<GameData> expected = new ArrayList<>();
+            expected.add(new GameData(1, "user", null, "gameName", new ChessGame()));
+            assertEquals(collGames, expected);
+        } catch (DataAccessException e) {
+            fail();
+        }
+    }
+    @Test
+    public void negList() {
+        Server server = new Server();
+        server.db.clear();
+        try {
+            server.db.userDataDAO.insertUser(new UserData("user", "pass", "ema"));
+            String authToken = server.db.authDataDAO.createAuth("user");
+            server.db.gameDataDAO.createGame("gameName", authToken);
+            server.db.gameDataDAO.addUserToGame(authToken, 1, "WHITE");
+            server.db.gameDataDAO.addUserToGame(authToken, 1, "BLACK");
+            assertThrows(DataAccessException.class, () -> server.db.gameDataDAO.listGames("fakeAuth"));
+        } catch (DataAccessException e) {
+            fail();
+        }
+    }
+}
