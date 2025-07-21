@@ -27,4 +27,22 @@ public class SQLBase {
         }
     }
 
+    public int findNum(String statement) throws DataAccessException {
+        int numGames = 0;
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        numGames += 1;
+                    }
+                }
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: internal error");
+        }
+        return numGames;
+    }
+
 }

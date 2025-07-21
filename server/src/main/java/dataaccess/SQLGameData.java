@@ -13,12 +13,13 @@ import java.util.Collection;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
-public class SQLGameData {
+public class SQLGameData extends SQLBase {
 
     public Server server;
     public SQLGameData(Server server) {this.server = server;}
 
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
+    @Override
+    public int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (var i = 0; i < params.length; i++) {

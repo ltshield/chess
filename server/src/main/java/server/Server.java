@@ -10,9 +10,14 @@ public class Server {
 
 //    public DataAccessObject db = new DataAccessObject(this);
     public SQLDao db;
+    public boolean isSQL = false;
     public Server() {
         try {
+            // if SQL database
             this.db = new SQLDao(this);
+            this.isSQL = true;
+
+            // if memory database
 //            this.db = new DataAccessObject(this);
         } catch (Exception e) {
             System.out.println("Unable to start server.");
