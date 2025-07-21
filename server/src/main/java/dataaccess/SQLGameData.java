@@ -6,6 +6,7 @@ import model.AuthData;
 import model.GameData;
 import server.Server;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -115,25 +116,7 @@ public class SQLGameData extends SQLBase {
 
             var finalStatement = "";
             try (var conn = DatabaseManager.getConnection()) {
-                var statement = "SELECT whiteUsername, blackUsername FROM game WHERE id=?";
-                try (var ps = conn.prepareStatement(statement)) {
-                    ps.setInt(1, gameID);
-                    try (var rs = ps.executeQuery()) {
-                        if (rs.next()) {
-                            String whiteUser = rs.getString("whiteUsername");
-                            String blackUser = rs.getString("blackUsername");
-                            if (playerColor.equals("WHITE") && whiteUser == null) {
-                                finalStatement = "UPDATE game SET whiteUsername=? WHERE id=?";
-                            }
-                            else if (playerColor.equals("BLACK") && blackUser == null) {
-                                finalStatement = "UPDATE game SET blackUsername=? WHERE id=?";
-                            } else {throw new DataAccessException("Error: already taken");}
-                        }
-                        else {
-                            throw new DataAccessException("Error: bad request");
-                        }
-                    }
-                }
+                finalStatement = addHelperFunc(conn, gameID, playerColor);
             } catch (Exception e) {
                 throw e;
             }
@@ -144,6 +127,32 @@ public class SQLGameData extends SQLBase {
         catch (SQLException e) {
             throw new DataAccessException("Error: internal error");
         }
+    }
+
+    public String addHelperFunc(Connection conn, int gameID, String playerColor) throws DataAccessException{
+        String statement = "SELECT whiteUsername, blackUsername FROM game WHERE id=?";
+        String finalStatement;
+        try (var ps = conn.prepareStatement(statement)) {
+            ps.setInt(1, gameID);
+            try (var rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String whiteUser = rs.getString("whiteUsername");
+                    String blackUser = rs.getString("blackUsername");
+                    if (playerColor.equals("WHITE") && whiteUser == null) {
+                        finalStatement = "UPDATE game SET whiteUsername=? WHERE id=?";
+                    }
+                    else if (playerColor.equals("BLACK") && blackUser == null) {
+                        finalStatement = "UPDATE game SET blackUsername=? WHERE id=?";
+                    } else {throw new DataAccessException("Error: already taken");}
+                }
+                else {
+                    throw new DataAccessException("Error: bad request");
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: already taken");
+        }
+        return finalStatement;
     }
 
     public void deleteAllGames() throws DataAccessException {

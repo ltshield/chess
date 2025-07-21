@@ -3,6 +3,7 @@ package dataaccess;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 public class SQLUserData extends SQLBase {
@@ -51,20 +52,7 @@ public class SQLUserData extends SQLBase {
         }
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT password FROM user WHERE username=?";
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, username);
-                try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        var hashedPassword = rs.getString("password");
-                        if(!BCrypt.checkpw(password, hashedPassword)) {
-                            throw new DataAccessException("Error: unauthorized");
-                        }
-                    }
-                    else {
-                        throw new DataAccessException("Error: unauthorized");
-                    }
-                }
-            }
+            helperFunc(statement, conn, username, password);
         } catch (DataAccessException e) {
             throw e;
         } catch (SQLException e) {
@@ -72,6 +60,24 @@ public class SQLUserData extends SQLBase {
         }
     }
 
+    public void helperFunc(String statement, Connection conn, String username, String password) throws DataAccessException {
+        try (var ps = conn.prepareStatement(statement)) {
+            ps.setString(1, username);
+            try (var rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    var hashedPassword = rs.getString("password");
+                    if(!BCrypt.checkpw(password, hashedPassword)) {
+                        throw new DataAccessException("Error: unauthorized");
+                    }
+                }
+                else {
+                    throw new DataAccessException("Error: unauthorized");
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+    }
     public void deleteAllUsers() throws DataAccessException {
         var statement = "TRUNCATE user";
         executeUpdate(statement);
