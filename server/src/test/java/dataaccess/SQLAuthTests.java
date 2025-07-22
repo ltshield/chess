@@ -5,6 +5,7 @@ import model.UserData;
 import org.junit.jupiter.api.Test;
 import server.Server;
 
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -25,12 +26,7 @@ public class SQLAuthTests {
             try (var conn = DatabaseManager.getConnection()) {
                 var statement = "SELECT username FROM auth WHERE authToken=?";
                 try (var ps = conn.prepareStatement(statement)) {
-                    ps.setString(1, authToken);
-                    try (var rs = ps.executeQuery()) {
-                        if (rs.next()) {
-                            username = rs.getString("username");
-                        }
-                    }
+                    username = getAuthHelper(ps, authToken, "username");
                 }
             } catch (Exception e) {
                 fail();
@@ -62,12 +58,7 @@ public class SQLAuthTests {
             try (var conn = DatabaseManager.getConnection()) {
                 var statement = "SELECT username, authToken FROM auth WHERE authToken=?";
                 try (var ps = conn.prepareStatement(statement)) {
-                    ps.setString(1, authToken);
-                    try (var rs = ps.executeQuery()) {
-                        if (rs.next()) {
-                            newAuthToken = rs.getString("authToken");
-                        }
-                    }
+                    newAuthToken = getAuthHelper(ps, authToken, "authToken");
                 }
             } catch (Exception e) {
                 fail();
@@ -76,6 +67,23 @@ public class SQLAuthTests {
         } catch (DataAccessException e) {
             fail();
         }
+    }
+
+    private String getAuthHelper(PreparedStatement ps, String authToken, String whatFor) {
+        try {
+            ps.setString(1, authToken);
+        } catch (Exception e) {
+            return null;
+        }
+        String newAuthToken = null;
+        try (var rs = ps.executeQuery()) {
+            if (rs.next()) {
+                newAuthToken = rs.getString(whatFor);
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return newAuthToken;
     }
 
     @Test
@@ -92,11 +100,7 @@ public class SQLAuthTests {
                 var statement = "SELECT username, authToken FROM auth WHERE authToken=?";
                 try (var ps = conn.prepareStatement(statement)) {
                     ps.setString(1, fakeAuthToken);
-                    try (var rs = ps.executeQuery()) {
-                        if (rs.next()) {
-                            didntMakeIt = false;
-                        }
-                    }
+                    didntMakeIt = deleteAuthHelper(ps);
                 }
             } catch (Exception e) {
                 fail();
@@ -121,11 +125,7 @@ public class SQLAuthTests {
                 var statement = "SELECT username, authToken FROM auth WHERE authToken=?";
                 try (var ps = conn.prepareStatement(statement)) {
                     ps.setString(1, authToken);
-                    try (var rs = ps.executeQuery()) {
-                        if (rs.next()) {
-                            madeIt = false;
-                        }
-                    }
+                    madeIt = deleteAuthHelper(ps);
                 }
             } catch (Exception e) {
                 fail();
@@ -134,6 +134,17 @@ public class SQLAuthTests {
         } catch (DataAccessException e) {
             fail();
         }
+    }
+
+    private boolean deleteAuthHelper(PreparedStatement ps) {
+        try (var rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     @Test
