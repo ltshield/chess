@@ -5,6 +5,7 @@ import model.UserData;
 import org.junit.jupiter.api.Test;
 import server.Server;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -174,21 +175,7 @@ public class SQLAuthTests {
             server.db.clear();
             boolean madeItThrough = true;
             try (var conn = DatabaseManager.getConnection()) {
-                Collection<String> statements = new ArrayList<>();
-                statements.add("SELECT * FROM game");
-                statements.add("SELECT * FROM user");
-                statements.add("SELECT * FROM auth");
-                for (String statement : statements) {
-                    try (var ps = conn.prepareStatement(statement)) {
-                        try (var rs = ps.executeQuery()) {
-
-                            if (rs.next()) {
-                                madeItThrough = false;
-                                break;
-                            }
-                        }
-                    }
-                }
+                madeItThrough = clearTestHelper(conn);
             } catch (Exception e) {
                 throw new DataAccessException("Error: bad request");
             }
@@ -197,4 +184,27 @@ public class SQLAuthTests {
             fail();
         }
     }
+
+    private boolean clearTestHelper(Connection conn) {
+        boolean madeItThrough = true;
+        Collection<String> statements = new ArrayList<>();
+        statements.add("SELECT * FROM game");
+        statements.add("SELECT * FROM user");
+        statements.add("SELECT * FROM auth");
+        for (String statement : statements) {
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+
+                    if (rs.next()) {
+                        madeItThrough = false;
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return madeItThrough;
+    }
+
 }
