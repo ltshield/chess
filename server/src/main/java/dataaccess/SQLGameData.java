@@ -149,8 +149,8 @@ public class SQLGameData extends SQLBase {
                     throw new DataAccessException("Error: bad request");
                 }
             }
-        } catch (Exception e) {
-            throw new DataAccessException("Error: already taken");
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: bad request");
         }
         return finalStatement;
     }
