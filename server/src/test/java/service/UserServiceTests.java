@@ -61,8 +61,6 @@ public class UserServiceTests {
         } catch (Exception e) {
             fail();
         }
-//        assertTrue(server.db.authDataDAO.currentUsers.isEmpty());
-//        assertTrue(server.db.userDataDAO.users.isEmpty());
     }
 
     @Test
