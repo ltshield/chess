@@ -25,7 +25,8 @@ public class JoinGameHandler extends GenericHandler implements Route  {
         try {
             String authToken = req.headers("Authorization");
             var request = new Gson().fromJson(req.body(), JoinGameRequest.class);
-            userService.joinGame(authToken, request);
+            JoinGameRequest fullGameReq = new JoinGameRequest(authToken, request.playerColor(), request.gameID());
+            userService.joinGame(fullGameReq);
             res.type("application/json");
             return new Gson().toJson(new HashMap<String, Object>());
         } catch (DataAccessException e) {

@@ -75,18 +75,18 @@ public class UserService {
         }
     }
 
-    public CreateGameResponse createGame(String authToken, CreateGameRequest request) throws DataAccessException {
+    public CreateGameResponse createGame(CreateGameRequest request) throws DataAccessException {
         try {
-            int result = server.db.gameDataDAO.createGame(request.gameName(), authToken);
+            int result = server.db.gameDataDAO.createGame(request.gameName(), request.authToken());
             return new CreateGameResponse(result);
         } catch (DataAccessException e) {
             throw e;
         }
     }
 
-    public void joinGame(String authToken, JoinGameRequest gameRequest) throws DataAccessException {
+    public void joinGame(JoinGameRequest gameRequest) throws DataAccessException {
         try {
-            server.db.gameDataDAO.addUserToGame(authToken, gameRequest.gameID(), gameRequest.playerColor());
+            server.db.gameDataDAO.addUserToGame(gameRequest.authToken(), gameRequest.gameID(), gameRequest.playerColor());
         } catch (DataAccessException e) {
             throw e;
         }

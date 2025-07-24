@@ -27,8 +27,10 @@ public class CreateGameHandler extends GenericHandler implements Route {
         try {
             String authToken = req.headers("Authorization");
             var request = new Gson().fromJson(req.body(), CreateGameRequest.class);
-            CreateGameResponse result = userService.createGame(authToken, request);
+            CreateGameRequest reqWithAuth = new CreateGameRequest(authToken, request.gameName());
+            CreateGameResponse result = userService.createGame(reqWithAuth);
             res.type("application/json");
+            res.status(200);
             return new Gson().toJson(result);
         } catch (DataAccessException e) {
             if (e.getMessage().equals("Error: not authorized")) {

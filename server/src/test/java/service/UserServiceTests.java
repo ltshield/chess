@@ -128,8 +128,8 @@ public class UserServiceTests {
             userService.clear();
             RegisterResult authToken = userService.register(new RegisterRequest("user", "pass", "email"));
             String auth = authToken.authToken();
-            userService.createGame(auth, new CreateGameRequest(auth,"game"));
-            assertThrows(DataAccessException.class, ()->userService.createGame("FAKEAUTH", new CreateGameRequest(auth,"game")));
+            userService.createGame(new CreateGameRequest(auth,"game"));
+            assertThrows(DataAccessException.class, ()->userService.createGame(new CreateGameRequest("FAKEAUTH","game")));
         } catch (DataAccessException e) {
             fail();
         }
@@ -143,7 +143,7 @@ public class UserServiceTests {
             userService.clear();
             RegisterResult authToken = userService.register(new RegisterRequest("user", "pass", "email"));
             String auth = authToken.authToken();
-            userService.createGame(auth, new CreateGameRequest(auth,"game"));
+            userService.createGame(new CreateGameRequest(auth,"game"));
             String statement = "SELECT * FROM game";
             assertTrue(server.db.gameDataDAO.findNum(statement) == 1);
         } catch (DataAccessException e) {
@@ -159,10 +159,10 @@ public class UserServiceTests {
             userService.clear();
             RegisterResult authToken = userService.register(new RegisterRequest("user", "pass", "email"));
             String auth = authToken.authToken();
-            userService.createGame(auth, new CreateGameRequest(auth,"game"));
-            userService.createGame(auth, new CreateGameRequest(auth,"game1"));
-            userService.joinGame(auth, new JoinGameRequest("WHITE", 1));
-            userService.createGame(auth, new CreateGameRequest(auth,"game2"));
+            userService.createGame(new CreateGameRequest(auth,"game"));
+            userService.createGame(new CreateGameRequest(auth,"game1"));
+            userService.joinGame(new JoinGameRequest(auth, "WHITE", 1));
+            userService.createGame(new CreateGameRequest(auth,"game2"));
             String statement = "SELECT * FROM game";
             assertTrue(server.db.gameDataDAO.findNum(statement) == 3);
         } catch (DataAccessException e) {
@@ -177,7 +177,7 @@ public class UserServiceTests {
         try {
             userService.clear();
             RegisterResult authToken = userService.register(new RegisterRequest("user", "pass", "email"));
-            assertThrows(DataAccessException.class, () -> userService.createGame("FAKEAUTH", new CreateGameRequest("FAKEAUTH","game")));
+            assertThrows(DataAccessException.class, () -> userService.createGame(new CreateGameRequest("FAKEAUTH","game")));
         } catch (DataAccessException e) {
             fail();
         }
@@ -191,9 +191,9 @@ public class UserServiceTests {
             userService.clear();
             RegisterResult authToken = userService.register(new RegisterRequest("user", "pass", "email"));
             String auth = authToken.authToken();
-            userService.createGame(auth, new CreateGameRequest(auth,"game"));
-            userService.createGame(auth, new CreateGameRequest(auth,"game1"));
-            assertThrows(DataAccessException.class, () -> userService.joinGame("FAKEAUTH", new JoinGameRequest("WHITE", 1)));
+            userService.createGame(new CreateGameRequest(auth,"game"));
+            userService.createGame(new CreateGameRequest(auth,"game1"));
+            assertThrows(DataAccessException.class, () -> userService.joinGame(new JoinGameRequest("FAKEAUTH","WHITE", 1)));
         } catch (DataAccessException e) {
             fail();
         }
@@ -208,9 +208,9 @@ public class UserServiceTests {
             userService.clear();
             RegisterResult authToken = userService.register(new RegisterRequest("user", "pass", "email"));
             String auth = authToken.authToken();
-            userService.createGame(auth, new CreateGameRequest(auth,"game"));
-            userService.createGame(auth, new CreateGameRequest(auth,"game1"));
-            userService.joinGame(auth, new JoinGameRequest("WHITE", 1));
+            userService.createGame(new CreateGameRequest(auth,"game"));
+            userService.createGame(new CreateGameRequest(auth,"game1"));
+            userService.joinGame(new JoinGameRequest(auth, "WHITE", 1));
             boolean bool = false;
 
             for (GameData game : server.db.gameDataDAO.listGames(auth)) {

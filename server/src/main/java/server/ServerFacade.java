@@ -3,11 +3,12 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 
+import org.eclipse.jetty.client.HttpResponseException;
 import service.*;
+import spark.Request;
 
 import java.io.*;
 import java.net.*;
-import java.util.HashMap;
 
 public class ServerFacade {
 
@@ -19,53 +20,64 @@ public class ServerFacade {
 
     public void clear() throws DataAccessException {
         var path = "/db";
-        System.out.println(serverUrl+path);
-        makeRequest("DELETE", path, null, null);
+        makeRequest("DELETE", path, null, null, null);
     }
 
     public RegisterResult register(RegisterRequest req) throws DataAccessException{
         var path = "/user";
-        return makeRequest("POST", path, req, RegisterResult.class);
+        return makeRequest("POST", path, req, RegisterResult.class, null);
     }
 
     public LoginResult login(LoginRequest req) throws DataAccessException {
         var path = "/session";
-        return makeRequest("POST", path, req, LoginResult.class);
+        return makeRequest("POST", path, req, LoginResult.class, null);
     }
 
     public Object logout(LogoutRequest req) throws DataAccessException {
         var path = "/session";
-        return makeRequest("DELETE", path, req, null);
+        String authToken = req.authorization();
+        return makeRequest("DELETE", path, req, null, authToken);
     }
 
     public ListGamesResponse listGames(ListGamesRequest req) throws DataAccessException {
         var path = "/game";
-        return makeRequest("GET", path, req, ListGamesResponse.class);
+        String authToken = req.authorization();
+        return makeRequest("GET", path, req, ListGamesResponse.class, authToken);
     }
 
     public CreateGameResponse createGame(CreateGameRequest req) throws DataAccessException {
         var path = "/game";
-        return makeRequest("POST", path, req, CreateGameResponse.class);
+        // set the authToken in the headers of the request before passing
+        String authToken = req.authToken();
+        return makeRequest("POST", path, req, CreateGameResponse.class, authToken);
     }
 
     public void joinGame(JoinGameRequest req) throws DataAccessException {
         var path = "/game";
-        makeRequest("PUT", path, req, null);
+        // how to check auth?
+        makeRequest("PUT", path, req, null, null);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
+            if (authToken == null) {
+                http.addRequestProperty("Authorization", null);
+            } else {
+                http.addRequestProperty("Authorization", authToken);
+            }
+
             writeBody(request, http);
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
         } catch (Exception ex) {
-            throw new DataAccessException("Error.");
+            System.out.println(ex.getMessage());
+            throw new DataAccessException(ex.getMessage());
         }
     }
 
@@ -88,7 +100,7 @@ public class ServerFacade {
                 }
             }
 
-            throw new DataAccessException("Error");
+            throw new DataAccessException("something went wrong");
         }
     }
 
