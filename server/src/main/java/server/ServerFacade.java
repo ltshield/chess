@@ -54,8 +54,8 @@ public class ServerFacade {
 
     public void joinGame(JoinGameRequest req) throws DataAccessException {
         var path = "/game";
-        // how to check auth?
-        makeRequest("PUT", path, req, null, null);
+        String authToken = req.authToken();
+        makeRequest("PUT", path, req, null, authToken);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {

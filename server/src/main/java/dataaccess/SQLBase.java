@@ -45,4 +45,22 @@ public class SQLBase {
         return numGames;
     }
 
+    public boolean checkIfIn(String statement) throws DataAccessException {
+        boolean inIt = false;
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        inIt = true;
+                    }
+                }
+            }
+        } catch (DataAccessException e) {
+            throw e;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: internal error");
+        }
+        return inIt;
+    }
+
 }
