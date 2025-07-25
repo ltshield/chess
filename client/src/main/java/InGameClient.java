@@ -42,29 +42,22 @@ public class InGameClient {
     }
 
     public String drawBoard() {
-//        GameData game = null;
-//        Gson gson = new Gson();
-//        Object obj = null;
-//        try (var conn = DatabaseManager.getConnection()) {
-//            var statement = "SELECT * FROM game WHERE id=?";
-//            try (var ps = conn.prepareStatement(statement)) {
-//                ps.setInt(1, gameID);
-//                try (var rs = ps.executeQuery()) {
-//                    if (rs.next()) {
-//                        obj = rs.getObject("game");
-//                        String json1 = obj.getAsJsonArray("board");
-//                        ChessBoard boardToDraw = gson.fromJson(json1, ChessBoard.class);
-//                        String turn = rs.getString("turn");
-//                        BoardUI board = new BoardUI(boardToDraw);
-//                        board.drawBoard(client.playerColor);
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//            System.out.println("error");
-//        }
-        BoardUI board = new BoardUI(new ChessGame());
-        board.drawBoard(client.playerColor);
+        Gson gson = new Gson();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM game WHERE id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        ChessGame gameObj = gson.fromJson(rs.getString("game"), ChessGame.class);
+                        BoardUI board = new BoardUI(gameObj);
+                        board.drawBoard(client.playerColor);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("error");
+        }
         return "";
     }
 }
