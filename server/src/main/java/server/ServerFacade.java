@@ -31,16 +31,16 @@ public class ServerFacade {
         return makeRequest("POST", path, req, LoginResult.class, null);
     }
 
-    public Object logout(LogoutRequest req) throws DataAccessException {
+    public void logout(LogoutRequest req) throws DataAccessException {
         var path = "/session";
         String authToken = req.authorization();
-        return makeRequest("DELETE", path, req, null, authToken);
+        makeRequest("DELETE", path, req, null, authToken);
     }
 
     public ListGamesResponse listGames(ListGamesRequest req) throws DataAccessException {
         var path = "/game";
-        String authToken = req.authorization();
-        return makeRequest("GET", path, req, ListGamesResponse.class, authToken);
+        String authToken = req.authToken();
+        return makeRequest("GET", path, null, ListGamesResponse.class, authToken);
     }
 
     public CreateGameResponse createGame(CreateGameRequest req) throws DataAccessException {
@@ -101,7 +101,7 @@ public class ServerFacade {
 ////                    if (http.getResponseMessage().equals("Forbidden")) {
 ////                        throw new DataAccessException("Sorry, there is already an account with that username.");
 ////                    }
-//                    throw new DataAccessException(http.getResponseMessage());
+//                    System.out.println(respErr.toString());}}
         }
     }
 

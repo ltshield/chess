@@ -34,7 +34,7 @@ public class AfterLoginClient {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "create" -> create(params);
-                case "list" -> list(params);
+                case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
                 case "logout" -> logout(params);
@@ -93,7 +93,8 @@ public class AfterLoginClient {
         throw new DataAccessException("Expected: <NAME>");
     }
 
-    public String list(String... params) throws DataAccessException {
+    public String list() throws DataAccessException {
+        System.out.println("Here are the current games:");
         ListGamesResponse res = server.listGames(new ListGamesRequest(client.authToken));
         String string = "";
         if (res.games() == null) {
@@ -103,6 +104,7 @@ public class AfterLoginClient {
         for (ListGameResponse game : res.games()) {
             string = string + String.format("\n %d %s: %s | %s", game.gameID(), game.gameName(), game.whiteUsername(), game.blackUsername());
         }
+        string += "\n";
         return string;
         }
 

@@ -66,9 +66,6 @@ public class UserService {
                 gamesList.add(new ListGameResponse(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()));
             }
             ListGamesResponse gameList = new ListGamesResponse(gamesList);
-            for (ListGameResponse resp : gamesList) {
-                System.out.println(resp);
-            }
             return gameList;
         } catch (DataAccessException e){
             throw e;
