@@ -1,7 +1,9 @@
 import dataaccess.DataAccessException;
 import server.ServerFacade;
 import service.LoginRequest;
+import service.LoginResult;
 import service.RegisterRequest;
+import service.RegisterResult;
 
 import java.util.Arrays;
 
@@ -16,7 +18,7 @@ public class BeforeLoginClient {
     public String help() {
         return """
                 - register <username> <password> <email>
-                - logIn <username> <password>
+                - login <username> <password>
                 - quit
                 """;
     }
@@ -28,7 +30,7 @@ public class BeforeLoginClient {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "register" -> register(params);
-                case "logIn" -> login(params);
+                case "login" -> login(params);
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -39,20 +41,22 @@ public class BeforeLoginClient {
 
     public String register(String... params) throws DataAccessException {
         if (params.length >= 1) {
-            server.register(new RegisterRequest(params[0], params[1], params[2]));
+            RegisterResult res = server.register(new RegisterRequest(params[0], params[1], params[2]));
+            client.authToken = res.authToken();
             client.switchState("LOGGEDIN");
             return String.format("You have successfully registered. Welcome to the server %s.", params[0]);
         }
-        throw new DataAccessException("Expected: <username> <password> <email>");
+        throw new DataAccessException("Expected: <username> <password> <email>.");
     }
 
     public String login(String... params) throws DataAccessException {
         if (params.length >= 1) {
-            server.login(new LoginRequest(params[0], params[1]));
+            LoginResult res = server.login(new LoginRequest(params[0], params[1]));
+            client.authToken = res.authToken();
             client.switchState("LOGGEDIN");
             return String.format("Welcome back %s!", params[0]);
         }
-        throw new DataAccessException("Expected: <username> <password>");
+        throw new DataAccessException("Expected: <username> <password>.");
     }
 
 }

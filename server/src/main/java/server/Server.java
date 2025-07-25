@@ -16,7 +16,6 @@ public class Server {
             // if SQL database
             this.db = new SQLDao(this);
             this.isSQL = true;
-            System.out.println("HERE");
             // if memory database
 //            this.db = new DataAccessObject(this);
         } catch (Exception e) {

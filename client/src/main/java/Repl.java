@@ -9,7 +9,7 @@ public class Repl {
     }
 
     public void run() {
-        System.out.println("\uD838\uDC36 Welcome to my Chess Server. Sign in to start.");
+        System.out.println("\uD838\uDC36 Welcome to my Chess Server. Sign in or register to start.");
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
@@ -31,6 +31,6 @@ public class Repl {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_BLUE);
+        System.out.print("\n" + RESET_TEXT_COLOR + "[" + client.state  + "] >>> " + SET_TEXT_COLOR_BLUE);
     }
 }

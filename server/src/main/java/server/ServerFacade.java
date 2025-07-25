@@ -94,7 +94,10 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
-                    throw new DataAccessException("Error");
+//                    if (http.getResponseMessage().equals("Forbidden")) {
+//                        throw new DataAccessException("Sorry, there is already an account with that username.");
+//                    }
+                    throw new DataAccessException(http.getResponseMessage());
                 }
             }
 
