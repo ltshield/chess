@@ -74,7 +74,6 @@ public class ServerFacade {
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
             throw new DataAccessException(ex.getMessage());
         }
     }
@@ -92,16 +91,17 @@ public class ServerFacade {
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, DataAccessException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
-            try (InputStream respErr = http.getErrorStream()) {
-                if (respErr != null) {
-//                    if (http.getResponseMessage().equals("Forbidden")) {
-//                        throw new DataAccessException("Sorry, there is already an account with that username.");
-//                    }
-                    throw new DataAccessException(http.getResponseMessage());
-                }
-            }
+            if (status == 403) {throw new DataAccessException("Sorry, that one is already taken.");}
+            if (status == 400) {throw new DataAccessException("Please respond in the correct format.");}
+            if (status == 401) {throw new DataAccessException("You are unauthorized to use that command.");}
+            else {throw new DataAccessException(http.getResponseMessage());}
 
-            throw new DataAccessException("something went wrong");
+//            try (InputStream respErr = http.getErrorStream()) {
+//                if (respErr != null) {
+////                    if (http.getResponseMessage().equals("Forbidden")) {
+////                        throw new DataAccessException("Sorry, there is already an account with that username.");
+////                    }
+//                    throw new DataAccessException(http.getResponseMessage());
         }
     }
 

@@ -34,19 +34,27 @@ public class BeforeLoginClient {
                 case "quit" -> "quit";
                 default -> help();
             };
-        } catch (DataAccessException e) {
+        } catch (Exception e) {
             return e.getMessage();
         }
     }
 
     public String register(String... params) throws DataAccessException {
-        if (params.length >= 1) {
-            RegisterResult res = server.register(new RegisterRequest(params[0], params[1], params[2]));
-            client.authToken = res.authToken();
-            client.switchState("LOGGEDIN");
-            return String.format("You have successfully registered. Welcome to the server %s.", params[0]);
+        try {
+            if (params.length >= 1) {
+                RegisterResult res = server.register(new RegisterRequest(params[0], params[1], params[2]));
+                client.authToken = res.authToken();
+                client.switchState("LOGGEDIN");
+                return String.format("You have successfully registered. Welcome to the server %s.", params[0]);
+            }
+        } catch (Exception e) {
+            if (e instanceof DataAccessException) {
+                throw e;
+            } else {
+            throw new DataAccessException("Expected: <username> <password> <email>.");
+            }
         }
-        throw new DataAccessException("Expected: <username> <password> <email>.");
+        throw new DataAccessException("Something went wrong.");
     }
 
     public String login(String... params) throws DataAccessException {
