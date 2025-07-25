@@ -1,8 +1,12 @@
 import chess.*;
+import server.Server;
 
 public class Main {
     public static void main(String[] args) {
-        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        System.out.println("♕ 240 Chess Client: " + piece);
+        Server server = new Server();
+        var port = server.run(0);
+        var serverUrl = "http://localhost:" + port;
+//        var serverUrl = "http://localhost:51830";
+        new Repl(serverUrl).run();
     }
 }

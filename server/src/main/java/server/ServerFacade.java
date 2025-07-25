@@ -3,9 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 
-import org.eclipse.jetty.client.HttpResponseException;
 import service.*;
-import spark.Request;
 
 import java.io.*;
 import java.net.*;
