@@ -33,7 +33,7 @@ public class AfterLoginClient {
                 case "create" -> create(params);
                 case "list" -> list(params);
                 case "join" -> join(params);
-//                case "observe" -> observe(params);
+                case "observe" -> observe(params);
                 case "logout" -> logout(params);
                 case "quit" -> "quit";
                 default -> help();
@@ -41,6 +41,25 @@ public class AfterLoginClient {
         } catch (DataAccessException e) {
             return e.getMessage();
         }
+    }
+
+    public String observe(String... params) throws DataAccessException {
+        if (params.length >= 1) {
+            Integer ID = null;
+            try {
+                ID = Integer.valueOf(params[0]);
+            } catch (Exception e) {
+                throw new DataAccessException("Expected integer value for ID.");
+            }
+            if (ID != null) {
+                // if not a valid ID, throw error.
+                client.playerColor = "OBSERVING";
+                client.inGameClient.gameID = ID;
+                client.switchState("INGAME");
+                return "Successfully viewing game.";
+            }
+        }
+        throw new DataAccessException("Error, something went wrong.");
     }
 
     public String create(String... params) throws DataAccessException {

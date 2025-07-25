@@ -230,5 +230,8 @@ public class BoardUI {
         if (playerColor.equals("BLACK")) {
             printBlackBoard();
         }
+        if (playerColor.equals("OBSERVING")) {
+            printWhiteBoard();
+        }
     }
 }

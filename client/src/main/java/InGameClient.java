@@ -1,5 +1,6 @@
 import chess.ChessGame;
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import server.ServerFacade;
 
@@ -23,7 +24,6 @@ public class InGameClient {
     }
 
     public String eval(String input) {
-//        try {
         var tokens = input.toLowerCase().split(" ");
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
@@ -32,9 +32,6 @@ public class InGameClient {
             case "quit" -> "quit";
             default -> help();
         };
-//        } catch (DataAccessException e) {
-//            return e.getMessage();
-//        }
     }
 
     public String drawBoard() {
@@ -48,11 +45,13 @@ public class InGameClient {
                         ChessGame gameObj = gson.fromJson(rs.getString("game"), ChessGame.class);
                         BoardUI board = new BoardUI(gameObj);
                         board.drawBoard(client.playerColor);
+                    } else {
+                        throw new DataAccessException("Error.");
                     }
                 }
             }
         } catch (Exception e) {
-            System.out.println("error");
+            System.out.println(e.getMessage());
         }
         return "";
     }
