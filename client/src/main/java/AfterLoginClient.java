@@ -71,6 +71,8 @@ public class AfterLoginClient {
             try {ID = Integer.parseInt(params[0]);}
             catch (Exception e) {throw new DataAccessException("Game ID must be integer.");}
             server.joinGame(new JoinGameRequest(client.authToken, params[1].toUpperCase(), ID));
+            client.playerColor = params[1].toUpperCase();
+            client.inGameClient.gameID = ID;
             client.switchState("INGAME");
             return String.format("Successfully joined game! Good luck!");
         }

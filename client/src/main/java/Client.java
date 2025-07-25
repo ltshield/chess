@@ -10,17 +10,17 @@ public class Client {
     private final String serverUrl;
     public String state = "LOGGEDOUT";
     public String authToken;
-
+    public String playerColor;
     private final BeforeLoginClient beforeLoginClient;
     private final AfterLoginClient afterLoginClient;
-    private final InGameClient inGameClient;
+    public final InGameClient inGameClient;
 
     public Client(String serverurl) {
         serverUrl = serverurl;
         serverFacade = new ServerFacade(serverUrl);
         beforeLoginClient = new BeforeLoginClient(serverFacade, this);
         afterLoginClient = new AfterLoginClient(serverFacade, this);
-        inGameClient = new InGameClient(serverFacade, this);
+        inGameClient = new InGameClient(serverFacade, this, null);
     }
 
     public void switchState(String newState) {

@@ -1,0 +1,248 @@
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
+
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Random;
+
+import static chess.ChessGame.TeamColor.WHITE;
+import static ui.EscapeSequences.*;
+
+public class BoardUI {
+
+    public BoardUI(ChessGame thisGame) {
+        game = thisGame;
+    }
+    private static ChessGame game;
+//    private static ChessBoard boardToDraw;
+//    public BoardUI(ChessBoard board) {
+//        boardToDraw = board;
+//    }
+
+    private static final String EMPTY = " ";
+
+    public static String convertToChar(ChessPiece.PieceType type) {
+        String stri = "";
+        if (type== ChessPiece.PieceType.BISHOP) {
+            stri = "B";
+        }
+        if (type== ChessPiece.PieceType.KING) {
+            stri = "K";
+        }
+        if (type== ChessPiece.PieceType.QUEEN) {
+            stri = "Q";
+        }
+        if (type== ChessPiece.PieceType.PAWN) {
+            stri = "P";
+        }
+        if (type== ChessPiece.PieceType.ROOK) {
+            stri = "R";
+        }
+        if (type== ChessPiece.PieceType.KNIGHT) {
+            stri = "N";
+        }
+        return stri;
+    }
+
+    public static String convertToColor(ChessGame.TeamColor color) {
+        if (color==WHITE) {
+            return SET_TEXT_COLOR_BLUE;
+        } else {
+            return SET_TEXT_COLOR_RED;
+        }
+    }
+
+    public static Collection<Character> defineAndPrintHeaderWhite() {
+        Collection<Character> headerItems = new ArrayList<>();
+        headerItems.add('a');
+        headerItems.add('b');
+        headerItems.add('c');
+        headerItems.add('d');
+        headerItems.add('e');
+        headerItems.add('f');
+        headerItems.add('g');
+        headerItems.add('h');
+        return headerItems;
+    }
+
+    public static Collection<Character> defineAndPrintHeaderBlack() {
+        Collection<Character> headerItems = new ArrayList<>();
+        headerItems.add('h');
+        headerItems.add('g');
+        headerItems.add('f');
+        headerItems.add('e');
+        headerItems.add('d');
+        headerItems.add('c');
+        headerItems.add('b');
+        headerItems.add('a');
+        return headerItems;
+    }
+    public static void printWhiteBoard() {
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        out.print(RESET_TEXT_COLOR);
+
+        out.print(ERASE_SCREEN);
+        out.print(SET_BG_COLOR_MAGENTA);
+
+        // HEADER
+        out.print(EMPTY.repeat(3));
+        Collection<Character> headerItems = defineAndPrintHeaderWhite();
+
+        for (char item : headerItems) {
+            out.print(EMPTY);
+            out.print(item);
+            out.print(EMPTY);
+        }
+        out.print(EMPTY.repeat(3));
+        out.print(RESET_BG_COLOR);
+        out.print("\n");
+
+        // 8 x 8 grid, black on bottom left
+        ChessBoard grid = game.board;
+        for (int i=8; i >= 1; i--) {
+            handleBoardDrawing(out, i, grid);
+        }
+
+        // FOOTER
+        out.print(SET_BG_COLOR_MAGENTA);
+        out.print(EMPTY.repeat(3));
+        for (char item : headerItems) {
+            out.print(EMPTY);
+            out.print(item);
+            out.print(EMPTY);
+        }
+        out.print(EMPTY.repeat(3));
+
+        out.print(RESET_BG_COLOR);
+        out.print("\n");
+    }
+
+    public static void handleBoardDrawing(PrintStream out, int i, ChessBoard grid) {
+
+        out.print(SET_BG_COLOR_MAGENTA);
+        out.print(EMPTY);
+        out.print(i);
+        out.print(EMPTY);
+        for (int j = 1; j <= 8; j++) {
+            ChessPiece piece = grid.getPiece(new ChessPosition(i,j));
+            if (j % 2 != 0 && i % 2 == 0) {
+                out.print(SET_BG_COLOR_WHITE);
+                if (piece != null) {
+                    ChessPiece.PieceType type = piece.getPieceType();
+                    ChessGame.TeamColor color = piece.getTeamColor();
+                    out.print(EMPTY);
+                    out.print(convertToColor(color));
+                    out.print(convertToChar(type));
+                    out.print(EMPTY);
+                } else {
+                    out.print(EMPTY.repeat(3));
+//                    out.print(SET_BG_COLOR_WHITE);
+                }
+            }
+            if (j % 2 == 0 && i % 2 == 0) {
+                out.print(SET_BG_COLOR_BLACK);
+                if (piece != null) {
+                    ChessPiece.PieceType type = piece.getPieceType();
+                    ChessGame.TeamColor color = piece.getTeamColor();
+                    out.print(EMPTY);
+                    out.print(convertToColor(color));
+                    out.print(convertToChar(type));
+                    out.print(EMPTY);
+                } else {
+                    out.print(EMPTY.repeat(3));
+//                    out.print(SET_BG_COLOR_WHITE);
+                }
+            }
+            if (j % 2 == 0 && i % 2 != 0) {
+                out.print(SET_BG_COLOR_WHITE);
+                if (piece != null) {
+                    ChessPiece.PieceType type = piece.getPieceType();
+                    ChessGame.TeamColor color = piece.getTeamColor();
+                    out.print(EMPTY);
+                    out.print(convertToColor(color));
+                    out.print(convertToChar(type));
+                    out.print(EMPTY);
+                } else {
+                    out.print(EMPTY.repeat(3));
+//                    out.print(SET_BG_COLOR_WHITE);
+                }
+            }
+            if (j % 2 != 0 && i % 2 != 0) {
+                out.print(SET_BG_COLOR_BLACK);
+                if (piece != null) {
+                    ChessPiece.PieceType type = piece.getPieceType();
+                    ChessGame.TeamColor color = piece.getTeamColor();
+                    out.print(EMPTY);
+                    out.print(convertToColor(color));
+                    out.print(convertToChar(type));
+                    out.print(EMPTY);
+                } else {
+                    out.print(EMPTY.repeat(3));
+//                    out.print(SET_BG_COLOR_WHITE);
+                }
+            }
+        }
+        out.print(SET_BG_COLOR_MAGENTA);
+        out.print(EMPTY);
+        out.print(RESET_TEXT_COLOR);
+        out.print(i);
+        out.print(EMPTY);
+        out.print(RESET_BG_COLOR);
+        out.print("\n");
+    }
+
+    public static void printBlackBoard() {
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        out.print(RESET_TEXT_COLOR);
+
+        out.print(ERASE_SCREEN);
+        out.print(SET_BG_COLOR_MAGENTA);
+
+        // HEADER
+        out.print(EMPTY.repeat(3));
+        Collection<Character> headerItems = defineAndPrintHeaderBlack();
+
+        // TODO: if white, keep headers and footers the same, if black switch them
+        for (char item : headerItems) {
+            out.print(EMPTY);
+            out.print(item);
+            out.print(EMPTY);
+        }
+        out.print(EMPTY.repeat(3));
+        out.print(RESET_BG_COLOR);
+        out.print("\n");
+
+        // 8 x 8 grid, black on bottom left
+        ChessBoard grid = game.board;
+        for (int i=1; i <= 8; i++) {
+            handleBoardDrawing(out, i, grid);
+        }
+
+        // FOOTER
+        out.print(SET_BG_COLOR_MAGENTA);
+        out.print(EMPTY.repeat(3));
+        for (char item : headerItems) {
+            out.print(EMPTY);
+            out.print(item);
+            out.print(EMPTY);
+        }
+        out.print(EMPTY.repeat(3));
+
+        out.print(RESET_BG_COLOR);
+        out.print("\n");
+    }
+
+    public static void drawBoard(String playerColor) {
+        if (playerColor.equals("WHITE")) {
+            printWhiteBoard();
+        }
+        if (playerColor.equals("BLACK")) {
+            printBlackBoard();
+        }
+    }
+}

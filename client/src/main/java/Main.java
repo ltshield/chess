@@ -1,4 +1,4 @@
-import chess.*;
+import chess.ChessGame;
 import server.Server;
 
 public class Main {
