@@ -1,5 +1,4 @@
 import dataaccess.DataAccessException;
-import model.GameData;
 import server.ServerFacade;
 import service.*;
 

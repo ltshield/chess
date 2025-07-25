@@ -3,12 +3,10 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Random;
 
 import static chess.ChessGame.TeamColor.WHITE;
 import static ui.EscapeSequences.*;
@@ -19,13 +17,7 @@ public class BoardUI {
         game = thisGame;
     }
     private static ChessGame game;
-//    private static ChessBoard boardToDraw;
-//    public BoardUI(ChessBoard board) {
-//        boardToDraw = board;
-//    }
-
     private static final String EMPTY = " ";
-
     public static String convertToChar(ChessPiece.PieceType type) {
         String stri = "";
         if (type== ChessPiece.PieceType.BISHOP) {
@@ -48,7 +40,6 @@ public class BoardUI {
         }
         return stri;
     }
-
     public static String convertToColor(ChessGame.TeamColor color) {
         if (color==WHITE) {
             return SET_TEXT_COLOR_BLUE;
@@ -56,7 +47,6 @@ public class BoardUI {
             return SET_TEXT_COLOR_RED;
         }
     }
-
     public static Collection<Character> defineAndPrintHeaderWhite() {
         Collection<Character> headerItems = new ArrayList<>();
         headerItems.add('a');
@@ -141,7 +131,6 @@ public class BoardUI {
                     out.print(EMPTY);
                 } else {
                     out.print(EMPTY.repeat(3));
-//                    out.print(SET_BG_COLOR_WHITE);
                 }
             }
             if (j % 2 == 0 && i % 2 == 0) {
@@ -155,7 +144,6 @@ public class BoardUI {
                     out.print(EMPTY);
                 } else {
                     out.print(EMPTY.repeat(3));
-//                    out.print(SET_BG_COLOR_WHITE);
                 }
             }
             if (j % 2 == 0 && i % 2 != 0) {
@@ -169,7 +157,6 @@ public class BoardUI {
                     out.print(EMPTY);
                 } else {
                     out.print(EMPTY.repeat(3));
-//                    out.print(SET_BG_COLOR_WHITE);
                 }
             }
             if (j % 2 != 0 && i % 2 != 0) {
@@ -183,7 +170,6 @@ public class BoardUI {
                     out.print(EMPTY);
                 } else {
                     out.print(EMPTY.repeat(3));
-//                    out.print(SET_BG_COLOR_WHITE);
                 }
             }
         }
