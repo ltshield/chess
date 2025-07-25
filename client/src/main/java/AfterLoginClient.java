@@ -1,4 +1,7 @@
+import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 import server.ServerFacade;
 import service.*;
 
@@ -53,6 +56,9 @@ public class AfterLoginClient {
             }
             if (ID != null) {
                 // if not a valid ID, throw error.
+                if(!validIDCheck(ID)) {
+                    throw new DataAccessException("Sorry, that is not a valid ID.");
+                }
                 client.playerColor = "OBSERVING";
                 client.inGameClient.gameID = ID;
                 client.switchState("INGAME");
@@ -60,6 +66,23 @@ public class AfterLoginClient {
             }
         }
         throw new DataAccessException("Error, something went wrong.");
+    }
+
+    public boolean validIDCheck(Integer ID) {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM game WHERE id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, ID);
+                try (var rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        return false;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return true;
     }
 
     public String create(String... params) throws DataAccessException {
@@ -84,17 +107,34 @@ public class AfterLoginClient {
         }
 
     public String join(String... params) throws DataAccessException {
-        if (params.length >= 1) {
-            int ID = 100;
-            try {ID = Integer.parseInt(params[0]);}
-            catch (Exception e) {throw new DataAccessException("Game ID must be integer.");}
-            server.joinGame(new JoinGameRequest(client.authToken, params[1].toUpperCase(), ID));
-            client.playerColor = params[1].toUpperCase();
-            client.inGameClient.gameID = ID;
-            client.switchState("INGAME");
-            return String.format("Successfully joined game! Good luck!");
+        try {
+            if (params.length >= 1) {
+                int ID = 100;
+                try {
+                    ID = Integer.parseInt(params[0]);
+                } catch (Exception e) {
+                    throw new DataAccessException("Game ID must be integer.");
+                }
+                String playerColor = params[1];
+                playerColor = playerColor.toUpperCase();
+                if(!validIDCheck(ID)) {
+                    throw new DataAccessException("Sorry, that is not a valid ID.");
+                }
+                if(!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) {
+                    throw new DataAccessException("Sorry, that is not a valid player color.");
+                }
+                server.joinGame(new JoinGameRequest(client.authToken, playerColor, ID));
+                client.playerColor = playerColor;
+                client.inGameClient.gameID = ID;
+                client.switchState("INGAME");
+                return String.format("Successfully joined game! Good luck!");
+            }
+        } catch (Exception e) {
+            if (e instanceof DataAccessException) {throw e;}
+            if (e instanceof ArrayIndexOutOfBoundsException) {throw new DataAccessException("That is not a valid ID.");}
+            else {throw new DataAccessException("Expected: <ID> <WHITE|BLACK>");}
         }
-        throw new DataAccessException("Expected: <ID>");
+        return "";
     }
 
     public String logout(String... params) throws DataAccessException {
