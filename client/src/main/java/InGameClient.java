@@ -2,16 +2,15 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
-import server.ServerFacade;
 
 import java.util.Arrays;
 
 public class InGameClient {
     private final ServerFacade server;
-    private final Client client;
+    private final BaseClient client;
     public Integer gameID;
 
-    public InGameClient(ServerFacade serverFacade, Client OgClient, Integer gameid) {
+    public InGameClient(ServerFacade serverFacade, BaseClient OgClient, Integer gameid) {
         server = serverFacade;
         client = OgClient;
         gameID = gameid;

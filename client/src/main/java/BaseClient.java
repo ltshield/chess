@@ -1,9 +1,7 @@
-import server.ServerFacade;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Client {
+public class BaseClient {
     private final ServerFacade serverFacade;
     private final String serverUrl;
     public String state = "LOGGEDOUT";
@@ -13,7 +11,7 @@ public class Client {
     private final AfterLoginClient afterLoginClient;
     public final InGameClient inGameClient;
 
-    public Client(String serverurl) {
+    public BaseClient(String serverurl) {
         serverUrl = serverurl;
         serverFacade = new ServerFacade(serverUrl);
         beforeLoginClient = new BeforeLoginClient(serverFacade, this);

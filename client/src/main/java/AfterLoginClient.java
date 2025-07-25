@@ -1,17 +1,14 @@
-import chess.ChessGame;
-import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
-import server.ServerFacade;
 import service.*;
 
 import java.util.Arrays;
 
 public class AfterLoginClient {
     private final ServerFacade server;
-    private final Client client;
+    private final BaseClient client;
 
-    public AfterLoginClient(ServerFacade serverFacade, Client OgClient) {
+    public AfterLoginClient(ServerFacade serverFacade, BaseClient OgClient) {
         server = serverFacade;
         client = OgClient;
     }

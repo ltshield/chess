@@ -1,5 +1,4 @@
 import dataaccess.DataAccessException;
-import server.ServerFacade;
 import service.LoginRequest;
 import service.LoginResult;
 import service.RegisterRequest;
@@ -9,9 +8,9 @@ import java.util.Arrays;
 
 public class BeforeLoginClient {
     private final ServerFacade server;
-    private final Client client;
+    private final BaseClient client;
 
-    public BeforeLoginClient(ServerFacade serverFacade, Client OgClient) {
+    public BeforeLoginClient(ServerFacade serverFacade, BaseClient OgClient) {
         server = serverFacade;
         client = OgClient;
     }

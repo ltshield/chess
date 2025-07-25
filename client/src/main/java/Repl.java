@@ -2,10 +2,10 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class Repl {
-    private final Client client;
+    private final BaseClient client;
 
     public Repl(String serverUrl) {
-        client = new Client(serverUrl);
+        client = new BaseClient(serverUrl);
     }
 
     public void run() {
