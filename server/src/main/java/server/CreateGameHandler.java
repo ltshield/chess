@@ -1,18 +1,13 @@
 package server;
 
-import dataaccess.DataAccessException;
-import model.GameData;
+import DataAccessException.DataAccessException;
 import service.CreateGameRequest;
 import service.CreateGameResponse;
-import service.LoginRequest;
 import spark.Request;
 import spark.Response;
 import service.UserService;
 import com.google.gson.Gson;
 import spark.Route;
-
-import java.util.Collection;
-import java.util.Map;
 
 public class CreateGameHandler extends GenericHandler implements Route {
     public Server server;

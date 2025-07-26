@@ -1,7 +1,7 @@
 package client;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
+import DataAccessException.DataAccessException;
 
 import service.*;
 

@@ -1,7 +1,6 @@
 package server;
 
-import dataaccess.DataAccessException;
-import service.LogoutRequest;
+import DataAccessException.DataAccessException;
 import spark.Request;
 import spark.Response;
 import service.UserService;
@@ -9,7 +8,6 @@ import com.google.gson.Gson;
 import spark.Route;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class LogoutHandler extends GenericHandler implements Route {
     public Server server;

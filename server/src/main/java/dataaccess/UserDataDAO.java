@@ -1,5 +1,6 @@
 package dataaccess;
 
+import DataAccessException.DataAccessException;
 import model.UserData;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ public class UserDataDAO{
     public Collection<UserData> users = new ArrayList<>();
 
     //CRUD
-    public void insertUser(UserData u) throws DataAccessException{
+    public void insertUser(UserData u) throws DataAccessException {
         if (u.username() == null) {
             throw new DataAccessException("Error: bad request");
         }

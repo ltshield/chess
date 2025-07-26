@@ -1,18 +1,15 @@
 package dataaccess;
 
+import DataAccessException.DataAccessException;
 import org.junit.jupiter.api.Test;
 import server.Server;
 import model.UserData;
-
-import javax.xml.crypto.Data;
-
-import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class SQLUserTests {
     @Test
-    public void positiveInsert() throws DataAccessException{
+    public void positiveInsert() throws DataAccessException {
         Server server = new Server();
         server.db.clear();
         try {server.db.userDataDAO.insertUser(new UserData("user", "pass", "ema"));}

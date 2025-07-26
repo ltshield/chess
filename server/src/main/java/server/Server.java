@@ -1,10 +1,6 @@
 package server;
-import dataaccess.DataAccessException;
-import dataaccess.DataAccessObject;
 import dataaccess.SQLDao;
 import spark.*;
-
-import javax.xml.crypto.Data;
 
 public class Server {
 

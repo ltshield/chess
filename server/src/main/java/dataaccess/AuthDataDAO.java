@@ -1,5 +1,6 @@
 package dataaccess;
 
+import DataAccessException.DataAccessException;
 import model.AuthData;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class AuthDataDAO{
     }
 
     //CRUD
-    public String createAuth(String username) throws DataAccessException{
+    public String createAuth(String username) throws DataAccessException {
         AuthData newAuth = new AuthData(generateToken(), username);
         currentUsers.add(newAuth);
         if (!currentUsers.contains(newAuth)) {

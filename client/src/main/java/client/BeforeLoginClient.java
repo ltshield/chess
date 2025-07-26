@@ -1,6 +1,6 @@
 package client;
 
-import dataaccess.DataAccessException;
+import DataAccessException.DataAccessException;
 import service.LoginRequest;
 import service.LoginResult;
 import service.RegisterRequest;

@@ -1,5 +1,6 @@
 package dataaccess;
 
+import DataAccessException.DataAccessException;
 import chess.ChessGame;
 import model.GameData;
 import model.UserData;
@@ -14,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SQLGameDataTests {
 
     @Test
-    public void posCreate() throws DataAccessException{
+    public void posCreate() throws DataAccessException {
         Server server = new Server();
         server.db.clear();
         try {

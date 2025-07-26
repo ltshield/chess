@@ -1,6 +1,6 @@
 package server;
 
-import dataaccess.DataAccessException;
+import DataAccessException.DataAccessException;
 import spark.Request;
 import spark.Response;
 import service.RegisterRequest;
@@ -8,8 +8,6 @@ import service.RegisterResult;
 import service.UserService;
 import com.google.gson.Gson;
 import spark.Route;
-
-import java.util.Map;
 
 public class RegisterHandler extends GenericHandler implements Route {
     public Server server;

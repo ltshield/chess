@@ -1,5 +1,6 @@
 package dataaccess;
 
+import DataAccessException.DataAccessException;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
@@ -20,7 +21,7 @@ public class GameDataDAO{
     }
 
     //CRUD
-    public int createGame(String gameName, String authToken) throws DataAccessException{
+    public int createGame(String gameName, String authToken) throws DataAccessException {
         try {
             server.db.authDataDAO.getAuth(authToken);
             if (gameName == null) {

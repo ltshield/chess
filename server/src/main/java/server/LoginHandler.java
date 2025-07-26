@@ -1,6 +1,6 @@
 package server;
 
-import dataaccess.DataAccessException;
+import DataAccessException.DataAccessException;
 import spark.Request;
 import spark.Response;
 import service.LoginRequest;
@@ -8,8 +8,6 @@ import service.LoginResult;
 import service.UserService;
 import com.google.gson.Gson;
 import spark.Route;
-
-import java.util.Map;
 
 public class LoginHandler extends GenericHandler implements Route {
     public Server server;

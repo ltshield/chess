@@ -1,5 +1,6 @@
 package dataaccess;
 
+import DataAccessException.DataAccessException;
 import model.AuthData;
 
 import java.sql.SQLException;
@@ -10,7 +11,7 @@ public class SQLAuth extends SQLBase {
         return UUID.randomUUID().toString();
     }
 
-    public String createAuth(String username) throws DataAccessException{
+    public String createAuth(String username) throws DataAccessException {
         if (username == null) {
             throw new DataAccessException("Error: bad request.");
         }
