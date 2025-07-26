@@ -93,7 +93,7 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             if (status == 403) {throw new DataAccessException("Sorry, that one is already taken.");}
             if (status == 400) {throw new DataAccessException("Please respond in the correct format.");}
-            if (status == 401) {throw new DataAccessException("You are unauthorized to use that command.");}
+            if (status == 401) {throw new DataAccessException("Incorrect authorization.");}
             else {throw new DataAccessException(http.getResponseMessage());}
         }
     }

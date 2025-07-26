@@ -61,13 +61,19 @@ public class BeforeLoginClient {
     }
 
     public String login(String... params) throws DataAccessException {
-        if (params.length >= 1) {
-            LoginResult res = server.login(new LoginRequest(params[0], params[1]));
-            client.authToken = res.authToken();
-            client.switchState("LOGGEDIN");
-            String formatted = String.format("Welcome back %s!", params[0]);
-            System.out.println(formatted);
-            return client.eval("list");
+        try {
+            if (params.length >= 1) {
+                LoginResult res = server.login(new LoginRequest(params[0], params[1]));
+                client.authToken = res.authToken();
+                client.switchState("LOGGEDIN");
+                String formatted = String.format("Welcome back %s!", params[0]);
+                System.out.println(formatted);
+                return client.eval("list");
+            }
+        } catch (Exception e) {
+            if (e instanceof DataAccessException) {
+                throw e;
+            }
         }
         throw new DataAccessException("Expected: <username> <password>.");
     }
