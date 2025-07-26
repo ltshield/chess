@@ -1,8 +1,6 @@
 package client;
 
 import chess.ChessGame;
-import com.google.gson.Gson;
-import DataAccessException.DataAccessException;
 
 import java.util.Arrays;
 
@@ -12,9 +10,9 @@ public class InGameClient {
     public Integer gameID;
 
 
-    public InGameClient(ServerFacade serverFacade, BaseClient OgClient, Integer gameid) {
+    public InGameClient(ServerFacade serverFacade, BaseClient ogClient, Integer gameid) {
         server = serverFacade;
-        client = OgClient;
+        client = ogClient;
         gameID = gameid;
     }
 

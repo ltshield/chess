@@ -1,6 +1,6 @@
 package client;
 
-import DataAccessException.DataAccessException;
+import dataexception.DataAccessException;
 import service.LoginRequest;
 import service.LoginResult;
 import service.RegisterRequest;
@@ -12,9 +12,9 @@ public class BeforeLoginClient {
     private final ServerFacade server;
     private final BaseClient client;
 
-    public BeforeLoginClient(ServerFacade serverFacade, BaseClient OgClient) {
+    public BeforeLoginClient(ServerFacade serverFacade, BaseClient ogClient) {
         server = serverFacade;
-        client = OgClient;
+        client = ogClient;
     }
     public String help() {
         return """

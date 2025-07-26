@@ -1,5 +1,5 @@
 package dataaccess;
-import DataAccessException.DataAccessException;
+import dataexception.DataAccessException;
 import server.Server;
 import java.sql.SQLException;
 

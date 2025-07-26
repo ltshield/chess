@@ -1,6 +1,6 @@
 package client;
 
-import DataAccessException.DataAccessException;
+import dataexception.DataAccessException;
 import service.*;
 
 import java.util.Arrays;
@@ -10,9 +10,9 @@ public class AfterLoginClient {
     private final BaseClient client;
     private int numGames;
 
-    public AfterLoginClient(ServerFacade serverFacade, BaseClient OgClient) {
+    public AfterLoginClient(ServerFacade serverFacade, BaseClient ogClient) {
         server = serverFacade;
-        client = OgClient;
+        client = ogClient;
         numGames=0;
     }
 
@@ -49,19 +49,19 @@ public class AfterLoginClient {
 
     public String observe(String... params) throws DataAccessException {
         if (params.length >= 1) {
-            Integer ID = null;
+            Integer iD = null;
             try {
-                ID = Integer.valueOf(params[0]);
+                iD = Integer.valueOf(params[0]);
             } catch (Exception e) {
                 throw new DataAccessException("Expected integer value for ID.");
             }
-            if (ID != null) {
+            if (iD != null) {
                 // if not a valid ID, throw error.
-                if(ID > numGames-1) {
+                if(iD > numGames-1) {
                     throw new DataAccessException("Sorry, that is not a valid ID.");
                 }
                 client.playerColor = "OBSERVING";
-                client.inGameClient.gameID = ID;
+                client.inGameClient.gameID = iD;
                 client.switchState("INGAME");
                 return "Successfully viewing game.";
             }
@@ -98,23 +98,23 @@ public class AfterLoginClient {
     public String join(String... params) throws DataAccessException {
         try {
             if (params.length >= 1) {
-                int ID = 100;
+                int iD = 100;
                 try {
-                    ID = Integer.parseInt(params[0]);
+                    iD = Integer.parseInt(params[0]);
                 } catch (Exception e) {
                     throw new DataAccessException("Game ID must be integer.");
                 }
                 String playerColor = params[1];
                 playerColor = playerColor.toUpperCase();
-                if(ID > numGames) {
+                if(iD > numGames) {
                     throw new DataAccessException("Sorry, that is not a valid ID.");
                 }
                 if(!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) {
                     throw new DataAccessException("Sorry, that is not a valid player color.");
                 }
-                server.joinGame(new JoinGameRequest(client.authToken, playerColor, ID));
+                server.joinGame(new JoinGameRequest(client.authToken, playerColor, iD));
                 client.playerColor = playerColor;
-                client.inGameClient.gameID = ID;
+                client.inGameClient.gameID = iD;
                 client.switchState("INGAME");
                 return String.format("Successfully joined game! Good luck!");
             }

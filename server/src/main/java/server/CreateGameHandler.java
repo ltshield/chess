@@ -1,6 +1,6 @@
 package server;
 
-import DataAccessException.DataAccessException;
+import dataexception.DataAccessException;
 import service.CreateGameRequest;
 import service.CreateGameResponse;
 import spark.Request;

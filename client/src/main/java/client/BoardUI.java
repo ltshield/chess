@@ -85,14 +85,7 @@ public class BoardUI {
         out.print(EMPTY.repeat(3));
         Collection<Character> headerItems = defineAndPrintHeaderWhite();
 
-        for (char item : headerItems) {
-            out.print(EMPTY);
-            out.print(item);
-            out.print(EMPTY);
-        }
-        out.print(EMPTY.repeat(3));
-        out.print(RESET_BG_COLOR);
-        out.print("\n");
+        drawHeader(out, headerItems);
 
         // 8 x 8 grid, black on bottom left
         ChessBoard grid = game.board;
@@ -102,16 +95,7 @@ public class BoardUI {
 
         // FOOTER
         out.print(SET_BG_COLOR_MAGENTA);
-        out.print(EMPTY.repeat(3));
-        for (char item : headerItems) {
-            out.print(EMPTY);
-            out.print(item);
-            out.print(EMPTY);
-        }
-        out.print(EMPTY.repeat(3));
-
-        out.print(RESET_BG_COLOR);
-        out.print("\n");
+        drawHeader(out, headerItems);
     }
 
     public static void handleBoardDrawing(PrintStream out, int i, ChessBoard grid) {
@@ -124,55 +108,19 @@ public class BoardUI {
             ChessPiece piece = grid.getPiece(new ChessPosition(i,j));
             if (j % 2 != 0 && i % 2 == 0) {
                 out.print(SET_BG_COLOR_WHITE);
-                if (piece != null) {
-                    ChessPiece.PieceType type = piece.getPieceType();
-                    ChessGame.TeamColor color = piece.getTeamColor();
-                    out.print(EMPTY);
-                    out.print(convertToColor(color));
-                    out.print(convertToChar(type));
-                    out.print(EMPTY);
-                } else {
-                    out.print(EMPTY.repeat(3));
-                }
+                printPieces(out, piece);
             }
             if (j % 2 == 0 && i % 2 == 0) {
                 out.print(SET_BG_COLOR_BLACK);
-                if (piece != null) {
-                    ChessPiece.PieceType type = piece.getPieceType();
-                    ChessGame.TeamColor color = piece.getTeamColor();
-                    out.print(EMPTY);
-                    out.print(convertToColor(color));
-                    out.print(convertToChar(type));
-                    out.print(EMPTY);
-                } else {
-                    out.print(EMPTY.repeat(3));
-                }
+                printPieces(out, piece);
             }
             if (j % 2 == 0 && i % 2 != 0) {
                 out.print(SET_BG_COLOR_WHITE);
-                if (piece != null) {
-                    ChessPiece.PieceType type = piece.getPieceType();
-                    ChessGame.TeamColor color = piece.getTeamColor();
-                    out.print(EMPTY);
-                    out.print(convertToColor(color));
-                    out.print(convertToChar(type));
-                    out.print(EMPTY);
-                } else {
-                    out.print(EMPTY.repeat(3));
-                }
+                printPieces(out, piece);
             }
             if (j % 2 != 0 && i % 2 != 0) {
                 out.print(SET_BG_COLOR_BLACK);
-                if (piece != null) {
-                    ChessPiece.PieceType type = piece.getPieceType();
-                    ChessGame.TeamColor color = piece.getTeamColor();
-                    out.print(EMPTY);
-                    out.print(convertToColor(color));
-                    out.print(convertToChar(type));
-                    out.print(EMPTY);
-                } else {
-                    out.print(EMPTY.repeat(3));
-                }
+                printPieces(out, piece);
             }
         }
         out.print(SET_BG_COLOR_MAGENTA);
@@ -182,6 +130,19 @@ public class BoardUI {
         out.print(EMPTY);
         out.print(RESET_BG_COLOR);
         out.print("\n");
+    }
+
+    public static void printPieces(PrintStream out, ChessPiece piece) {
+        if (piece != null) {
+            ChessPiece.PieceType type = piece.getPieceType();
+            ChessGame.TeamColor color = piece.getTeamColor();
+            out.print(EMPTY);
+            out.print(convertToColor(color));
+            out.print(convertToChar(type));
+            out.print(EMPTY);
+        } else {
+            out.print(EMPTY.repeat(3));
+        }
     }
 
     public static void printBlackBoard() {
@@ -195,15 +156,7 @@ public class BoardUI {
         out.print(EMPTY.repeat(3));
         Collection<Character> headerItems = defineAndPrintHeaderBlack();
 
-        // TODO: if white, keep headers and footers the same, if black switch them
-        for (char item : headerItems) {
-            out.print(EMPTY);
-            out.print(item);
-            out.print(EMPTY);
-        }
-        out.print(EMPTY.repeat(3));
-        out.print(RESET_BG_COLOR);
-        out.print("\n");
+        drawHeader(out, headerItems);
 
         // 8 x 8 grid, black on bottom left
         ChessBoard grid = game.board;
@@ -213,6 +166,10 @@ public class BoardUI {
 
         // FOOTER
         out.print(SET_BG_COLOR_MAGENTA);
+        drawHeader(out, headerItems);
+    }
+
+    public static void drawHeader(PrintStream out, Collection<Character> headerItems) {
         out.print(EMPTY.repeat(3));
         for (char item : headerItems) {
             out.print(EMPTY);

@@ -1,7 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import DataAccessException.DataAccessException;
+import dataexception.DataAccessException;
 import spark.Response;
 
 import java.util.Map;

@@ -1,4 +1,4 @@
-package DataAccessException;
+package dataexception;
 
 /**
  * Indicates there was an error connecting to the database

@@ -1,6 +1,6 @@
 package dataaccess;
 
-import DataAccessException.DataAccessException;
+import dataexception.DataAccessException;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
@@ -154,21 +154,6 @@ public class SQLGameData extends SQLBase {
             throw new DataAccessException("Error: bad request");
         }
         return finalStatement;
-    }
-
-    public boolean inIt(Connection conn, int gameID) throws DataAccessException {
-        String statement = "SELECT game FROM game WHERE id=?";
-        try (var ps = conn.prepareStatement(statement)) {
-            ps.setInt(1, gameID);
-            try (var rs = ps.executeQuery()) {
-                if (!rs.next()) {
-                    return false;
-                }
-            }
-        } catch (Exception e) {
-            throw new DataAccessException("Error: bad request");
-        }
-        return true;
     }
 
     public void deleteAllGames() throws DataAccessException {

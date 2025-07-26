@@ -1,7 +1,7 @@
 package client;
 
 import com.google.gson.Gson;
-import DataAccessException.DataAccessException;
+import dataexception.DataAccessException;
 
 import service.*;
 
@@ -95,13 +95,6 @@ public class ServerFacade {
             if (status == 400) {throw new DataAccessException("Please respond in the correct format.");}
             if (status == 401) {throw new DataAccessException("You are unauthorized to use that command.");}
             else {throw new DataAccessException(http.getResponseMessage());}
-
-//            try (InputStream respErr = http.getErrorStream()) {
-//                if (respErr != null) {
-////                    if (http.getResponseMessage().equals("Forbidden")) {
-////                        throw new DataAccessException("Sorry, there is already an account with that username.");
-////                    }
-//                    System.out.println(respErr.toString());}}
         }
     }
 
