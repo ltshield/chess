@@ -3,7 +3,6 @@ package client;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import DataAccessException.DataAccessException;
-import dataaccess.DatabaseManager;
 
 import java.util.Arrays;
 
