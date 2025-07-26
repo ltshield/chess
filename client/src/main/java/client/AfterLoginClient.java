@@ -4,6 +4,7 @@ import dataexception.DataAccessException;
 import service.*;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 public class AfterLoginClient {
     private final ServerFacade server;
@@ -73,7 +74,7 @@ public class AfterLoginClient {
         if (params.length >= 1) {
             CreateGameResponse res = server.createGame(new CreateGameRequest(client.authToken, params[0]));
             numGames += 1;
-            return String.format("Game %s created. If you would like to join use ID: %d", params[0], res.gameID());
+            return String.format("Game %s created.", params[0]);
         }
         throw new DataAccessException("Expected: <NAME>");
     }
@@ -89,7 +90,15 @@ public class AfterLoginClient {
         numGames = 0;
         for (ListGameResponse game : res.games()) {
             numGames += 1;
-            string = string + String.format("\n %d %s: %s | %s", game.gameID(), game.gameName(), game.whiteUsername(), game.blackUsername());
+            String whiteUsername = "Available";
+            String blackUsername = "Available";
+            if (game.whiteUsername() != null) {
+                whiteUsername = String.format("%s", game.whiteUsername());
+            }
+            if (game.blackUsername() != null) {
+                blackUsername = String.format("%s", game.blackUsername());
+            }
+            string = string + String.format("\n %d %s: (WHITE) %s | (BLACK) %s", numGames, game.gameName(), whiteUsername, blackUsername);
         }
         string += "\n";
         return string;
@@ -97,6 +106,7 @@ public class AfterLoginClient {
 
     public String join(String... params) throws DataAccessException {
         try {
+            ListGamesResponse res = server.listGames(new ListGamesRequest(client.authToken));
             if (params.length >= 1) {
                 int iD = 100;
                 try {
@@ -112,16 +122,46 @@ public class AfterLoginClient {
                 if(!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) {
                     throw new DataAccessException("Sorry, that is not a valid player color.");
                 }
+                Collection<ListGameResponse> gamesInQuestion = res.games();
+                int i = 1;
+                ListGameResponse toDealWith = null;
+                for (ListGameResponse resp : gamesInQuestion) {
+                    if (i==iD) {
+                        toDealWith = resp;
+                    }
+                    i++;
+                }
+                if (toDealWith.whiteUsername() != null) {
+                    if (toDealWith.whiteUsername().equals(client.username) && playerColor.equals("WHITE")) {
+                        client.playerColor = "WHITE";
+                        client.inGameClient.gameID = iD;
+                        client.switchState("INGAME");
+                        System.out.println(String.format("Successfully joined game! Good luck!"));
+                        return client.eval("help");
+                    }
+                }
+
+                if (toDealWith.blackUsername() != null) {
+                    if (toDealWith.blackUsername().equals(client.username) && playerColor.equals("BLACK")) {
+                        client.playerColor = "BLACK";
+                        client.inGameClient.gameID = iD;
+                        client.switchState("INGAME");
+                        System.out.println(String.format("Successfully joined game! Good luck!"));
+                        return client.eval("help");
+                    }
+                }
                 server.joinGame(new JoinGameRequest(client.authToken, playerColor, iD));
                 client.playerColor = playerColor;
                 client.inGameClient.gameID = iD;
                 client.switchState("INGAME");
-                return String.format("Successfully joined game! Good luck!");
+                System.out.println(String.format("Successfully joined game! Good luck!"));
+                return client.eval("help");
             }
         } catch (Exception e) {
             if (e instanceof DataAccessException) {throw e;}
             if (e instanceof ArrayIndexOutOfBoundsException) {throw new DataAccessException("That is not a valid ID.");}
-            else {throw new DataAccessException("Expected: <ID> <WHITE|BLACK>");}
+            else {System.out.println(e.getMessage());
+                throw new DataAccessException("Expected: <ID> <WHITE|BLACK>");}
         }
         return "";
     }

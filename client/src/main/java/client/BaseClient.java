@@ -9,6 +9,7 @@ public class BaseClient {
     public String state = "LOGGEDOUT";
     public String authToken;
     public String playerColor;
+    public String username;
     private final BeforeLoginClient beforeLoginClient;
     private final AfterLoginClient afterLoginClient;
     public final InGameClient inGameClient;

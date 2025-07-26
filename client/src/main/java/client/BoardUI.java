@@ -82,7 +82,6 @@ public class BoardUI {
         out.print(SET_BG_COLOR_MAGENTA);
 
         // HEADER
-        out.print(EMPTY.repeat(3));
         Collection<Character> headerItems = defineAndPrintHeaderWhite();
 
         drawHeader(out, headerItems);
@@ -153,7 +152,6 @@ public class BoardUI {
         out.print(SET_BG_COLOR_MAGENTA);
 
         // HEADER
-        out.print(EMPTY.repeat(3));
         Collection<Character> headerItems = defineAndPrintHeaderBlack();
 
         drawHeader(out, headerItems);

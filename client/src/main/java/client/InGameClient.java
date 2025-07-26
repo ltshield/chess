@@ -1,6 +1,9 @@
 package client;
 
 import chess.ChessGame;
+import dataexception.DataAccessException;
+import service.LoginRequest;
+import service.LoginResult;
 
 import java.util.Arrays;
 
@@ -18,7 +21,9 @@ public class InGameClient {
 
     public String help() {
         return """
-                - redraw
+                - draw
+                - exit
+                - quit
                 """;
     }
 
@@ -27,12 +32,19 @@ public class InGameClient {
         var cmd = (tokens.length > 0) ? tokens[0] : "help";
         var params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
-            case "redraw" -> drawBoard();
+            case "draw" -> drawBoard();
+            case "exit" -> exitGame();
             case "quit" -> "quit";
             default -> help();
         };
     }
 
+    public String exitGame() {
+        client.switchState("LOGGEDIN");
+        String formatted = String.format("You have successfully exited the game.");
+        System.out.println(formatted);
+        return client.eval("list");
+    }
     public String drawBoard() {
         BoardUI board = new BoardUI(new ChessGame());
         board.drawBoard(client.playerColor);

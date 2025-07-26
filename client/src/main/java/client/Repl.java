@@ -11,7 +11,7 @@ public class Repl {
     }
 
     public void run() {
-        System.out.println("\uD838\uDC36 Welcome to my Chess Server. Sign in or register to start.");
+        System.out.println("Welcome to my Chess Server. Sign in or register to start.");
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
