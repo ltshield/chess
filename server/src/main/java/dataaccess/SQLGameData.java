@@ -156,6 +156,21 @@ public class SQLGameData extends SQLBase {
         return finalStatement;
     }
 
+    public boolean inIt(Connection conn, int gameID) throws DataAccessException {
+        String statement = "SELECT game FROM game WHERE id=?";
+        try (var ps = conn.prepareStatement(statement)) {
+            ps.setInt(1, gameID);
+            try (var rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: bad request");
+        }
+        return true;
+    }
+
     public void deleteAllGames() throws DataAccessException {
         var statement = "TRUNCATE game";
         executeUpdate(statement);

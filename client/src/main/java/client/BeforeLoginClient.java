@@ -46,7 +46,9 @@ public class BeforeLoginClient {
                 RegisterResult res = server.register(new RegisterRequest(params[0], params[1], params[2]));
                 client.authToken = res.authToken();
                 client.switchState("LOGGEDIN");
-                return String.format("You have successfully registered. Welcome to the server %s.", params[0]);
+                String formatted = String.format("You have successfully registered. Welcome to the server %s.", params[0]);
+                System.out.println(formatted);
+                return client.eval("list");
             }
         } catch (Exception e) {
             if (e instanceof DataAccessException) {
@@ -63,7 +65,9 @@ public class BeforeLoginClient {
             LoginResult res = server.login(new LoginRequest(params[0], params[1]));
             client.authToken = res.authToken();
             client.switchState("LOGGEDIN");
-            return String.format("Welcome back %s!", params[0]);
+            String formatted = String.format("Welcome back %s!", params[0]);
+            System.out.println(formatted);
+            return client.eval("list");
         }
         throw new DataAccessException("Expected: <username> <password>.");
     }
