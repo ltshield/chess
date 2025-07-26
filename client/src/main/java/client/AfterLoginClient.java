@@ -1,3 +1,5 @@
+package client;
+
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import service.*;
