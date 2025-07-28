@@ -21,7 +21,7 @@ public class InGameClient {
 
     public String help() {
         return """
-                - draw
+                - draw: draws game board
                 - exit
                 - quit
                 """;

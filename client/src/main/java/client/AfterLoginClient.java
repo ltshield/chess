@@ -58,7 +58,7 @@ public class AfterLoginClient {
             }
             if (iD != null) {
                 // if not a valid ID, throw error.
-                if(iD > numGames-1) {
+                if(iD > numGames) {
                     throw new DataAccessException("Sorry, that is not a valid ID.");
                 }
                 client.playerColor = "OBSERVING";
