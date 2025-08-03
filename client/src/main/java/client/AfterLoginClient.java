@@ -2,6 +2,9 @@ package client;
 
 import dataexception.DataAccessException;
 import service.*;
+import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
+import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,6 +12,7 @@ import java.util.Collection;
 public class AfterLoginClient {
     private final ServerFacade server;
     private final BaseClient client;
+    public InGameClient inGameClient;
     private int numGames;
 
     public AfterLoginClient(ServerFacade serverFacade, BaseClient ogClient) {
@@ -155,6 +159,8 @@ public class AfterLoginClient {
                 client.inGameClient.gameID = iD;
                 client.switchState("INGAME");
                 System.out.println(String.format("Successfully joined game! Good luck!"));
+                WebSocketFacade webSocketFacade = new WebSocketFacade(server.serverUrl, inGameClient);
+                webSocketFacade.send("Connected");
                 return client.eval("help");
             }
         } catch (Exception e) {

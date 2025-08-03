@@ -1,5 +1,6 @@
 package server;
 import dataaccess.SQLDao;
+import server.websocket.WebSocketHandler;
 import spark.*;
 
 public class Server {
@@ -26,6 +27,7 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         //This line initializes the server and can be removed once you have a functioning endpoint
+        Spark.webSocket("/ws", new WebSocketHandler());
         Spark.delete("/db", new ClearHandler(this));
         Spark.post("/user", new RegisterHandler(this));
         Spark.post("/session", new LoginHandler(this));

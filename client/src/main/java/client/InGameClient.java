@@ -1,13 +1,12 @@
 package client;
 
+import websocket.NotificationHandler;
+import websocket.messages.ServerMessage;
 import chess.ChessGame;
-import dataexception.DataAccessException;
-import service.LoginRequest;
-import service.LoginResult;
 
 import java.util.Arrays;
 
-public class InGameClient {
+public class InGameClient implements NotificationHandler {
     private final ServerFacade server;
     private final BaseClient client;
     public Integer gameID;
@@ -26,6 +25,18 @@ public class InGameClient {
                 - quit
                 """;
     }
+
+    public void notify(ServerMessage message) {
+//        websocket.messages.ServerMessage.ServerMessageType type =
+//        switch (message.getServerMessageType()) {
+//            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getMessage());
+//            case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
+//            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGame());
+//        };
+        System.out.println(message);
+    }
+
+
 
     public String eval(String input) {
         var tokens = input.toLowerCase().split(" ");
