@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -43,6 +44,28 @@ public class SQLGameData extends SQLBase {
         } catch (SQLException e) {
             throw new DataAccessException("Error: internal error");
         }
+    }
+
+    public ChessGame getGameBoard(int gameID) throws DataAccessException {
+        ChessGame actualGame = null;
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "SELECT game FROM game WHERE id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String game = rs.getString("game");
+                        actualGame = new Gson().fromJson(game, ChessGame.class);
+                    }
+                    else {
+                        throw new DataAccessException("Error: bad request");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: bad request");
+        }
+        return actualGame;
     }
 
     public int createGame(String gameName, String authToken) throws DataAccessException{
@@ -96,6 +119,62 @@ public class SQLGameData extends SQLBase {
             throw new DataAccessException("Error: internal error");
         }
         return games;
+    }
+
+    public boolean checkIfInGame(String authToken, int gameID, String playerColor) throws DataAccessException {
+        try {
+            Collection<String> availableColors = new ArrayList<>();
+            availableColors.add("WHITE");
+            availableColors.add("BLACK");
+            if (playerColor == null || !availableColors.contains(playerColor)) {
+                throw new DataAccessException("Error: bad request");
+            }
+
+            AuthData user = null;
+            try {
+                user = server.db.authDataDAO.getAuth(authToken);
+            } catch(DataAccessException e) {
+                throw e;
+            }
+
+            boolean finalStatement = false;
+            try (var conn = DatabaseManager.getConnection()) {
+                finalStatement = checkHelperFunc(conn, gameID, playerColor, user.username());
+            } catch (Exception e) {
+                throw e;
+            }
+            return finalStatement;
+        } catch (DataAccessException e) {
+            throw e;
+        }
+        catch (SQLException e) {
+            throw new DataAccessException("Error: internal error");
+        }
+    }
+
+    public boolean checkHelperFunc(Connection conn, int gameID, String playerColor, String username) throws DataAccessException{
+        String statement = "SELECT whiteUsername, blackUsername FROM game WHERE id=?";
+        try (var ps = conn.prepareStatement(statement)) {
+            ps.setInt(1, gameID);
+            try (var rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String whiteUser = rs.getString("whiteUsername");
+                    String blackUser = rs.getString("blackUsername");
+                    if (playerColor.equals("WHITE") && Objects.equals(whiteUser, username)) {
+                        return true;
+                    }
+                    else if (playerColor.equals("BLACK") && Objects.equals(blackUser, username)) {
+                        return true;
+                    }
+                }
+                else {
+                    throw new DataAccessException("Error: bad request");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error: bad request");
+        }
+        return false;
     }
 
     public void addUserToGame(String authToken, int gameID, String playerColor) throws DataAccessException {

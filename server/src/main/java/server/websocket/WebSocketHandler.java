@@ -29,16 +29,40 @@ public class WebSocketHandler {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
             AuthData authData = getUsername(command.getAuthToken());
             String username = authData.username();
-            saveSession(command.getGameID(), session);
+            saveSession(username, command.getGameID(), session);
+            Integer gameID = command.gameID;
 
             switch (command.getCommandType()) {
-                case CONNECT -> connect(session, username, command);
-//                case MAKE_MOVE -> makeMove(session, username, command);
-//                case LEAVE -> leaveGame(session, username, command);
-//                case RESIGN -> resign(session, username, command);
+                case CONNECT -> connect(session, username, gameID);
+//                case MAKE_MOVE -> makeMove(session, username);
+                case LEAVE -> leaveGame(username);
+//                case RESIGN -> resign(session, username);
             }
         } catch (Exception e) {
             sendMessage(session, new DataAccessException("Error: unauthorized"));
+        }
+    }
+
+    private void leaveGame(String username) throws DataAccessException {
+        connections.remove(username);
+        var message = String.format("%s has left the game!", username);
+        var notification = new NotificationMessage(message);
+        try {
+            System.out.println("We are here?");
+            connections.broadcast(username, notification);
+        } catch (Exception e) {
+            throw new DataAccessException("Error: broadcasting went wrong.");
+        }
+    }
+    private void connect(Session session, String username, Integer gameID) throws DataAccessException {
+        connections.add(username, gameID, session);
+        var message = String.format("%s has joined the game!", username);
+        var notification = new NotificationMessage(message);
+        try {
+            System.out.println("We are here?");
+            connections.broadcast(username, notification);
+        } catch (Exception e) {
+            throw new DataAccessException("Error: broadcasting went wrong.");
         }
     }
 
@@ -74,18 +98,9 @@ public class WebSocketHandler {
         }
     }
 
-    public void connect(Session session, String username, UserGameCommand command) {
-        connections.add(username, session);
-        System.out.println("Made it to connect method");
-        try {
-            session.getRemote().sendString("Done");
-        } catch (Exception e) {
-            System.out.println("Whoops");
-        }
-    }
-
-    public void saveSession(Integer gameID, Session session) {
-        games.put(gameID, session);
+    public void saveSession(String visitorName, Integer gameID, Session session) {
+        Connection connection = new Connection(visitorName, session);
+        connections.connections.put(gameID, connection);
     }
 
 }

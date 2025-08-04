@@ -50,10 +50,10 @@ public class ServerFacade {
         return makeRequest("POST", path, req, CreateGameResponse.class, authToken);
     }
 
-    public void joinGame(JoinGameRequest req) throws DataAccessException {
+    public JoinGameResponse joinGame(JoinGameRequest req) throws DataAccessException {
         var path = "/game";
         String authToken = req.authToken();
-        makeRequest("PUT", path, req, null, authToken);
+        return makeRequest("PUT", path, req, JoinGameResponse.class, authToken);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {

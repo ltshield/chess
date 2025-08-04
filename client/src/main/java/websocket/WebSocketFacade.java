@@ -52,6 +52,10 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+    public void makeMoveClient(String authToken, Integer gameID) throws DataAccessException {
+
+    }
+
     public void leaveGameClient(String authToken, Integer gameID) throws DataAccessException {
         try {
             var action = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);

@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataexception.DataAccessException;
 import model.AuthData;
 import model.GameData;
@@ -58,6 +59,10 @@ public class UserService {
             server.db.clear();
     }
 
+    public ChessGame getGameBoard(int gameID) throws DataAccessException {
+        return server.db.gameDataDAO.getGameBoard(gameID);
+    }
+
     public ListGamesResponse listGames(String authToken) throws DataAccessException {
         try {
             Collection<GameData> games = server.db.gameDataDAO.listGames(authToken);
@@ -81,9 +86,15 @@ public class UserService {
         }
     }
 
-    public void joinGame(JoinGameRequest gameRequest) throws DataAccessException {
+    public JoinGameResponse joinGame(JoinGameRequest gameRequest) throws DataAccessException {
         try {
-            server.db.gameDataDAO.addUserToGame(gameRequest.authToken(), gameRequest.gameID(), gameRequest.playerColor());
+            if (server.db.gameDataDAO.checkIfInGame(gameRequest.authToken(), gameRequest.gameID(), gameRequest.playerColor())) {
+                return new JoinGameResponse(gameRequest.gameID(), getGameBoard(gameRequest.gameID()));
+            } else {
+                server.db.gameDataDAO.addUserToGame(gameRequest.authToken(), gameRequest.gameID(), gameRequest.playerColor());
+                JoinGameResponse newResponse = new JoinGameResponse(gameRequest.gameID(), getGameBoard(gameRequest.gameID()));
+                return newResponse;
+            }
         } catch (DataAccessException e) {
             throw e;
         }

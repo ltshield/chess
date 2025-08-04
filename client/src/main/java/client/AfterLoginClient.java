@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import dataexception.DataAccessException;
 import service.*;
 import websocket.NotificationHandler;
@@ -139,7 +140,11 @@ public class AfterLoginClient {
                     if (toDealWith.whiteUsername().equals(client.username) && playerColor.equals("WHITE")) {
                         client.playerColor = "WHITE";
                         client.inGameClient.gameID = iD;
+                        JoinGameResponse resp = server.joinGame(new JoinGameRequest(client.authToken, playerColor, iD));
+                        client.inGameClient.game = resp.game();
                         client.switchState("INGAME");
+                        client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, inGameClient);
+                        client.inGameClient.webSocketFacade.enterGameClient(client.authToken, iD);
                         System.out.println(String.format("Successfully joined game! Good luck!"));
                         return client.eval("help");
                     }
@@ -150,16 +155,21 @@ public class AfterLoginClient {
                         client.playerColor = "BLACK";
                         client.inGameClient.gameID = iD;
                         client.switchState("INGAME");
+                        JoinGameResponse resp = server.joinGame(new JoinGameRequest(client.authToken, playerColor, iD));
+                        client.inGameClient.game = resp.game();
+                        client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, inGameClient);
+                        client.inGameClient.webSocketFacade.enterGameClient(client.authToken, iD);
                         System.out.println(String.format("Successfully joined game! Good luck!"));
                         return client.eval("help");
                     }
                 }
-                server.joinGame(new JoinGameRequest(client.authToken, playerColor, iD));
+                JoinGameResponse resp = server.joinGame(new JoinGameRequest(client.authToken, playerColor, iD));
+                client.inGameClient.game = resp.game();
                 client.playerColor = playerColor;
                 client.inGameClient.gameID = iD;
+
                 client.switchState("INGAME");
                 System.out.println(String.format("Successfully joined game! Good luck!"));
-//                webSocketFacade.send("Connected");
                 client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, inGameClient);
                 client.inGameClient.webSocketFacade.enterGameClient(client.authToken, iD);
                 return client.eval("help");

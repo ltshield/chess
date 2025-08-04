@@ -1,9 +1,6 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -74,7 +71,7 @@ public class BoardUI {
         headerItems.add('a');
         return headerItems;
     }
-    public static void printWhiteBoard() {
+    public static void printWhiteBoard(Collection<ChessPosition> toHighlight) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(RESET_TEXT_COLOR);
 
@@ -89,7 +86,7 @@ public class BoardUI {
         // 8 x 8 grid, black on bottom left
         ChessBoard grid = game.board;
         for (int i=8; i >= 1; i--) {
-            handleBoardDrawing(out, i, grid);
+            handleBoardDrawing(out, i, grid, toHighlight);
         }
 
         // FOOTER
@@ -97,29 +94,50 @@ public class BoardUI {
         drawHeader(out, headerItems);
     }
 
-    public static void handleBoardDrawing(PrintStream out, int i, ChessBoard grid) {
+    public static void handleBoardDrawing(PrintStream out, int i, ChessBoard grid, Collection<ChessPosition> toHighlight) {
 
         out.print(SET_BG_COLOR_MAGENTA);
         out.print(EMPTY);
         out.print(i);
         out.print(EMPTY);
         for (int j = 1; j <= 8; j++) {
+            ChessPosition testPos = new ChessPosition(i, j);
             ChessPiece piece = grid.getPiece(new ChessPosition(i,j));
             if (j % 2 != 0 && i % 2 == 0) {
-                out.print(SET_BG_COLOR_WHITE);
-                printPieces(out, piece);
+                if (toHighlight != null && toHighlight.contains(testPos)) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                    printPieces(out, piece);
+                } else {
+                    out.print(SET_BG_COLOR_WHITE);
+                    printPieces(out, piece);
+                }
             }
             if (j % 2 == 0 && i % 2 == 0) {
-                out.print(SET_BG_COLOR_BLACK);
-                printPieces(out, piece);
+                if (toHighlight != null && toHighlight.contains(testPos)) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                    printPieces(out, piece);
+                } else {
+                    out.print(SET_BG_COLOR_BLACK);
+                    printPieces(out, piece);
+                }
             }
             if (j % 2 == 0 && i % 2 != 0) {
-                out.print(SET_BG_COLOR_WHITE);
-                printPieces(out, piece);
+                if (toHighlight != null && toHighlight.contains(testPos)) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                    printPieces(out, piece);
+                } else {
+                    out.print(SET_BG_COLOR_WHITE);
+                    printPieces(out, piece);
+                }
             }
             if (j % 2 != 0 && i % 2 != 0) {
-                out.print(SET_BG_COLOR_BLACK);
-                printPieces(out, piece);
+                if (toHighlight != null && toHighlight.contains(testPos)) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                    printPieces(out, piece);
+                } else {
+                    out.print(SET_BG_COLOR_BLACK);
+                    printPieces(out, piece);
+                }
             }
         }
         out.print(SET_BG_COLOR_MAGENTA);
@@ -144,7 +162,8 @@ public class BoardUI {
         }
     }
 
-    public static void printBlackBoard() {
+    public static void printBlackBoard(Collection<ChessPosition> toHighlight) {
+        Collection<ChessPosition> highlightThese = toHighlight;
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(RESET_TEXT_COLOR);
 
@@ -159,7 +178,7 @@ public class BoardUI {
         // 8 x 8 grid, black on bottom left
         ChessBoard grid = game.board;
         for (int i=1; i <= 8; i++) {
-            handleBoardDrawing(out, i, grid);
+            handleBoardDrawing(out, i, grid, highlightThese);
         }
 
         // FOOTER
@@ -180,15 +199,24 @@ public class BoardUI {
         out.print("\n");
     }
 
-    public static void drawBoard(String playerColor) {
+    public static void drawHighlightedBoard(String playerColor, ChessPosition position) {
+        Collection<ChessMove> possibleMoves = game.validMoves(position);
+        Collection<ChessPosition> possibleSpaces = new ArrayList<>();
+        for (ChessMove move: possibleMoves) {
+            possibleSpaces.add(move.getEndPosition());
+        }
+        drawBoard(playerColor, possibleSpaces);
+    }
+
+    public static void drawBoard(String playerColor, Collection<ChessPosition> toHighlight) {
         if (playerColor.equals("WHITE")) {
-            printWhiteBoard();
+            printWhiteBoard(toHighlight);
         }
         if (playerColor.equals("BLACK")) {
-            printBlackBoard();
+            printBlackBoard(toHighlight);
         }
         if (playerColor.equals("OBSERVING")) {
-            printWhiteBoard();
+            printWhiteBoard(toHighlight);
         }
     }
 }
