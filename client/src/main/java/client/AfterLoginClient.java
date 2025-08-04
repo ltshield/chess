@@ -159,8 +159,9 @@ public class AfterLoginClient {
                 client.inGameClient.gameID = iD;
                 client.switchState("INGAME");
                 System.out.println(String.format("Successfully joined game! Good luck!"));
-                WebSocketFacade webSocketFacade = new WebSocketFacade(server.serverUrl, inGameClient);
-                webSocketFacade.send("Connected");
+//                webSocketFacade.send("Connected");
+                client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, inGameClient);
+                client.inGameClient.webSocketFacade.enterGameClient(client.authToken, iD);
                 return client.eval("help");
             }
         } catch (Exception e) {

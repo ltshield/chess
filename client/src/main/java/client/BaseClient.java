@@ -19,7 +19,7 @@ public class BaseClient {
         serverFacade = new ServerFacade(serverUrl);
         beforeLoginClient = new BeforeLoginClient(serverFacade, this);
         afterLoginClient = new AfterLoginClient(serverFacade, this);
-        inGameClient = new InGameClient(serverFacade, this, null);
+        inGameClient = new InGameClient(serverFacade, this, null, null);
     }
 
     public void switchState(String newState) {

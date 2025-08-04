@@ -1,6 +1,8 @@
 package client;
 
+import dataexception.DataAccessException;
 import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
 import websocket.messages.ServerMessage;
 import chess.ChessGame;
 
@@ -11,11 +13,14 @@ public class InGameClient implements NotificationHandler {
     private final BaseClient client;
     public Integer gameID;
 
+    public WebSocketFacade webSocketFacade;
 
-    public InGameClient(ServerFacade serverFacade, BaseClient ogClient, Integer gameid) {
+
+    public InGameClient(ServerFacade serverFacade, BaseClient ogClient, Integer gameid, WebSocketFacade webSocketFac) {
         server = serverFacade;
         client = ogClient;
         gameID = gameid;
+        webSocketFacade = webSocketFac;
     }
 
     public String help() {
@@ -54,8 +59,14 @@ public class InGameClient implements NotificationHandler {
         client.switchState("LOGGEDIN");
         String formatted = String.format("You have successfully exited the game.");
         System.out.println(formatted);
+        try {
+            webSocketFacade.leaveGameClient(client.authToken, gameID);
+        } catch (Exception e) {
+            System.out.println("Seems like there was an error exiting the game.");
+        }
         return client.eval("list");
     }
+
     public String drawBoard() {
         BoardUI board = new BoardUI(new ChessGame());
         board.drawBoard(client.playerColor);

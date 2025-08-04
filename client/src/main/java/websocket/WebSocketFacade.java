@@ -1,6 +1,7 @@
 package websocket;
 
 import com.google.gson.Gson;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
@@ -40,6 +41,25 @@ public class WebSocketFacade extends Endpoint {
     //Endpoint requires this method, but you don't have to do anything
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+    }
+
+    public void enterGameClient(String authToken, Integer gameID) throws DataAccessException {
+        try {
+            var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        } catch (IOException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+    }
+
+    public void leaveGameClient(String authToken, Integer gameID) throws DataAccessException {
+        try {
+            var action = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+            this.session.close();
+        } catch (IOException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
     }
 
     public void send(String message) throws DataAccessException {
