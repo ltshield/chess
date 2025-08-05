@@ -17,7 +17,7 @@ import java.sql.SQLException;
 @WebSocket
 public class WebSocketHandler {
 
-    private final ConnectionManager connections = new ConnectionManager();
+    private final ConnectionManager connectionManager = new ConnectionManager();
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws DataAccessException  {
@@ -26,13 +26,13 @@ public class WebSocketHandler {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
             AuthData authData = getUsername(command.getAuthToken());
             String username = authData.username();
-            saveSession(username, command.getGameID(), session);
+//            saveSession(username, command.getGameID(), session);
             Integer gameID = command.gameID;
 
             switch (command.getCommandType()) {
                 case CONNECT -> connect(session, username, gameID);
 //                case MAKE_MOVE -> makeMove(session, username);
-                case LEAVE -> leaveGame(username);
+                case LEAVE -> leaveGame(username, gameID);
 //                case RESIGN -> resign(session, username);
             }
         } catch (Exception e) {
@@ -40,23 +40,23 @@ public class WebSocketHandler {
         }
     }
 
-    private void leaveGame(String username) throws DataAccessException {
-        connections.remove(username);
+    private void leaveGame(String username, Integer gameID) throws DataAccessException {
+        connectionManager.remove(username, gameID);
         var message = String.format("%s has left the game!", username);
         var notification = new NotificationMessage(message);
         try {
             System.out.println("Leaving game...");
-            connections.broadcast(username, notification);
+            connectionManager.broadcast(username, notification, gameID);
         } catch (Exception e) {
             throw new DataAccessException("Error: broadcasting went wrong.");
         }
     }
     private void connect(Session session, String username, Integer gameID) throws DataAccessException {
-        connections.add(username, gameID, session);
+        connectionManager.add(username, gameID, session);
         var message = String.format("%s has joined the game!", username);
         var notification = new NotificationMessage(message);
         try {
-            connections.broadcast(username, notification);
+            connectionManager.broadcast(username, notification, gameID);
         } catch (Exception e) {
             throw new DataAccessException("Error: broadcasting went wrong.");
         }
@@ -94,9 +94,9 @@ public class WebSocketHandler {
         }
     }
 
-    public void saveSession(String visitorName, Integer gameID, Session session) {
-        Connection connection = new Connection(visitorName, session);
-        connections.connections.put(gameID, connection);
-    }
+//    public void saveSession(String visitorName, Integer gameID, Session session) {
+//        Connection connection = new Connection(visitorName, session);
+//        connectionManager.add(visitorName, gameID, session);
+//    }
 
 }

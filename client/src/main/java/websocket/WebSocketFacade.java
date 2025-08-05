@@ -2,6 +2,7 @@ package websocket;
 
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
@@ -30,7 +31,11 @@ public class WebSocketFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-                    notificationHandler.notify(notification);
+                    if (notification.serverMessageType.equals(ServerMessage.ServerMessageType.NOTIFICATION)) {
+                        System.out.println("Here ya are.");
+                        NotificationMessage notifi = new Gson().fromJson(message, NotificationMessage.class);
+                        notificationHandler.notify(notifi);
+                    }
                 }
             });
         } catch (Exception e) {
