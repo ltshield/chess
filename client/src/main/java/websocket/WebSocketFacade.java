@@ -2,6 +2,8 @@ package websocket;
 
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -33,7 +35,14 @@ public class WebSocketFacade extends Endpoint {
                     if (notification.serverMessageType.equals(ServerMessage.ServerMessageType.NOTIFICATION)) {
                         NotificationMessage notifi = new Gson().fromJson(message, NotificationMessage.class);
                         notificationHandler.notify(notifi);
-//                        System.out.println(notifi.getMessage());
+                    }
+                    if (notification.serverMessageType.equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
+                        LoadGameMessage notifi = new Gson().fromJson(message, LoadGameMessage.class);
+                        notificationHandler.notify(notifi);
+                    }
+                    if (notification.serverMessageType.equals(ServerMessage.ServerMessageType.ERROR)) {
+                        ErrorMessage notifi = new Gson().fromJson(message, ErrorMessage.class);
+                        notificationHandler.notify(notifi);
                     }
                 }
             });
@@ -47,17 +56,40 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
+//    public void drawGame(String authToken, Integer gameID) throws DataAccessException {
+//        try {
+//            var action = new UserGameCommand(UserGameCommand.CommandType., authToken, gameID);
+//            this.session.getBasicRemote().sendText(new Gson().toJson(action));
+//        } catch (IOException ex) {
+//            throw new DataAccessException(ex.getMessage());
+//        }
+//    }
+
     public void enterGameClient(String authToken, Integer gameID) throws DataAccessException {
         try {
             var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
-            throw new DataAccessException(ex.getMessage());
+//            throwErrorClient(ex.getMessage());
+            System.out.println("I am in the enter game client.");
         }
     }
 
-    public void makeMoveClient(String authToken, Integer gameID) throws DataAccessException {
+//    public void throwErrorClient(String errorMessage) {
+//        try {
+//            var error = new ErrorMessage(errorMessage);
+//            this.session.getBasicRemote().sendText(new Gson().toJson(error));
+//        } catch (Exception e) {
+//            System.out.println("Whoops.");;
+//        }
+//    }
 
+    public void makeMoveClient(String authToken, Integer gameID) throws DataAccessException {
+        try {
+            ;
+        } catch (Exception e) {
+            System.out.println("I am in the make move client.");
+        }
     }
 
     public void leaveGameClient(String authToken, Integer gameID) throws DataAccessException {
@@ -66,7 +98,8 @@ public class WebSocketFacade extends Endpoint {
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
             this.session.close();
         } catch (IOException ex) {
-            throw new DataAccessException(ex.getMessage());
+//            throwErrorClient(ex.getMessage());
+            System.out.println("I am in the leave game client.");
         }
     }
 

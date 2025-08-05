@@ -4,14 +4,14 @@ import chess.ChessGame;
 
 public class LoadGameMessage extends ServerMessage {
 
-    private final ChessGame game;
+    private final int game;
 
-    public LoadGameMessage(ChessGame gam) {
+    public LoadGameMessage(Integer gam) {
         super(ServerMessageType.LOAD_GAME);
         game = gam;
     }
 
-    public ChessGame getGame() {
+    public Integer getGameID() {
         return game;
     }
 }

@@ -48,7 +48,16 @@ public class ConnectionManager {
                     if (notification.serverMessageType.equals(ServerMessage.ServerMessageType.NOTIFICATION)) {
                         c.send(new Gson().toJson(notification));
                     }
-//                    c.send(notification.toString());
+                }
+                if (c.username.equals(excludeVisitorName)) {
+                    if (notification.serverMessageType.equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
+                        c.send(new Gson().toJson(notification));
+                    }
+                }
+                if (c.username.equals(excludeVisitorName)) {
+                    if (notification.serverMessageType.equals(ServerMessage.ServerMessageType.ERROR)) {
+                        c.send(new Gson().toJson(notification));
+                    }
                 }
             } else {
                 removeList.add(c);

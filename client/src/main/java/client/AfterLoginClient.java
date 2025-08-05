@@ -177,10 +177,14 @@ public class AfterLoginClient {
                 return client.eval("help");
             }
         } catch (Exception e) {
-            if (e instanceof DataAccessException) {throw e;}
-            if (e instanceof ArrayIndexOutOfBoundsException) {throw new DataAccessException("That is not a valid ID.");}
+            if (e instanceof DataAccessException) {
+                throw e;
+            }
+            if (e instanceof ArrayIndexOutOfBoundsException) {
+                throw new DataAccessException("Sorry, that is not a valid option.");
+            }
             else {System.out.println(e.getMessage());
-                throw new DataAccessException("Expected: <ID> <WHITE|BLACK>");}
+            }
         }
         return "";
     }

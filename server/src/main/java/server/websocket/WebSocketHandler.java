@@ -38,7 +38,16 @@ public class WebSocketHandler {
 //                case RESIGN -> resign(session, username);
             }
         } catch (Exception e) {
+//            UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+//            AuthData authData = getUsername(command.getAuthToken());
+//            String username = authData.username();
+//            Integer gameID = command.gameID;
             sendMessage(session, new DataAccessException("Error: unauthorized"));
+//            try {
+//                connectionManager.broadcast(username, new ErrorMessage(e.getMessage()), gameID);
+//            } catch (Exception exc) {
+//                ;
+//            }
         }
     }
 
@@ -58,6 +67,8 @@ public class WebSocketHandler {
         var notification = new NotificationMessage(message);
         try {
             connectionManager.broadcast(username, notification, gameID);
+            var loadGameMessage = new LoadGameMessage(gameID);
+            connectionManager.broadcast(username, loadGameMessage, gameID);
         } catch (Exception e) {
             throw new DataAccessException("Error: broadcasting went wrong.");
         }
@@ -65,7 +76,8 @@ public class WebSocketHandler {
 
     private void sendMessage(Session session, DataAccessException e) throws DataAccessException {
         try {
-            session.getRemote().sendString(e.getMessage());
+            ErrorMessage err = new ErrorMessage(e.getMessage());
+            session.getRemote().sendString(new Gson().toJson(err));
         } catch (Exception apple) {
             throw new DataAccessException("Error: something went wrong");
         }

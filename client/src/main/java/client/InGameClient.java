@@ -49,7 +49,7 @@ public class InGameClient implements NotificationHandler {
         switch (message.getServerMessageType()) {
             case NOTIFICATION -> displayNotification(((NotificationMessage) message).getMessage());
             case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
-            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGame());
+            case LOAD_GAME -> loadGame();
         };
     }
 
@@ -63,7 +63,7 @@ public class InGameClient implements NotificationHandler {
 //        return ERROR;
     }
 
-    public void loadGame(ChessGame game) {
+    public void loadGame() {
         drawBoard();
 //        return LOAD_GAME;
     }
@@ -299,7 +299,8 @@ public class InGameClient implements NotificationHandler {
             webSocketFacade.leaveGameClient(client.authToken, gameID);
             webSocketFacade = null;
         } catch (Exception e) {
-            System.out.println("Seems like there was an error exiting the game.");
+//            webSocketFacade.throwErrorClient(e.getMessage());
+            System.out.println("I am in the exitgame function for ingame client.");
         }
         return client.eval("list");
     }
