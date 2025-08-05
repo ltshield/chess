@@ -1,6 +1,7 @@
 package client;
 
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import dataexception.DataAccessException;
 import service.*;
@@ -15,7 +16,6 @@ import chess.ChessGame;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import static websocket.messages.ServerMessage.ServerMessageType.*;
 
@@ -24,9 +24,7 @@ public class InGameClient implements NotificationHandler {
     private final BaseClient client;
     public Integer gameID;
     public WebSocketFacade webSocketFacade;
-
     public ChessGame game;
-
     public InGameClient(ServerFacade serverFacade, BaseClient ogClient, Integer gameid, WebSocketFacade webSocketFac) {
         server = serverFacade;
         client = ogClient;
@@ -47,7 +45,7 @@ public class InGameClient implements NotificationHandler {
     }
 
     public void notify(ServerMessage message) {
-        websocket.messages.ServerMessage.ServerMessageType type =
+//        websocket.messages.ServerMessage.ServerMessageType type =
         switch (message.getServerMessageType()) {
             case NOTIFICATION -> displayNotification(((NotificationMessage) message).getMessage());
             case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
@@ -55,19 +53,19 @@ public class InGameClient implements NotificationHandler {
         };
     }
 
-    public ServerMessage.ServerMessageType displayNotification(String message) {
+    public void displayNotification(String message) {
         System.out.println(message);
-        return NOTIFICATION;
+//        return NOTIFICATION;
     }
 
-    public ServerMessage.ServerMessageType displayError(String message) {
+    public void displayError(String message) {
         System.out.println(String.format("Error: %s", message));
-        return ERROR;
+//        return ERROR;
     }
 
-    public ServerMessage.ServerMessageType loadGame(ChessGame game) {
+    public void loadGame(ChessGame game) {
         drawBoard();
-        return LOAD_GAME;
+//        return LOAD_GAME;
     }
 
     public String eval(String input) {
@@ -77,7 +75,7 @@ public class InGameClient implements NotificationHandler {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "draw" -> drawBoard();
-                case "exit" -> exitGame();
+                case "leave" -> exitGame();
                 case "resign" -> resignGame();
                 case "quit" -> "quit";
                 case "highlight" -> highlightPossibilities(params);
@@ -162,6 +160,63 @@ public class InGameClient implements NotificationHandler {
     }
 
     public String performMove(String... params) {
+        if (client.playerColor.equals("OBSERVING")) {
+            System.out.println("Error: observers cannot make moves.");
+        }
+        ChessGame.TeamColor turn = game.getTeamTurn();
+        if (turn.equals(ChessGame.TeamColor.WHITE)) {
+            if (!client.playerColor.equals("WHITE")) {
+                System.out.println("Error: not your turn.");
+                return "";
+            }
+        }
+        if (turn.equals(ChessGame.TeamColor.BLACK)) {
+            if (!client.playerColor.equals("BLACK")) {
+                System.out.println("Error: not your turn.");
+                return "";
+            }
+        }
+        String startPos = params[0];
+        String[] startPositions = startPos.split("");
+        String endPos = params[1];
+        String[] endPositions = endPos.split("");
+
+        ChessPosition startPosition = new ChessPosition(Integer.parseInt(startPositions[0]), Integer.parseInt(startPositions[1]));
+        ChessPosition endPosition = new ChessPosition(Integer.parseInt(endPositions[0]), Integer.parseInt(endPositions[1]));
+        if (game.board.getPiece(startPosition) == null) {
+            System.out.println("Error: there is not a piece in that spot.");
+            return "";
+        }
+        if (game.board.getPiece(startPosition) != null) {
+            ChessPiece piece = game.board.getPiece(startPosition);
+            ChessGame.TeamColor color = piece.getTeamColor();
+            if (color.equals(ChessGame.TeamColor.WHITE) && client.playerColor.equals("BLACK")) {
+                System.out.println("Error: that piece is not yours to move.");
+                return "";
+            }
+            if (color.equals(ChessGame.TeamColor.BLACK) && client.playerColor.equals("WHITE")) {
+                System.out.println("Error: that piece is not yours to move.");
+                return "";
+            }
+            Collection<ChessMove> possibleMoves = game.validMoves(startPosition);
+            Collection<ChessPosition> possibleSpaces = new ArrayList<>();
+            for (ChessMove move: possibleMoves) {
+                possibleSpaces.add(move.getEndPosition());
+            }
+            // make the move!
+            if (possibleSpaces.contains(endPosition)) {
+                try {
+                    // TODO: implement pawn promotion logic too
+                    game.makeMove(new ChessMove(startPosition, endPosition, null));
+                    server.updateGame(new UpdateGameRequest(client.authToken, game, gameID));
+                    return "";
+                    // TODO: how to send the move back to the server?
+                } catch (Exception e) {
+                    System.out.println("Error: invalid move.");
+                    return "";
+                }
+            }
+        }
         return "";
     }
 

@@ -13,14 +13,11 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.*;
 
 import java.sql.SQLException;
-import java.sql.SQLOutput;
-import java.util.concurrent.ConcurrentHashMap;
 
 @WebSocket
 public class WebSocketHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
-    ConcurrentHashMap<Integer, Session> games = new ConcurrentHashMap<>();
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws DataAccessException  {
@@ -48,7 +45,7 @@ public class WebSocketHandler {
         var message = String.format("%s has left the game!", username);
         var notification = new NotificationMessage(message);
         try {
-            System.out.println("We are here?");
+            System.out.println("Leaving game...");
             connections.broadcast(username, notification);
         } catch (Exception e) {
             throw new DataAccessException("Error: broadcasting went wrong.");
@@ -59,7 +56,6 @@ public class WebSocketHandler {
         var message = String.format("%s has joined the game!", username);
         var notification = new NotificationMessage(message);
         try {
-            System.out.println("We are here?");
             connections.broadcast(username, notification);
         } catch (Exception e) {
             throw new DataAccessException("Error: broadcasting went wrong.");

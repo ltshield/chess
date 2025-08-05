@@ -7,12 +7,14 @@ import model.AuthData;
 import model.GameData;
 import server.Server;
 
+import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
+import static chess.ChessGame.TeamColor.WHITE;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
@@ -119,6 +121,20 @@ public class SQLGameData extends SQLBase {
             throw new DataAccessException("Error: internal error");
         }
         return games;
+    }
+
+    public void updateGameBoard(Integer gameID, ChessGame game) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "UPDATE game SET game=? WHERE id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                var json = new Gson().toJson(game);
+                ps.setString(1, json);
+                ps.setInt(2, gameID);
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: couldn't update game board.");
+        }
     }
 
     public boolean checkIfInGame(String authToken, int gameID, String playerColor) throws DataAccessException {

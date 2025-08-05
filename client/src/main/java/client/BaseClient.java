@@ -1,6 +1,7 @@
 package client;
 
 import chess.ChessGame;
+import websocket.NotificationHandler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +20,7 @@ public class BaseClient {
     public BaseClient(String serverurl) {
         serverUrl = serverurl;
         serverFacade = new ServerFacade(serverUrl);
+
         beforeLoginClient = new BeforeLoginClient(serverFacade, this);
         afterLoginClient = new AfterLoginClient(serverFacade, this);
         inGameClient = new InGameClient(serverFacade, this, null, null);

@@ -1,8 +1,10 @@
 package client;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataexception.DataAccessException;
 
+import server.Server;
 import service.*;
 
 import java.io.*;
@@ -54,6 +56,12 @@ public class ServerFacade {
         // set the authToken in the headers of the request before passing
         String authToken = req.authToken();
         return makeRequest("POST", path, req, CreateGameResponse.class, authToken);
+    }
+
+    public UpdateGameResponse updateGame(UpdateGameRequest req) throws DataAccessException {
+        var path = "/db";
+        String authToken = req.authToken();
+        return makeRequest("POST", path, req, UpdateGameResponse.class, authToken);
     }
 
     public JoinGameResponse joinGame(JoinGameRequest req) throws DataAccessException {

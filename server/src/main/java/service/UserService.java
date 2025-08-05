@@ -86,14 +86,18 @@ public class UserService {
         }
     }
 
+    public UpdateGameResponse updateGame(UpdateGameRequest gameRequest) throws DataAccessException {
+        server.db.gameDataDAO.updateGameBoard(gameRequest.gameID(), gameRequest.game());
+        return new UpdateGameResponse(gameRequest.game());
+    }
+
     public JoinGameResponse joinGame(JoinGameRequest gameRequest) throws DataAccessException {
         try {
             if (server.db.gameDataDAO.checkIfInGame(gameRequest.authToken(), gameRequest.gameID(), gameRequest.playerColor())) {
-                return new JoinGameResponse(gameRequest.gameID(), getGameBoard(gameRequest.gameID()));
+                    return new JoinGameResponse(gameRequest.gameID(), getGameBoard(gameRequest.gameID()));
             } else {
                 server.db.gameDataDAO.addUserToGame(gameRequest.authToken(), gameRequest.gameID(), gameRequest.playerColor());
-                JoinGameResponse newResponse = new JoinGameResponse(gameRequest.gameID(), getGameBoard(gameRequest.gameID()));
-                return newResponse;
+                return new JoinGameResponse(gameRequest.gameID(), getGameBoard(gameRequest.gameID()));
             }
         } catch (DataAccessException e) {
             throw e;

@@ -143,6 +143,7 @@ public class AfterLoginClient {
                         JoinGameResponse resp = server.joinGame(new JoinGameRequest(client.authToken, playerColor, iD));
                         client.inGameClient.game = resp.game();
                         client.switchState("INGAME");
+                        client.playerColor = playerColor;
                         client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, inGameClient);
                         client.inGameClient.webSocketFacade.enterGameClient(client.authToken, iD);
                         System.out.println(String.format("Successfully joined game! Good luck!"));
@@ -157,6 +158,7 @@ public class AfterLoginClient {
                         client.switchState("INGAME");
                         JoinGameResponse resp = server.joinGame(new JoinGameRequest(client.authToken, playerColor, iD));
                         client.inGameClient.game = resp.game();
+                        client.playerColor = playerColor;
                         client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, inGameClient);
                         client.inGameClient.webSocketFacade.enterGameClient(client.authToken, iD);
                         System.out.println(String.format("Successfully joined game! Good luck!"));
