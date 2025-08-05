@@ -280,6 +280,7 @@ public class InGameClient implements NotificationHandler {
                     // TODO: implement pawn promotion logic too
                     game.makeMove(new ChessMove(startPosition, endPosition, null));
                     server.updateGame(new UpdateGameRequest(client.authToken, game, gameID));
+                    webSocketFacade.makeMoveClient(client.authToken, gameID, new ChessMove(startPosition, endPosition, null));
                     return "";
                     // TODO: how to send the move back to the server?
                 } catch (Exception e) {

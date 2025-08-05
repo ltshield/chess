@@ -1,6 +1,8 @@
 package websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -75,18 +77,19 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-//    public void throwErrorClient(String errorMessage) {
-//        try {
-//            var error = new ErrorMessage(errorMessage);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(error));
-//        } catch (Exception e) {
-//            System.out.println("Whoops.");;
-//        }
-//    }
-
-    public void makeMoveClient(String authToken, Integer gameID) throws DataAccessException {
+    public void throwErrorClient(String errorMessage) {
         try {
-            ;
+            var error = new ErrorMessage(errorMessage);
+            this.session.getBasicRemote().sendText(new Gson().toJson(error));
+        } catch (Exception e) {
+            System.out.println("Whoops.");;
+        }
+    }
+
+    public void makeMoveClient(String authToken, Integer gameID, ChessMove move) throws DataAccessException {
+        try {
+            MakeMoveCommand makeMoveCommand = new MakeMoveCommand(move, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(makeMoveCommand));
         } catch (Exception e) {
             System.out.println("I am in the make move client.");
         }

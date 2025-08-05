@@ -1,5 +1,6 @@
 package server.websocket;
 
+import chess.ChessMove;
 import dataaccess.DatabaseManager;
 import dataexception.*;
 import model.AuthData;
@@ -24,30 +25,44 @@ public class WebSocketHandler {
         System.out.println(message);
         try {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-            AuthData authData = getUsername(command.getAuthToken());
-            String username = authData.username();
+            if (command.commandType.equals(UserGameCommand.CommandType.MAKE_MOVE)) {
+                MakeMoveCommand makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
+                AuthData authData = getUsername(makeMoveCommand.getAuthToken());
+                String username = authData.username();
+                makeMove(username, makeMoveCommand.gameID, makeMoveCommand.move);
+            }
+            else {
+                AuthData authData = getUsername(command.getAuthToken());
+                String username = authData.username();
 
-            // get playercolor the same way
+                // get playercolor the same way
 
-            Integer gameID = command.gameID;
+                Integer gameID = command.gameID;
 
-            switch (command.getCommandType()) {
-                case CONNECT -> connect(session, username, gameID);
-//                case MAKE_MOVE -> makeMove(session, username);
-                case LEAVE -> leaveGame(username, gameID);
-//                case RESIGN -> resign(session, username);
+                switch (command.getCommandType()) {
+                    case CONNECT -> connect(session, username, gameID);
+    //                case MAKE_MOVE -> makeMove(session, username, move);
+                    case LEAVE -> leaveGame(username, gameID);
+    //                case RESIGN -> resign(session, username);
+                }
             }
         } catch (Exception e) {
-//            UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-//            AuthData authData = getUsername(command.getAuthToken());
-//            String username = authData.username();
-//            Integer gameID = command.gameID;
-            sendMessage(session, new DataAccessException("Error: unauthorized"));
-//            try {
-//                connectionManager.broadcast(username, new ErrorMessage(e.getMessage()), gameID);
-//            } catch (Exception exc) {
-//                ;
-//            }
+            sendErrorMessage(session, new DataAccessException("Error: unauthorized"));
+        }
+    }
+
+    private void makeMove(String username, Integer gameID, ChessMove move) throws DataAccessException {
+        String message = String.format("%s has moved %s.", username, move);
+        NotificationMessage notification = new NotificationMessage(message);
+        try {
+            connectionManager.broadcast(username, notification, gameID);
+
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameID);
+            connectionManager.broadcast(username, loadGameMessage, gameID);
+            connectionManager.sendMessage(username, loadGameMessage, gameID);
+
+        } catch (Exception e) {
+            throw new DataAccessException("Error: broadcasting went wrong.");
         }
     }
 
@@ -68,13 +83,13 @@ public class WebSocketHandler {
         try {
             connectionManager.broadcast(username, notification, gameID);
             var loadGameMessage = new LoadGameMessage(gameID);
-            connectionManager.broadcast(username, loadGameMessage, gameID);
+            connectionManager.sendMessage(username, loadGameMessage, gameID);
         } catch (Exception e) {
             throw new DataAccessException("Error: broadcasting went wrong.");
         }
     }
 
-    private void sendMessage(Session session, DataAccessException e) throws DataAccessException {
+    private void sendErrorMessage(Session session, DataAccessException e) throws DataAccessException {
         try {
             ErrorMessage err = new ErrorMessage(e.getMessage());
             session.getRemote().sendString(new Gson().toJson(err));

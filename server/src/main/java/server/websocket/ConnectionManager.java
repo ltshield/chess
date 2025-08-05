@@ -49,7 +49,8 @@ public class ConnectionManager {
                         c.send(new Gson().toJson(notification));
                     }
                 }
-                if (c.username.equals(excludeVisitorName)) {
+                // set it to !c
+                if (!c.username.equals(excludeVisitorName)) {
                     if (notification.serverMessageType.equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
                         c.send(new Gson().toJson(notification));
                     }
@@ -67,6 +68,20 @@ public class ConnectionManager {
         // Clean up any connections that were left open.
         for (var c : removeList) {
             connections.get(gameID).remove(c);
+        }
+    }
+
+    public void sendMessage(String username, ServerMessage notification, Integer gameID) throws IOException{
+        Set<Connection> listOfConnectionsInGame = connections.get(gameID);
+        for (var c : listOfConnectionsInGame) {
+            if (c.session.isOpen()) {
+                if (c.username.equals(username)) {
+//                    if (notification.serverMessageType.equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
+                    c.send(new Gson().toJson(notification));
+                    System.out.println("Sent notification.");
+//                    }
+                }
+            }
         }
     }
 }
