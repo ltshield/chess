@@ -78,7 +78,7 @@ public class ConnectionManager {
                 if (c.username.equals(username)) {
 //                    if (notification.serverMessageType.equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
                     c.send(new Gson().toJson(notification));
-                    System.out.println("Sent notification.");
+//                    System.out.println("Sent notification.");
 //                    }
                 }
             }

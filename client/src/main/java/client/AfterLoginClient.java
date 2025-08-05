@@ -122,6 +122,10 @@ public class AfterLoginClient {
                 String playerColor = params[1];
                 playerColor = playerColor.toUpperCase();
                 if(iD > numGames) {
+//                    if (client.inGameClient.webSocketFacade == null) {
+//                        client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, client.inGameClient);
+//                    }
+//                    client.inGameClient.webSocketFacade.throwErrorClient("Error, not a valid ID.");
                     throw new DataAccessException("Sorry, that is not a valid ID.");
                 }
                 if(!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) {
