@@ -26,7 +26,9 @@ public class WebSocketHandler {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
             AuthData authData = getUsername(command.getAuthToken());
             String username = authData.username();
-//            saveSession(username, command.getGameID(), session);
+
+            // get playercolor the same way
+
             Integer gameID = command.gameID;
 
             switch (command.getCommandType()) {
@@ -42,10 +44,9 @@ public class WebSocketHandler {
 
     private void leaveGame(String username, Integer gameID) throws DataAccessException {
         connectionManager.remove(username, gameID);
-        var message = String.format("%s has left the game!", username);
+        String message = String.format("%s has left the game!", username);
         var notification = new NotificationMessage(message);
         try {
-            System.out.println("Leaving game...");
             connectionManager.broadcast(username, notification, gameID);
         } catch (Exception e) {
             throw new DataAccessException("Error: broadcasting went wrong.");
@@ -53,7 +54,7 @@ public class WebSocketHandler {
     }
     private void connect(Session session, String username, Integer gameID) throws DataAccessException {
         connectionManager.add(username, gameID, session);
-        var message = String.format("%s has joined the game!", username);
+        String message = String.format("%s has joined the game!", username);
         var notification = new NotificationMessage(message);
         try {
             connectionManager.broadcast(username, notification, gameID);

@@ -16,7 +16,6 @@ public class WebSocketFacade extends Endpoint {
     Session session;
     NotificationHandler notificationHandler;
 
-
     public WebSocketFacade(String url, NotificationHandler notificationHandler) throws DataAccessException {
         try {
             url = url.replace("http", "ws");
@@ -32,9 +31,9 @@ public class WebSocketFacade extends Endpoint {
                 public void onMessage(String message) {
                     ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
                     if (notification.serverMessageType.equals(ServerMessage.ServerMessageType.NOTIFICATION)) {
-                        System.out.println("Here ya are.");
                         NotificationMessage notifi = new Gson().fromJson(message, NotificationMessage.class);
                         notificationHandler.notify(notifi);
+//                        System.out.println(notifi.getMessage());
                     }
                 }
             });
@@ -78,24 +77,5 @@ public class WebSocketFacade extends Endpoint {
             throw new DataAccessException("Error");
         }
     }
-
-//    public void enterPetShop(String visitorName) throws ResponseException {
-//        try {
-//            var action = new Action(Action.Type.ENTER, visitorName);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-//        } catch (IOException ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
-//
-//    public void leavePetShop(String visitorName) throws ResponseException {
-//        try {
-//            var action = new Action(Action.Type.EXIT, visitorName);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-//            this.session.close();
-//        } catch (IOException ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
 
 }

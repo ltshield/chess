@@ -144,7 +144,7 @@ public class AfterLoginClient {
                         client.inGameClient.game = resp.game();
                         client.switchState("INGAME");
                         client.playerColor = playerColor;
-                        client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, inGameClient);
+                        client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, client.inGameClient);
                         client.inGameClient.webSocketFacade.enterGameClient(client.authToken, iD);
                         System.out.println(String.format("Successfully joined game! Good luck!"));
                         return client.eval("help");
@@ -159,7 +159,7 @@ public class AfterLoginClient {
                         JoinGameResponse resp = server.joinGame(new JoinGameRequest(client.authToken, playerColor, iD));
                         client.inGameClient.game = resp.game();
                         client.playerColor = playerColor;
-                        client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, inGameClient);
+                        client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, client.inGameClient);
                         client.inGameClient.webSocketFacade.enterGameClient(client.authToken, iD);
                         System.out.println(String.format("Successfully joined game! Good luck!"));
                         return client.eval("help");
@@ -172,7 +172,7 @@ public class AfterLoginClient {
 
                 client.switchState("INGAME");
                 System.out.println(String.format("Successfully joined game! Good luck!"));
-                client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, inGameClient);
+                client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, client.inGameClient);
                 client.inGameClient.webSocketFacade.enterGameClient(client.authToken, iD);
                 return client.eval("help");
             }
