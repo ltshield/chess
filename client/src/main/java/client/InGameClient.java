@@ -159,6 +159,84 @@ public class InGameClient implements NotificationHandler {
         return "";
     }
 
+    public String[] convertToIntegerWhite(String[] strings) {
+        Collection<String> letters = new ArrayList<>();
+        letters.add("a");
+        letters.add("b");
+        letters.add("c");
+        letters.add("d");
+        letters.add("e");
+        letters.add("f");
+        letters.add("g");
+        letters.add("h");
+        if (letters.contains(strings[1])) {
+            if (strings[1].equals("a")) {
+                strings[1] = String.valueOf(1);
+            }
+            if (strings[1].equals("b")) {
+                strings[1] = String.valueOf(2);
+            }
+            if (strings[1].equals("c")) {
+                strings[1] = String.valueOf(3);
+            }
+            if (strings[1].equals("d")) {
+                strings[1] = String.valueOf(4);
+            }
+            if (strings[1].equals("e")) {
+                strings[1] = String.valueOf(5);
+            }
+            if (strings[1].equals("f")) {
+                strings[1] = String.valueOf(6);
+            }
+            if (strings[1].equals("g")) {
+                strings[1] = String.valueOf(7);
+            }
+            if (strings[1].equals("h")) {
+                strings[1] = String.valueOf(8);
+            }
+        }
+        return strings;
+    }
+
+    public String[] convertToIntegerBlack(String[] strings) {
+        Collection<String> letters = new ArrayList<>();
+        letters.add("a");
+        letters.add("b");
+        letters.add("c");
+        letters.add("d");
+        letters.add("e");
+        letters.add("f");
+        letters.add("g");
+        letters.add("h");
+        if (letters.contains(strings[1])) {
+            if (strings[1].equals("a")) {
+                strings[1] = String.valueOf(8);
+            }
+            if (strings[1].equals("b")) {
+                strings[1] = String.valueOf(7);
+            }
+            if (strings[1].equals("c")) {
+                strings[1] = String.valueOf(6);
+            }
+            if (strings[1].equals("d")) {
+                strings[1] = String.valueOf(5);
+            }
+            if (strings[1].equals("e")) {
+                strings[1] = String.valueOf(4);
+            }
+            if (strings[1].equals("f")) {
+                strings[1] = String.valueOf(3);
+            }
+            if (strings[1].equals("g")) {
+                strings[1] = String.valueOf(2);
+            }
+            if (strings[1].equals("h")) {
+                strings[1] = String.valueOf(1);
+            }
+        }
+        return strings;
+    }
+
     public String performMove(String... params) {
         if (client.playerColor.equals("OBSERVING")) {
             System.out.println("Error: observers cannot make moves.");
@@ -176,13 +254,35 @@ public class InGameClient implements NotificationHandler {
                 return "";
             }
         }
-        String startPos = params[0];
-        String[] startPositions = startPos.split("");
-        String endPos = params[1];
-        String[] endPositions = endPos.split("");
 
-        ChessPosition startPosition = new ChessPosition(Integer.parseInt(startPositions[0]), Integer.parseInt(startPositions[1]));
-        ChessPosition endPosition = new ChessPosition(Integer.parseInt(endPositions[0]), Integer.parseInt(endPositions[1]));
+        ChessPosition startPosition = null;
+        ChessPosition endPosition = null;
+        if (client.playerColor.equals("WHITE")) {
+            String startPos = params[0];
+            String[] startPositions = startPos.split("");
+            // convert startPositions[1] to integer
+            startPositions = convertToIntegerWhite(startPositions);
+
+            String endPos = params[1];
+            String[] endPositions = endPos.split("");
+            // convert endPositions[1] to integer
+            endPositions = convertToIntegerWhite(endPositions);
+            startPosition = new ChessPosition(Integer.parseInt(startPositions[0]), Integer.parseInt(startPositions[1]));
+            endPosition = new ChessPosition(Integer.parseInt(endPositions[0]), Integer.parseInt(endPositions[1]));
+        }
+        if (client.playerColor.equals("BLACK")) {
+            String startPos = params[0];
+            String[] startPositions = startPos.split("");
+            // convert startPositions[1] to integer (opposite indexing)
+            startPositions = convertToIntegerBlack(startPositions);
+            String endPos = params[1];
+            String[] endPositions = endPos.split("");
+            // convert endPositions[1] to integer (opposite indexing)
+            endPositions = convertToIntegerBlack(endPositions);
+            startPosition = new ChessPosition(Integer.parseInt(startPositions[0]), Integer.parseInt(startPositions[1]));
+            endPosition = new ChessPosition(Integer.parseInt(endPositions[0]), Integer.parseInt(endPositions[1]));
+        }
+
         if (game.board.getPiece(startPosition) == null) {
             System.out.println("Error: there is not a piece in that spot.");
             return "";
