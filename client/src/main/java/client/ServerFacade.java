@@ -21,6 +21,12 @@ public class ServerFacade {
         makeRequest("DELETE", path, null, null, null);
     }
 
+//    public ChessGameResponse getBoard(ChessGameRequest req) throws DataAccessException {
+//        var path = "/db";
+//        String authToken = req.authToken();
+//        return makeRequest("GET", path, req, ChessGameResponse.class, authToken);
+//    }
+
     public RegisterResult register(RegisterRequest req) throws DataAccessException{
         var path = "/user";
         return makeRequest("POST", path, req, RegisterResult.class, null);

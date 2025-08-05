@@ -3,6 +3,7 @@ package client;
 import chess.ChessMove;
 import chess.ChessPosition;
 import dataexception.DataAccessException;
+import service.*;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
 import websocket.messages.ErrorMessage;
@@ -14,6 +15,7 @@ import chess.ChessGame;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static websocket.messages.ServerMessage.ServerMessageType.*;
 
@@ -64,7 +66,7 @@ public class InGameClient implements NotificationHandler {
     }
 
     public ServerMessage.ServerMessageType loadGame(ChessGame game) {
-        drawBoard(game);
+        drawBoard();
         return LOAD_GAME;
     }
 
@@ -74,7 +76,7 @@ public class InGameClient implements NotificationHandler {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
-                case "draw" -> drawBoard(null);
+                case "draw" -> drawBoard();
                 case "exit" -> exitGame();
                 case "resign" -> resignGame();
                 case "quit" -> "quit";
@@ -92,7 +94,7 @@ public class InGameClient implements NotificationHandler {
         return client.eval("list");
     }
 
-    public String highlightPossibilities(String... params) throws DataAccessException {
+    public String highlightPossibilities(String... params) {
         if (params.length >= 1) {
             String position = params[0];
             String[] positions = position.split("");
@@ -145,11 +147,12 @@ public class InGameClient implements NotificationHandler {
                 System.out.println("Not a valid position.");
                 return "";
             }
-            game = new ChessGame();
+
             if (game.board.getPiece(pos) == null) {
                 System.out.println("There is not a piece there.");
                 return "";
             }
+            refreshGame(gameID);
             BoardUI board = new BoardUI(game);
             board.drawHighlightedBoard(client.playerColor, pos);
         } else {
@@ -175,17 +178,20 @@ public class InGameClient implements NotificationHandler {
         return client.eval("list");
     }
 
-
-    public String drawBoard(ChessGame game) {
-
-        if (game == null) {
-            BoardUI board = new BoardUI(new ChessGame());
-            board.drawBoard(client.playerColor, null);
+    public void refreshGame(int gameID) {
+        try {
+            JoinGameResponse resp = server.joinGame(new JoinGameRequest(client.authToken, client.playerColor, gameID));
+            this.game = resp.game();
+            System.out.println("Refreshed game!");
+        } catch (Exception e) {
+            System.out.println("Error refreshing game.");
         }
-        else {
-            BoardUI board = new BoardUI(game);
-            board.drawBoard(client.playerColor, null);
-        }
+    }
+
+    public String drawBoard() {
+        refreshGame(gameID);
+        BoardUI board = new BoardUI(game);
+        board.drawBoard(client.playerColor, null);
         return "";
     }
 }
