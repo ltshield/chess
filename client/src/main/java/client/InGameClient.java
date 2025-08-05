@@ -97,43 +97,14 @@ public class InGameClient implements NotificationHandler {
             String position = params[0];
             String[] positions = position.split("");
             ChessPosition pos = null;
-            Collection<String> letters = new ArrayList<>();
-            letters.add("a");
-            letters.add("b");
-            letters.add("c");
-            letters.add("d");
-            letters.add("e");
-            letters.add("f");
-            letters.add("g");
-            letters.add("h");
-            if (letters.contains(positions[1])) {
-                if (positions[1].equals("a")) {
-                    positions[1] = String.valueOf(1);
-                }
-                if (positions[1].equals("b")) {
-                    positions[1] = String.valueOf(2);
-                }
-                if (positions[1].equals("c")) {
-                    positions[1] = String.valueOf(3);
-                }
-                if (positions[1].equals("d")) {
-                    positions[1] = String.valueOf(4);
-                }
-                if (positions[1].equals("e")) {
-                    positions[1] = String.valueOf(5);
-                }
-                if (positions[1].equals("f")) {
-                    positions[1] = String.valueOf(6);
-                }
-                if (positions[1].equals("g")) {
-                    positions[1] = String.valueOf(7);
-                }
-                if (positions[1].equals("h")) {
-                    positions[1] = String.valueOf(8);
-                }
-            } else {
-                System.out.println("Not a valid position.");
-                return "";
+            if (client.playerColor.equals("WHITE")) {
+                positions = convertToIntegerWhite(positions);
+            }
+            if (client.playerColor.equals("BLACK")) {
+                positions = convertToIntegerBlack(positions);
+            }
+            if (client.playerColor.equals("OBSERVING")) {
+                positions = convertToIntegerWhite(positions);
             }
             try {
                 pos = new ChessPosition(Integer.parseInt(positions[0]), Integer.parseInt(positions[1]));
