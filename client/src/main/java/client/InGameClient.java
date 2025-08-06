@@ -309,7 +309,7 @@ public class InGameClient implements NotificationHandler {
             // make the move!
             if (possibleSpaces.contains(endPosition)) {
                 try {
-                    // TODO: implement pawn promotion logic too
+                    // implement pawn promotion logic too?
 //                    game.makeMove(new ChessMove(startPosition, endPosition, null));
                     webSocketFacade.makeMoveClient(client.authToken, gameID, new ChessMove(startPosition, endPosition, null));
                     server.updateGame(new UpdateGameRequest(client.authToken, game, gameID, client.username, client.playerColor));

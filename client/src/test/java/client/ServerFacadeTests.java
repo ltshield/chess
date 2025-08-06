@@ -4,6 +4,10 @@ import dataexception.DataAccessException;
 import org.junit.jupiter.api.*;
 import server.Server;
 import service.*;
+import service.beforelogin.LoginRequest;
+import service.beforelogin.LoginResult;
+import service.beforelogin.RegisterRequest;
+import service.beforelogin.RegisterResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 

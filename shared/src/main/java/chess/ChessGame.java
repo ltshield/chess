@@ -69,17 +69,12 @@ public class ChessGame {
             for (ChessMove myMove : validOptions) {
                 ChessBoard newBoard = copyBoard(board);
                 Collection<ChessMove> oppMoves = checkFutureBoardState(newBoard, myMove, query);
-//                boolean inCheck = false;
                 for (ChessMove move : oppMoves) {
                     ChessPosition endPos = move.getEndPosition();
                     if (myMove.getEndPosition().equals(endPos)) {
-//                        inCheck = true;
                         toDelete.add(myMove);
                     }
                 }
-//                if (inCheck) {
-//                    toDelete.add(myMove);
-//                }
             }
 
             for (ChessMove move : toDelete) {

@@ -4,6 +4,10 @@ import com.google.gson.Gson;
 import dataexception.DataAccessException;
 
 import service.*;
+import service.beforelogin.LoginRequest;
+import service.beforelogin.LoginResult;
+import service.beforelogin.RegisterRequest;
+import service.beforelogin.RegisterResult;
 
 import java.io.*;
 import java.net.*;
@@ -20,12 +24,6 @@ public class ServerFacade {
         var path = "/db";
         makeRequest("DELETE", path, null, null, null);
     }
-
-//    public ChessGameResponse getBoard(ChessGameRequest req) throws DataAccessException {
-//        var path = "/db";
-//        String authToken = req.authToken();
-//        return makeRequest("GET", path, req, ChessGameResponse.class, authToken);
-//    }
 
     public RegisterResult register(RegisterRequest req) throws DataAccessException{
         var path = "/user";

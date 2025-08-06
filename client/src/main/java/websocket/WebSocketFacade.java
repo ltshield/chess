@@ -58,15 +58,6 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-//    public void drawGame(String authToken, Integer gameID) throws DataAccessException {
-//        try {
-//            var action = new UserGameCommand(UserGameCommand.CommandType., authToken, gameID);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-//        } catch (IOException ex) {
-//            throw new DataAccessException(ex.getMessage());
-//        }
-//    }
-
     public void enterGameClient(String authToken, Integer gameID) throws DataAccessException {
         try {
             var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
@@ -74,15 +65,6 @@ public class WebSocketFacade extends Endpoint {
         } catch (IOException ex) {
 //            throwErrorClient(ex.getMessage());
             System.out.println("I am in the enter game client.");
-        }
-    }
-
-    public void throwErrorClient(String errorMessage) {
-        try {
-            var error = new ErrorMessage(errorMessage);
-            this.session.getBasicRemote().sendText(new Gson().toJson(error));
-        } catch (Exception e) {
-            System.out.println("Whoops.");;
         }
     }
 

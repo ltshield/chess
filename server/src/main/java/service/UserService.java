@@ -6,6 +6,11 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import server.Server;
+import service.beforelogin.LoginRequest;
+import service.beforelogin.LoginResult;
+import service.beforelogin.RegisterRequest;
+import service.beforelogin.RegisterResult;
+
 import java.util.*;
 
 public class UserService {

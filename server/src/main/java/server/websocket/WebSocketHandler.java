@@ -30,13 +30,13 @@ public class WebSocketHandler {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
             if (command.commandType.equals(UserGameCommand.CommandType.MAKE_MOVE)) {
                 MakeMoveCommand makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
-                AuthData authData = getUsername(makeMoveCommand.getAuthToken());
-                String username = authData.username();
+                String username = getUsername(makeMoveCommand.getAuthToken());
+//                String username = authData.username();
                 boolean legal = true;
 
                 // check it is that player's turn
                 Integer gameID = command.gameID;
-                String playerColor = getPlayerColor(username, gameID, authData.authToken());
+                String playerColor = getPlayerColor(username, gameID, makeMoveCommand.authToken);
                 if (!rightTurn(playerColor, gameID)) {
                     legal = false;
                     sendErrorMessage(session, new DataAccessException("Error: not your turn."));
@@ -60,15 +60,14 @@ public class WebSocketHandler {
                 }
             }
             else {
-                AuthData authData = getUsername(command.getAuthToken());
-                String username = authData.username();
+                String username = getUsername(command.getAuthToken());
 
                 // get playercolor the same way
 
                 Integer gameID = command.gameID;
-                String playerColor = getPlayerColor(username, gameID, authData.authToken());
+                String playerColor = getPlayerColor(username, gameID, command.authToken);
 
-                int i = getNumGames(authData.authToken(), gameID);
+                int i = getNumGames(command.authToken, gameID);
                 if (command.gameID > i) {
                     sendErrorMessage(session, new DataAccessException("Error: not a valid ID."));
                 }
@@ -367,7 +366,7 @@ public class WebSocketHandler {
         }
     }
 
-    public AuthData getUsername(String authToken) throws DataAccessException {
+    public String getUsername(String authToken) throws DataAccessException {
         if (authToken == null) {
             throw new DataAccessException("Error: bad request");
         }
@@ -377,7 +376,7 @@ public class WebSocketHandler {
                 ps.setString(1, authToken);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return new AuthData(authToken, rs.getString("username"));
+                        return rs.getString("username");
                     }
                     else {
                         throw new DataAccessException("Error: not authorized");

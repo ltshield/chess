@@ -6,6 +6,10 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 import server.Server;
+import service.beforelogin.LoginRequest;
+import service.beforelogin.LoginResult;
+import service.beforelogin.RegisterRequest;
+import service.beforelogin.RegisterResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 

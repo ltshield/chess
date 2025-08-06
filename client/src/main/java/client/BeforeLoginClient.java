@@ -1,10 +1,10 @@
 package client;
 
 import dataexception.DataAccessException;
-import service.LoginRequest;
-import service.LoginResult;
-import service.RegisterRequest;
-import service.RegisterResult;
+import service.beforelogin.LoginRequest;
+import service.beforelogin.LoginResult;
+import service.beforelogin.RegisterRequest;
+import service.beforelogin.RegisterResult;
 
 import java.util.Arrays;
 
