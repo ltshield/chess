@@ -39,4 +39,19 @@ public class GenericHandler {
         res.body(body);
         return body;
     }
+
+    public Object handleErrors(DataAccessException e, Response res) {
+        if (e.getMessage().equals("Error: not authorized")) {
+            return notAuthorized(e, res);
+        }
+        if (e.getMessage().equals("Error: bad request")) {
+            return badRequest(e, res);
+        }
+        if (e.getMessage().equals("Error: already taken")) {
+            return alreadyTaken(e, res);
+        }
+        else {
+            return otherError(new DataAccessException("Error: internal error"), res);
+        }
+    }
 }

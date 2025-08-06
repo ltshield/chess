@@ -7,8 +7,6 @@ import spark.Response;
 import com.google.gson.Gson;
 import spark.Route;
 
-import java.util.HashMap;
-
 public class JoinGameHandler extends GenericHandler implements Route  {
     public Server server;
     public JoinGameHandler(Server server) {
@@ -28,18 +26,7 @@ public class JoinGameHandler extends GenericHandler implements Route  {
             res.status(200);
             return new Gson().toJson(resp);
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("Error: not authorized")) {
-                return notAuthorized(e, res);
-            }
-            if (e.getMessage().equals("Error: bad request")) {
-                return badRequest(e, res);
-            }
-            if (e.getMessage().equals("Error: already taken")) {
-                return alreadyTaken(e, res);
-            }
-            else {
-                return otherError(new DataAccessException("Error: internal error"), res);
-            }
+            return handleErrors(e, res);
         }
     }
 }

@@ -4,14 +4,10 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import dataexception.DataAccessException;
 import service.ChessGameRequest;
-import service.ChessGameResponse;
-import service.JoinGameRequest;
 import service.UserService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-
-import java.util.HashMap;
 
 public class GetGameHandler extends GenericHandler implements Route {
 
@@ -33,17 +29,7 @@ public class GetGameHandler extends GenericHandler implements Route {
             res.type("application/json");
             return new Gson().toJson(game);
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("Error: not authorized")) {
-                return notAuthorized(e, res);
-            }
-            if (e.getMessage().equals("Error: bad request")) {
-                return badRequest(e, res);
-            }
-            if (e.getMessage().equals("Error: already taken")) {
-                return alreadyTaken(e, res);
-            } else {
-                return otherError(new DataAccessException("Error: internal error"), res);
-            }
+            return handleErrors(e, res);
         }
     }
 }

@@ -227,7 +227,6 @@ public class InGameClient implements NotificationHandler {
         if (client.playerColor.equals("OBSERVING")) {
             System.out.println("Error: observers cannot make moves.");
         }
-
         ChessGame.TeamColor turn = game.getTeamTurn();
         if (turn.equals(ChessGame.TeamColor.WHITE)) {
             if (!client.playerColor.equals("WHITE")) {
@@ -241,7 +240,6 @@ public class InGameClient implements NotificationHandler {
                 return "";
             }
         }
-
         ChessGame.TeamColor col = null;
         if (client.playerColor.equals("WHITE")) {
             col = ChessGame.TeamColor.WHITE;
@@ -257,7 +255,6 @@ public class InGameClient implements NotificationHandler {
             System.out.println("Error: you are in stalemate.");
             return "";
         }
-
         ChessPosition startPosition = null;
         ChessPosition endPosition = null;
         if (client.playerColor.equals("WHITE")) {
@@ -265,7 +262,6 @@ public class InGameClient implements NotificationHandler {
             String[] startPositions = startPos.split("");
             // convert startPositions[1] to integer
             startPositions = convertToIntegerWhite(startPositions);
-
             String endPos = params[1];
             String[] endPositions = endPos.split("");
             // convert endPositions[1] to integer
@@ -285,7 +281,6 @@ public class InGameClient implements NotificationHandler {
             startPosition = new ChessPosition(Integer.parseInt(startPositions[0]), Integer.parseInt(startPositions[1]));
             endPosition = new ChessPosition(Integer.parseInt(endPositions[0]), Integer.parseInt(endPositions[1]));
         }
-
         if (game.board.getPiece(startPosition) == null) {
             System.out.println("Error: there is not a piece in that spot.");
             return "";

@@ -94,6 +94,26 @@ public class BoardUI {
         drawHeader(out, headerItems);
     }
 
+    public static void draw1(PrintStream out, Collection<ChessPosition> highlight, ChessPiece piece, ChessPosition pos) {
+        if (highlight != null && highlight.contains(pos)) {
+            out.print(SET_BG_COLOR_YELLOW);
+            printPieces(out, piece);
+        } else {
+            out.print(SET_BG_COLOR_WHITE);
+            printPieces(out, piece);
+        }
+    }
+
+    public static void draw2(PrintStream out, Collection<ChessPosition> highlight, ChessPiece piece, ChessPosition pos) {
+        if (highlight != null && highlight.contains(pos)) {
+            out.print(SET_BG_COLOR_YELLOW);
+            printPieces(out, piece);
+        } else {
+            out.print(SET_BG_COLOR_BLACK);
+            printPieces(out, piece);
+        }
+    }
+
     public static void handleBoardDrawing(PrintStream out, int i, ChessBoard grid, Collection<ChessPosition> toHighlight) {
 
         out.print(SET_BG_COLOR_MAGENTA);
@@ -104,40 +124,16 @@ public class BoardUI {
             ChessPosition testPos = new ChessPosition(i, j);
             ChessPiece piece = grid.getPiece(new ChessPosition(i,j));
             if (j % 2 != 0 && i % 2 == 0) {
-                if (toHighlight != null && toHighlight.contains(testPos)) {
-                    out.print(SET_BG_COLOR_YELLOW);
-                    printPieces(out, piece);
-                } else {
-                    out.print(SET_BG_COLOR_WHITE);
-                    printPieces(out, piece);
-                }
+                draw1(out, toHighlight, piece, testPos);
             }
             if (j % 2 == 0 && i % 2 == 0) {
-                if (toHighlight != null && toHighlight.contains(testPos)) {
-                    out.print(SET_BG_COLOR_YELLOW);
-                    printPieces(out, piece);
-                } else {
-                    out.print(SET_BG_COLOR_BLACK);
-                    printPieces(out, piece);
-                }
+                draw2(out, toHighlight, piece, testPos);
             }
             if (j % 2 == 0 && i % 2 != 0) {
-                if (toHighlight != null && toHighlight.contains(testPos)) {
-                    out.print(SET_BG_COLOR_YELLOW);
-                    printPieces(out, piece);
-                } else {
-                    out.print(SET_BG_COLOR_WHITE);
-                    printPieces(out, piece);
-                }
+                draw1(out, toHighlight, piece, testPos);
             }
             if (j % 2 != 0 && i % 2 != 0) {
-                if (toHighlight != null && toHighlight.contains(testPos)) {
-                    out.print(SET_BG_COLOR_YELLOW);
-                    printPieces(out, piece);
-                } else {
-                    out.print(SET_BG_COLOR_BLACK);
-                    printPieces(out, piece);
-                }
+                draw2(out, toHighlight, piece, testPos);
             }
         }
         out.print(SET_BG_COLOR_MAGENTA);

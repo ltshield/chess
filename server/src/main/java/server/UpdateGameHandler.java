@@ -25,18 +25,7 @@ public class UpdateGameHandler extends GenericHandler implements Route {
             res.type("application/json");
             return new Gson().toJson(resp, UpdateGameResponse.class);
         } catch (DataAccessException e) {
-            if (e.getMessage().equals("Error: not authorized")) {
-                return notAuthorized(e, res);
-            }
-            if (e.getMessage().equals("Error: bad request")) {
-                return badRequest(e, res);
-            }
-            if (e.getMessage().equals("Error: already taken")) {
-                return alreadyTaken(e, res);
-            }
-            else {
-                return otherError(new DataAccessException("Error: internal error"), res);
-            }
+            return handleErrors(e, res);
         }
     }
 }
