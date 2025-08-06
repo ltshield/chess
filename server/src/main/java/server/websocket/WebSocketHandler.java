@@ -1,30 +1,21 @@
 package server.websocket;
-
-import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessMove;
 import dataaccess.DatabaseManager;
 import dataexception.*;
-import model.AuthData;
-import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import websocket.messages.*;
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-
 import websocket.commands.*;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-
 @WebSocket
 public class WebSocketHandler {
-
     private final ConnectionManager connectionManager = new ConnectionManager();
-
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws DataAccessException  {
         System.out.println(message);
@@ -85,7 +76,25 @@ public class WebSocketHandler {
             sendErrorMessage(session, new DataAccessException("Error: unauthorized"));
         }
     }
-
+    private void resignHelper(ResultSet rs, int gameID) throws DataAccessException {
+        try {
+            if (rs.next()) {
+                ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
+                gem.resigned = true;
+                try (var conn2 = DatabaseManager.getConnection()) {
+                    String statement2 = "UPDATE game SET game=? WHERE id=?";
+                    try (var ps2 = conn2.prepareStatement(statement2)) {
+                        var json = new Gson().toJson(gem);
+                        ps2.setString(1, json);
+                        ps2.setInt(2, gameID);
+                        ps2.executeUpdate();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: whoops");
+        }
+    }
     private void resign(Session session, String username, int gameID, String authToken) throws DataAccessException {
         if (isResigned(gameID)) {
             sendErrorMessage(session, new DataAccessException("Error: game is already resigned."));
@@ -102,19 +111,7 @@ public class WebSocketHandler {
                 try (var ps = conn.prepareStatement(statement)) {
                     ps.setInt(1, gameID);
                     try (var rs = ps.executeQuery()) {
-                        if (rs.next()) {
-                            ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
-                            gem.resigned = true;
-                            try (var conn2 = DatabaseManager.getConnection()) {
-                                String statement2 = "UPDATE game SET game=? WHERE id=?";
-                                try (var ps2 = conn2.prepareStatement(statement2)) {
-                                    var json = new Gson().toJson(gem);
-                                    ps2.setString(1, json);
-                                    ps2.setInt(2, gameID);
-                                    ps2.executeUpdate();
-                                }
-                            }
-                        }
+                        resignHelper(rs, gameID);
                     }
                 }
             } catch (Exception e) {
@@ -129,28 +126,33 @@ public class WebSocketHandler {
             }
         }
     }
+    private boolean isResignedHelper(ResultSet rs) throws DataAccessException {
+        try {
+            if (rs.next()) {
+                ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
+                if (gem.resigned == true) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: whoops");
+        }
+        throw new DataAccessException("Error");
+    }
     private boolean isResigned(int gameID) {
-        boolean resigned = false;
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT game FROM game WHERE id=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
-                        if (gem.resigned == true) {
-                            resigned = true;
-                        }
-                    }
+                    return isResignedHelper(rs);
                 }
             }
         }
         catch (Exception e) {
             return false;
         }
-        return resigned;
     }
-
     private boolean checkmateHelper(ResultSet rs, String playerColor) throws DataAccessException {
         try {
             if (rs.next()) {
@@ -189,15 +191,10 @@ public class WebSocketHandler {
                 try (var rs = ps.executeQuery()) {
                     checkmateHelper(rs, playerColor);
                 }
-            }
-            return false;
-        } catch (DataAccessException e) {
-            throw e;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error: internal error");
-        }
+            } return false;
+        } catch (DataAccessException e) {throw e;
+        } catch (SQLException e) {throw new DataAccessException("Error: internal error");}
     }
-
     private boolean validMoveHelper(ResultSet rs, ChessMove move) throws DataAccessException {
         try {
             if (rs.next()) {
@@ -219,7 +216,6 @@ public class WebSocketHandler {
         }
         return false;
     }
-
     private boolean validMove(int gameID, ChessMove move) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT game FROM game WHERE id=?";
@@ -235,7 +231,6 @@ public class WebSocketHandler {
             throw new DataAccessException("Error: internal error");
         }
     }
-
     private boolean rightHelper(ResultSet rs, String playerColor) throws DataAccessException {
         try {
             if (rs.next()) {
@@ -280,7 +275,6 @@ public class WebSocketHandler {
             throw new DataAccessException("Error: internal error");
         }
     }
-
     private void makeMoveHelper(ResultSet rs, ChessMove move, int gameID) throws DataAccessException {
         try {
             String gameString = rs.getString("game");
@@ -328,7 +322,6 @@ public class WebSocketHandler {
             throw new DataAccessException("Error: broadcasting went wrong.");
         }
     }
-
     public void helperWhite(int gameID) throws DataAccessException{
         try (var conn2 = DatabaseManager.getConnection()) {
             String statement2 = "UPDATE game SET whiteUsername=? WHERE id=?";
@@ -341,7 +334,6 @@ public class WebSocketHandler {
             throw new DataAccessException("Error: whoops");
         }
     }
-
     public void helperBlack(int gameID) throws DataAccessException {
         try (var conn2 = DatabaseManager.getConnection()) {
             String statement2 = "UPDATE game SET blackUsername=? WHERE id=?";
@@ -354,7 +346,6 @@ public class WebSocketHandler {
             throw new DataAccessException("Error: whoops");
         }
     }
-
     private void helperBoth(ResultSet rs, String playerColor, String username, int gameID) throws DataAccessException {
         try {
             String whiteUsername = rs.getString("whiteUsername");
@@ -369,7 +360,6 @@ public class WebSocketHandler {
             throw new DataAccessException("Error: whoops");
         }
     }
-
     private void leaveGame(String username, Integer gameID, String playerColor) throws DataAccessException {
         connectionManager.remove(username, gameID);
         try (var conn = DatabaseManager.getConnection()) {
@@ -405,7 +395,6 @@ public class WebSocketHandler {
             throw new DataAccessException("Error: broadcasting went wrong.");
         }
     }
-
     private void sendErrorMessage(Session session, DataAccessException e) throws DataAccessException {
         try {
             ErrorMessage err = new ErrorMessage(e.getMessage());
@@ -414,7 +403,6 @@ public class WebSocketHandler {
             throw new DataAccessException("Error: something went wrong");
         }
     }
-
     public String usernameHelper(ResultSet rs) throws DataAccessException {
         try {
             if (rs.next()) {
@@ -444,7 +432,6 @@ public class WebSocketHandler {
             throw new DataAccessException("Error: internal error");
         }
     }
-
     public String getPlayerColor(String username, int gameID, String authToken) throws DataAccessException {
         if (authToken == null) {
             throw new DataAccessException("Error: bad request");
@@ -463,7 +450,6 @@ public class WebSocketHandler {
             throw new DataAccessException("Error: internal error");
         }
     }
-
     public String playerColHelper(ResultSet rs, String username) throws DataAccessException {
         try {
             if (rs.next()) {
@@ -481,7 +467,6 @@ public class WebSocketHandler {
         }
         throw new DataAccessException("Something went wrong collecting color.");
     }
-
     public int getNumGames(String authToken, int gameID) throws DataAccessException {
         if (authToken == null) {
             throw new DataAccessException("Error: bad request");
@@ -500,7 +485,6 @@ public class WebSocketHandler {
         }
         return i;
     }
-
     public int numGamesHelper(PreparedStatement ps, int i) throws DataAccessException {
         try (var rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -510,5 +494,4 @@ public class WebSocketHandler {
             throw new DataAccessException("Whoops");}
         return i;
     }
-
 }
