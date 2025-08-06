@@ -14,6 +14,7 @@ public class ChessGame {
 
     private TeamColor turn = TeamColor.WHITE;
     public ChessBoard board = new ChessBoard();
+    public boolean resigned = false;
 
     public ChessGame() {
         board.resetBoard();

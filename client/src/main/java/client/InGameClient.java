@@ -89,7 +89,18 @@ public class InGameClient implements NotificationHandler {
 
     public String resignGame() {
         // keep game in memory but no more moves allowed?
-        return client.eval("list");
+        if (client.playerColor.equals("OBSERVING")) {
+            System.out.println("Error: observers cannot resign.");
+        }
+        game.resigned = true;
+        try {
+            server.updateGame(new UpdateGameRequest(client.authToken, game, gameID));
+            webSocketFacade.resignGameClient(client.authToken, gameID);
+        }
+        catch (Exception e) {
+            System.out.println("Something went wrong with resigning.");
+        }
+        return client.eval("help");
     }
 
     public String highlightPossibilities(String... params) {
@@ -209,6 +220,10 @@ public class InGameClient implements NotificationHandler {
     }
 
     public String performMove(String... params) {
+        if (game.resigned) {
+            System.out.println("Error: game is over.");
+            return "";
+        }
         if (client.playerColor.equals("OBSERVING")) {
             System.out.println("Error: observers cannot make moves.");
         }

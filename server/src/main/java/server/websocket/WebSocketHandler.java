@@ -69,13 +69,78 @@ public class WebSocketHandler {
                     switch (command.getCommandType()) {
                         case CONNECT -> connect(session, username, gameID, playerColor);
                         case LEAVE -> leaveGame(username, gameID);
-        //                case RESIGN -> resign(session, username);
+                        case RESIGN -> resign(session, username, gameID, playerColor);
                     }
                 }
             }
         } catch (Exception e) {
             sendErrorMessage(session, new DataAccessException("Error: unauthorized"));
         }
+    }
+
+    private void resign(Session session, String username, int gameID, String authToken) throws DataAccessException {
+        if (isResigned(gameID)) {
+            sendErrorMessage(session, new DataAccessException("Error: game is already resigned."));
+            return;
+        }
+        // if username not in the valid usernames for the game, cannot resign
+        if (getPlayerColor(username, gameID, authToken).equals("OBSERVER")) {
+            sendErrorMessage(session, new DataAccessException("Error: observers cannot resign."));
+        }
+        else {
+            String message = String.format("%s has resigned. The game is now over.", username);
+            try (var conn = DatabaseManager.getConnection()) {
+                var statement = "SELECT game FROM game WHERE id=?";
+                try (var ps = conn.prepareStatement(statement)) {
+                    ps.setInt(1, gameID);
+                    try (var rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
+                            gem.resigned = true;
+                            try (var conn2 = DatabaseManager.getConnection()) {
+                                String statement2 = "UPDATE game SET game=? WHERE id=?";
+                                try (var ps2 = conn2.prepareStatement(statement2)) {
+                                    var json = new Gson().toJson(gem);
+                                    ps2.setString(1, json);
+                                    ps2.setInt(2, gameID);
+                                    ps2.executeUpdate();
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                throw new DataAccessException("Error: updating game");
+            }
+            NotificationMessage notification = new NotificationMessage(message);
+            try {
+                connectionManager.broadcast(username, notification, gameID);
+                connectionManager.sendMessage(username, notification, gameID);
+            } catch (Exception e) {
+                throw new DataAccessException("Error: broadcasting went wrong.");
+            }
+        }
+    }
+    private boolean isResigned(int gameID) {
+        boolean resigned = false;
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT game FROM game WHERE id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
+                        if (gem.resigned == true) {
+                            resigned = true;
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            return false;
+        }
+        return resigned;
     }
 
     private boolean validMove(int gameID, ChessMove move) throws DataAccessException {
@@ -86,6 +151,9 @@ public class WebSocketHandler {
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
                         ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
+                        if (gem.resigned) {
+                            return false;
+                        }
                         Collection<ChessMove> valMoves = gem.validMoves(move.getStartPosition());
                         if (valMoves.contains(move)) {
                             return true;
@@ -265,10 +333,5 @@ public class WebSocketHandler {
         }
         return i;
     }
-
-//    public void saveSession(String visitorName, Integer gameID, Session session) {
-//        Connection connection = new Connection(visitorName, session);
-//        connectionManager.add(visitorName, gameID, session);
-//    }
 
 }

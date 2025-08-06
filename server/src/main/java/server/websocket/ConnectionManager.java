@@ -48,9 +48,6 @@ public class ConnectionManager {
                     if (notification.serverMessageType.equals(ServerMessage.ServerMessageType.NOTIFICATION)) {
                         c.send(new Gson().toJson(notification));
                     }
-                }
-                // set it to !c
-                if (!c.username.equals(excludeVisitorName)) {
                     if (notification.serverMessageType.equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
                         c.send(new Gson().toJson(notification));
                     }
