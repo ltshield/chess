@@ -9,6 +9,7 @@ import server.Server;
 
 import javax.xml.crypto.Data;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -123,6 +124,32 @@ public class SQLGameData extends SQLBase {
         return games;
     }
 
+    public void update(ResultSet rs, String playerColor, Connection conn, int gameID) throws DataAccessException {
+        try {
+            if (rs.next()) {
+                String whiteUser = rs.getString("whiteUsername");
+                String blackUser = rs.getString("blackUsername");
+                if (whiteUser != null && playerColor.equals("WHITE")) {
+                    String statement2 = "UPDATE game SET whiteUsername=? WHERE id=?";
+                    try (var ps2 = conn.prepareStatement(statement2)) {
+                        ps2.setString(1, null);
+                        ps2.setInt(2, gameID);
+                        ps2.executeUpdate();
+                    }
+                }
+                if (blackUser != null && playerColor.equals("BLACK")) {
+                    String statement2 = "UPDATE game SET blackUsername=? WHERE id=?";
+                    try (var ps2 = conn.prepareStatement(statement2)) {
+                        ps2.setString(1, null);
+                        ps2.setInt(2, gameID);
+                        ps2.executeUpdate();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Whoops");
+        }
+    }
     public void updateGameBoard(Integer gameID, ChessGame game, String username, String playerColor) throws DataAccessException {
         if (username==null) {
             try (var conn = DatabaseManager.getConnection()) {
@@ -131,26 +158,7 @@ public class SQLGameData extends SQLBase {
                     ps.setInt(1, gameID);
                     ps.executeQuery();
                     try (var rs = ps.executeQuery()) {
-                        if (rs.next()) {
-                            String whiteUser = rs.getString("whiteUsername");
-                            String blackUser = rs.getString("blackUsername");
-                            if (whiteUser != null && playerColor.equals("WHITE")) {
-                                String statement2 = "UPDATE game SET whiteUsername=? WHERE id=?";
-                                try (var ps2 = conn.prepareStatement(statement2)) {
-                                    ps2.setString(1, null);
-                                    ps2.setInt(2, gameID);
-                                    ps2.executeUpdate();
-                                }
-                            }
-                            if (blackUser != null && playerColor.equals("BLACK")) {
-                                String statement2 = "UPDATE game SET blackUsername=? WHERE id=?";
-                                try (var ps2 = conn.prepareStatement(statement2)) {
-                                    ps2.setString(1, null);
-                                    ps2.setInt(2, gameID);
-                                    ps2.executeUpdate();
-                                }
-                            }
-                        }
+                        update(rs, playerColor, conn, gameID);
                     }
                 }
             } catch (Exception e) {

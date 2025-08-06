@@ -15,6 +15,8 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
 import websocket.commands.*;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 
@@ -149,35 +151,43 @@ public class WebSocketHandler {
         return resigned;
     }
 
+    private boolean checkmateHelper(ResultSet rs, String playerColor) throws DataAccessException {
+        try {
+            if (rs.next()) {
+                ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
+                ChessGame.TeamColor turnColor = gem.getTeamTurn();
+                if (playerColor.equals("WHITE")) {
+                    if (gem.isInCheckmate(turnColor) || gem.isInStalemate(turnColor)) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                if (playerColor.equals("BLACK")) {
+                    if (gem.isInStalemate(turnColor) || gem.isInStalemate(turnColor)) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                return false;
+            }
+            else {
+                throw new DataAccessException("Error: not authorized");
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: whoops");
+        }
+    }
     private boolean inCheckmateOrStalemate(String playerColor, int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT game FROM game WHERE id=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
-                        ChessGame.TeamColor turnColor = gem.getTeamTurn();
-                        if (playerColor.equals("WHITE")) {
-                            if (gem.isInCheckmate(turnColor) || gem.isInStalemate(turnColor)) {
-                                return true;
-                            }
-                            else {
-                                return false;
-                            }
-                        }
-                        if (playerColor.equals("BLACK")) {
-                            if (gem.isInStalemate(turnColor) || gem.isInStalemate(turnColor)) {
-                                return true;
-                            }
-                            else {
-                                return false;
-                            }
-                        }
-                    }
-                    else {
-                        throw new DataAccessException("Error: not authorized");
-                    }
+                    checkmateHelper(rs, playerColor);
                 }
             }
             return false;
@@ -188,26 +198,35 @@ public class WebSocketHandler {
         }
     }
 
+    private boolean validMoveHelper(ResultSet rs, ChessMove move) throws DataAccessException {
+        try {
+            if (rs.next()) {
+                ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
+                if (gem.resigned) {
+                    return false;
+                }
+                if (gem.ended) {
+                    return false;
+                }
+                Collection<ChessMove> valMoves = gem.validMoves(move.getStartPosition());
+                if (valMoves.contains(move)) {
+                    return true;
+                }
+                return false;
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: whoops");
+        }
+        return false;
+    }
+
     private boolean validMove(int gameID, ChessMove move) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT game FROM game WHERE id=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
-                        if (gem.resigned) {
-                            return false;
-                        }
-                        if (gem.ended) {
-                            return false;
-                        }
-                        Collection<ChessMove> valMoves = gem.validMoves(move.getStartPosition());
-                        if (valMoves.contains(move)) {
-                            return true;
-                        }
-                        return false;
-                    }
+                    return validMoveHelper(rs, move);
                 }
             }
         } catch (DataAccessException e) {
@@ -215,42 +234,45 @@ public class WebSocketHandler {
         } catch (SQLException e) {
             throw new DataAccessException("Error: internal error");
         }
-        return false;
     }
 
+    private boolean rightHelper(ResultSet rs, String playerColor) throws DataAccessException {
+        try {
+            if (rs.next()) {
+                ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
+                ChessGame.TeamColor turnColor = gem.getTeamTurn();
+                ChessGame.TeamColor userColorWhenMadeMove = null;
+                if (playerColor.equals("WHITE")) {
+                    userColorWhenMadeMove = ChessGame.TeamColor.BLACK;
+                    if (userColorWhenMadeMove.equals(turnColor)) {
+                        return false;
+                    }
+                    return true;
+                }
+                if (playerColor.equals("BLACK")) {
+                    userColorWhenMadeMove = ChessGame.TeamColor.WHITE;
+                    if (userColorWhenMadeMove.equals(turnColor)) {
+                        return false;
+                    }
+                    return true;
+                }
+                if (playerColor.equals("OBSERVER")) {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: whoops");
+        }
+        return true;
+    }
     private boolean rightTurn(String playerColor, int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT game FROM game WHERE id=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
-                        ChessGame.TeamColor turnColor = gem.getTeamTurn();
-                        ChessGame.TeamColor userColorWhenMadeMove = null;
-                        if (playerColor.equals("WHITE")) {
-                            userColorWhenMadeMove = ChessGame.TeamColor.BLACK;
-                            if (userColorWhenMadeMove.equals(turnColor)) {
-                                return false;
-                            }
-                            return true;
-                        }
-                        if (playerColor.equals("BLACK")) {
-                            userColorWhenMadeMove = ChessGame.TeamColor.WHITE;
-                            if (userColorWhenMadeMove.equals(turnColor)) {
-                                return false;
-                            }
-                            return true;
-                        }
-                        if (playerColor.equals("OBSERVER")) {
-                            return false;
-                        }
-                    }
-                    else {
-                        throw new DataAccessException("Error: not authorized");
-                    }
+                    return rightHelper(rs, playerColor);
                 }
-                return true;
             }
         } catch (DataAccessException e) {
             throw e;
@@ -259,6 +281,24 @@ public class WebSocketHandler {
         }
     }
 
+    private void makeMoveHelper(ResultSet rs, ChessMove move, int gameID) throws DataAccessException {
+        try {
+            String gameString = rs.getString("game");
+            ChessGame game = new Gson().fromJson(gameString, ChessGame.class);
+            game.makeMove(move);
+            String jsonString = new Gson().toJson(game);
+            try (var conn2 = DatabaseManager.getConnection()) {
+                String statement2 = "UPDATE game SET game=? WHERE id=?";
+                try (var ps2 = conn2.prepareStatement(statement2)) {
+                    ps2.setString(1, jsonString);
+                    ps2.setInt(2, gameID);
+                    ps2.executeUpdate();
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: message");
+        }
+    }
     private void makeMove(String username, Integer gameID, ChessMove move) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT game FROM game WHERE id=?";
@@ -266,18 +306,7 @@ public class WebSocketHandler {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        String gameString = rs.getString("game");
-                        ChessGame game = new Gson().fromJson(gameString, ChessGame.class);
-                        game.makeMove(move);
-                        String jsonString = new Gson().toJson(game);
-                        try (var conn2 = DatabaseManager.getConnection()) {
-                            String statement2 = "UPDATE game SET game=? WHERE id=?";
-                            try (var ps2 = conn2.prepareStatement(statement2)) {
-                                ps2.setString(1, jsonString);
-                                ps2.setInt(2, gameID);
-                                ps2.executeUpdate();
-                            }
-                        }
+                        makeMoveHelper(rs, move, gameID);
                     }
                 }
             }
@@ -300,6 +329,47 @@ public class WebSocketHandler {
         }
     }
 
+    public void helperWhite(int gameID) throws DataAccessException{
+        try (var conn2 = DatabaseManager.getConnection()) {
+            String statement2 = "UPDATE game SET whiteUsername=? WHERE id=?";
+            try (var ps2 = conn2.prepareStatement(statement2)) {
+                ps2.setString(1, null);
+                ps2.setInt(2, gameID);
+                ps2.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: whoops");
+        }
+    }
+
+    public void helperBlack(int gameID) throws DataAccessException {
+        try (var conn2 = DatabaseManager.getConnection()) {
+            String statement2 = "UPDATE game SET blackUsername=? WHERE id=?";
+            try (var ps2 = conn2.prepareStatement(statement2)) {
+                ps2.setString(1, null);
+                ps2.setInt(2, gameID);
+                ps2.executeUpdate();
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: whoops");
+        }
+    }
+
+    private void helperBoth(ResultSet rs, String playerColor, String username, int gameID) throws DataAccessException {
+        try {
+            String whiteUsername = rs.getString("whiteUsername");
+            String blackUsername = rs.getString("blackUsername");
+            if (playerColor.equals("WHITE") && whiteUsername != null && whiteUsername.equals(username)) {
+                helperWhite(gameID);
+            }
+            if (playerColor.equals("BLACK") && blackUsername != null && blackUsername.equals(username)) {
+                helperBlack(gameID);
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: whoops");
+        }
+    }
+
     private void leaveGame(String username, Integer gameID, String playerColor) throws DataAccessException {
         connectionManager.remove(username, gameID);
         try (var conn = DatabaseManager.getConnection()) {
@@ -308,28 +378,7 @@ public class WebSocketHandler {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        String whiteUsername = rs.getString("whiteUsername");
-                        String blackUsername = rs.getString("blackUsername");
-                        if (playerColor.equals("WHITE") && whiteUsername != null && whiteUsername.equals(username)) {
-                            try (var conn2 = DatabaseManager.getConnection()) {
-                                String statement2 = "UPDATE game SET whiteUsername=? WHERE id=?";
-                                try (var ps2 = conn2.prepareStatement(statement2)) {
-                                    ps2.setString(1, null);
-                                    ps2.setInt(2, gameID);
-                                    ps2.executeUpdate();
-                                }
-                            }
-                        }
-                        if (playerColor.equals("BLACK") && blackUsername != null && blackUsername.equals(username)) {
-                            try (var conn2 = DatabaseManager.getConnection()) {
-                                String statement2 = "UPDATE game SET blackUsername=? WHERE id=?";
-                                try (var ps2 = conn2.prepareStatement(statement2)) {
-                                    ps2.setString(1, null);
-                                    ps2.setInt(2, gameID);
-                                    ps2.executeUpdate();
-                                }
-                            }
-                        }
+                        helperBoth(rs, playerColor, username, gameID);
                     }
                 }
             }
@@ -366,6 +415,17 @@ public class WebSocketHandler {
         }
     }
 
+    public String usernameHelper(ResultSet rs) throws DataAccessException {
+        try {
+            if (rs.next()) {
+                return rs.getString("username");
+            } else {
+                throw new DataAccessException("Error: not authorized");
+            }
+        }catch (Exception e) {
+            throw new DataAccessException("Whoops");
+        }
+    }
     public String getUsername(String authToken) throws DataAccessException {
         if (authToken == null) {
             throw new DataAccessException("Error: bad request");
@@ -375,12 +435,7 @@ public class WebSocketHandler {
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, authToken);
                 try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return rs.getString("username");
-                    }
-                    else {
-                        throw new DataAccessException("Error: not authorized");
-                    }
+                    return usernameHelper(rs);
                 }
             }
         } catch (DataAccessException e) {
@@ -399,17 +454,7 @@ public class WebSocketHandler {
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        if (rs.getString("whiteUsername") != null && rs.getString("whiteUsername").equals(username)) {
-                            return "WHITE";
-                        }
-                        if (rs.getString("blackUsername") != null && rs.getString("blackUsername").equals(username)) {
-                            return "BLACK";
-                        }
-                        else {
-                            return "OBSERVER";
-                        }
-                    }
+                    return playerColHelper(rs, username);
                 }
             }
         } catch (DataAccessException e) {
@@ -417,7 +462,24 @@ public class WebSocketHandler {
         } catch (SQLException e) {
             throw new DataAccessException("Error: internal error");
         }
-        throw new DataAccessException("Something went wrong grabbing player color.");
+    }
+
+    public String playerColHelper(ResultSet rs, String username) throws DataAccessException {
+        try {
+            if (rs.next()) {
+                if (rs.getString("whiteUsername") != null && rs.getString("whiteUsername").equals(username)) {
+                    return "WHITE";
+                }
+                if (rs.getString("blackUsername") != null && rs.getString("blackUsername").equals(username)) {
+                    return "BLACK";
+                } else {
+                    return "OBSERVER";
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Whoops");
+        }
+        throw new DataAccessException("Something went wrong collecting color.");
     }
 
     public int getNumGames(String authToken, int gameID) throws DataAccessException {
@@ -429,18 +491,23 @@ public class WebSocketHandler {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT * FROM game";
             try (var ps = conn.prepareStatement(statement)) {
-//                ps.setInt(1, gameID);
-                try (var rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        i++;
-                    }
-                }
+                i = numGamesHelper(ps, i);
             }
         } catch (DataAccessException e) {
             throw e;
         } catch (SQLException e) {
             throw new DataAccessException("Error: internal error");
         }
+        return i;
+    }
+
+    public int numGamesHelper(PreparedStatement ps, int i) throws DataAccessException {
+        try (var rs = ps.executeQuery()) {
+            while (rs.next()) {
+                i++;
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Whoops");}
         return i;
     }
 
