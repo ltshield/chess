@@ -20,7 +20,7 @@ public class UpdateGameHandler extends GenericHandler implements Route {
         try {
             String authToken = req.headers("Authorization");
             var request = new Gson().fromJson(req.body(), UpdateGameRequest.class);
-            UpdateGameRequest fullGameReq = new UpdateGameRequest(authToken, request.game(), request.gameID());
+            UpdateGameRequest fullGameReq = new UpdateGameRequest(authToken, request.game(), request.gameID(), request.username(), request.playerColor());
             UpdateGameResponse resp = userService.updateGame(fullGameReq);
             res.type("application/json");
             return new Gson().toJson(resp, UpdateGameResponse.class);

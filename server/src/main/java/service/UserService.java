@@ -87,7 +87,7 @@ public class UserService {
     }
 
     public UpdateGameResponse updateGame(UpdateGameRequest gameRequest) throws DataAccessException {
-        server.db.gameDataDAO.updateGameBoard(gameRequest.gameID(), gameRequest.game());
+        server.db.gameDataDAO.updateGameBoard(gameRequest.gameID(), gameRequest.game(), gameRequest.username(), gameRequest.playerColor());
         return new UpdateGameResponse(gameRequest.game());
     }
 

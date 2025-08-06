@@ -25,6 +25,7 @@ public class JoinGameHandler extends GenericHandler implements Route  {
             JoinGameRequest fullGameReq = new JoinGameRequest(authToken, request.playerColor(), request.gameID());
             JoinGameResponse resp = userService.joinGame(fullGameReq);
             res.type("application/json");
+            res.status(200);
             return new Gson().toJson(resp);
         } catch (DataAccessException e) {
             if (e.getMessage().equals("Error: not authorized")) {

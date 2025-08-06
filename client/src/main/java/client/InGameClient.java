@@ -94,7 +94,7 @@ public class InGameClient implements NotificationHandler {
         }
         game.resigned = true;
         try {
-            server.updateGame(new UpdateGameRequest(client.authToken, game, gameID));
+            server.updateGame(new UpdateGameRequest(client.authToken, game, gameID, client.username, client.playerColor));
             webSocketFacade.resignGameClient(client.authToken, gameID);
         }
         catch (Exception e) {
@@ -294,7 +294,7 @@ public class InGameClient implements NotificationHandler {
                 try {
                     // TODO: implement pawn promotion logic too
                     game.makeMove(new ChessMove(startPosition, endPosition, null));
-                    server.updateGame(new UpdateGameRequest(client.authToken, game, gameID));
+                    server.updateGame(new UpdateGameRequest(client.authToken, game, gameID, client.username, client.playerColor));
                     webSocketFacade.makeMoveClient(client.authToken, gameID, new ChessMove(startPosition, endPosition, null));
                     return "";
                     // TODO: how to send the move back to the server?
@@ -314,6 +314,7 @@ public class InGameClient implements NotificationHandler {
         try {
             webSocketFacade.leaveGameClient(client.authToken, gameID);
             webSocketFacade = null;
+            server.updateGame(new UpdateGameRequest(client.authToken, game, gameID, null, client.playerColor));
         } catch (Exception e) {
 //            webSocketFacade.throwErrorClient(e.getMessage());
             System.out.println("I am in the exitgame function for ingame client.");

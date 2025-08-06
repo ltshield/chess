@@ -123,7 +123,41 @@ public class SQLGameData extends SQLBase {
         return games;
     }
 
-    public void updateGameBoard(Integer gameID, ChessGame game) throws DataAccessException {
+    public void updateGameBoard(Integer gameID, ChessGame game, String username, String playerColor) throws DataAccessException {
+        if (username==null) {
+            try (var conn = DatabaseManager.getConnection()) {
+                String statement = "SELECT whiteUsername, blackUsername FROM game WHERE id=?";
+                try (var ps = conn.prepareStatement(statement)) {
+                    ps.setInt(1, gameID);
+                    ps.executeQuery();
+                    try (var rs = ps.executeQuery()) {
+                        if (rs.next()) {
+                            String whiteUser = rs.getString("whiteUsername");
+                            String blackUser = rs.getString("blackUsername");
+                            if (whiteUser != null && playerColor.equals("WHITE")) {
+                                String statement2 = "UPDATE game SET whiteUsername=? WHERE id=?";
+                                try (var ps2 = conn.prepareStatement(statement2)) {
+                                    ps2.setString(1, null);
+                                    ps2.setInt(2, gameID);
+                                    ps2.executeUpdate();
+                                }
+                            }
+                            if (blackUser != null && playerColor.equals("BLACK")) {
+                                String statement2 = "UPDATE game SET blackUsername=? WHERE id=?";
+                                try (var ps2 = conn.prepareStatement(statement2)) {
+                                    ps2.setString(1, null);
+                                    ps2.setInt(2, gameID);
+                                    ps2.executeUpdate();
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                throw new DataAccessException("Error: couldn't update game board.");
+            }
+        }
+
         try (var conn = DatabaseManager.getConnection()) {
             String statement = "UPDATE game SET game=? WHERE id=?";
             try (var ps = conn.prepareStatement(statement)) {

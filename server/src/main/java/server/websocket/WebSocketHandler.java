@@ -61,14 +61,14 @@ public class WebSocketHandler {
                 Integer gameID = command.gameID;
                 String playerColor = getPlayerColor(username, gameID, authData.authToken());
 
-                int i = getNumGames(authData.authToken());
+                int i = getNumGames(authData.authToken(), gameID);
                 if (command.gameID > i) {
                     sendErrorMessage(session, new DataAccessException("Error: not a valid ID."));
                 }
                 else {
                     switch (command.getCommandType()) {
                         case CONNECT -> connect(session, username, gameID, playerColor);
-                        case LEAVE -> leaveGame(username, gameID);
+                        case LEAVE -> leaveGame(username, gameID, playerColor);
                         case RESIGN -> resign(session, username, gameID, playerColor);
                     }
                 }
@@ -224,8 +224,42 @@ public class WebSocketHandler {
         }
     }
 
-    private void leaveGame(String username, Integer gameID) throws DataAccessException {
+    private void leaveGame(String username, Integer gameID, String playerColor) throws DataAccessException {
         connectionManager.remove(username, gameID);
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT whiteUsername, blackUsername FROM game WHERE id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String whiteUsername = rs.getString("whiteUsername");
+                        String blackUsername = rs.getString("blackUsername");
+                        if (playerColor.equals("WHITE") && whiteUsername.equals(username)) {
+                            try (var conn2 = DatabaseManager.getConnection()) {
+                                String statement2 = "UPDATE game SET whiteUsername=? WHERE id=?";
+                                try (var ps2 = conn2.prepareStatement(statement2)) {
+                                    ps2.setString(1, null);
+                                    ps2.setInt(2, gameID);
+                                    ps2.executeUpdate();
+                                }
+                            }
+                        }
+                        if (playerColor.equals("BLACK") && blackUsername.equals(username)) {
+                            try (var conn2 = DatabaseManager.getConnection()) {
+                                String statement2 = "UPDATE game SET blackUsername=? WHERE id=?";
+                                try (var ps2 = conn2.prepareStatement(statement2)) {
+                                    ps2.setString(1, null);
+                                    ps2.setInt(2, gameID);
+                                    ps2.executeUpdate();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: updating game");
+        }
         String message = String.format("%s has left the game!", username);
         var notification = new NotificationMessage(message);
         try {
@@ -290,10 +324,10 @@ public class WebSocketHandler {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        if (rs.getString("whiteUsername").equals(username)) {
+                        if (rs.getString("whiteUsername") != null && rs.getString("whiteUsername").equals(username)) {
                             return "WHITE";
                         }
-                        if (rs.getString("blackUsername").equals(username)) {
+                        if (rs.getString("whiteUsername") != null && rs.getString("blackUsername").equals(username)) {
                             return "BLACK";
                         }
                         else {
@@ -310,16 +344,16 @@ public class WebSocketHandler {
         throw new DataAccessException("Something went wrong grabbing player color.");
     }
 
-    public int getNumGames(String authToken) throws DataAccessException {
+    public int getNumGames(String authToken, int gameID) throws DataAccessException {
         if (authToken == null) {
             throw new DataAccessException("Error: bad request");
         }
         // should this be set to 1? or 0?
-        int i = 1;
+        int i = 0;
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT game FROM game WHERE id=?";
+            var statement = "SELECT * FROM game";
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, authToken);
+//                ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     while (rs.next()) {
                         i++;
