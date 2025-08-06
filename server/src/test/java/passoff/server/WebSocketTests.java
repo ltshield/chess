@@ -160,7 +160,6 @@ public class WebSocketTests {
     @DisplayName("Make Move Game Over")
     public void invalidMoveGameOver() {
         setupNormalGame();
-
         //Fools mate setup
         ChessMove move = new ChessMove(new ChessPosition(2, 7), new ChessPosition(4, 7), null);
         makeMove(white, gameID, move, true, false, Set.of(black, observer), Set.of(), "first move");

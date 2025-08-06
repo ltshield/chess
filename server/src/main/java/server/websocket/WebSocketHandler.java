@@ -40,15 +40,18 @@ public class WebSocketHandler {
                 if (!rightTurn(playerColor, gameID)) {
                     legal = false;
                     sendErrorMessage(session, new DataAccessException("Error: not your turn."));
+                    return;
                 }
                 if (inCheckmateOrStalemate(playerColor, gameID)) {
                     legal = false;
                     sendErrorMessage(session, new DataAccessException("Error: game is over."));
+                    return;
                 }
                 // check if it is valid
                 if (!validMove(gameID, makeMoveCommand.move)) {
                     legal = false;
                     sendErrorMessage(session, new DataAccessException("Error: not valid move."));
+                    return;
                 }
                 // check if they are moving their own piece
                 if (legal == true) {
@@ -258,8 +261,34 @@ public class WebSocketHandler {
     }
 
     private void makeMove(String username, Integer gameID, ChessMove move) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT game FROM game WHERE id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String gameString = rs.getString("game");
+                        ChessGame game = new Gson().fromJson(gameString, ChessGame.class);
+                        game.makeMove(move);
+                        String jsonString = new Gson().toJson(game);
+                        try (var conn2 = DatabaseManager.getConnection()) {
+                            String statement2 = "UPDATE game SET game=? WHERE id=?";
+                            try (var ps2 = conn2.prepareStatement(statement2)) {
+                                ps2.setString(1, jsonString);
+                                ps2.setInt(2, gameID);
+                                ps2.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Error: updating game");
+        }
+
         String message = String.format("%s has moved %s.", username, move);
         NotificationMessage notification = new NotificationMessage(message);
+
         try {
             connectionManager.broadcast(username, notification, gameID);
 
