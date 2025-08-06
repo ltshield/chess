@@ -1,10 +1,8 @@
 package client;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import dataexception.DataAccessException;
 
-import server.Server;
 import service.*;
 
 import java.io.*;
