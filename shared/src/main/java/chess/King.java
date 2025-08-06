@@ -51,7 +51,7 @@ public class King {
         }
 
         // Southwest
-        if (currRow-1 >= 0 && currCol-1 >= 1) {
+        if (currRow-1 >= 1 && currCol-1 >= 1) {
             ChessPosition query = new ChessPosition(currRow - 1, currCol - 1);
             checkIfInTaken(self, board, query, options);
         }

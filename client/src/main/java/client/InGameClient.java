@@ -227,6 +227,7 @@ public class InGameClient implements NotificationHandler {
         if (client.playerColor.equals("OBSERVING")) {
             System.out.println("Error: observers cannot make moves.");
         }
+
         ChessGame.TeamColor turn = game.getTeamTurn();
         if (turn.equals(ChessGame.TeamColor.WHITE)) {
             if (!client.playerColor.equals("WHITE")) {
@@ -239,6 +240,22 @@ public class InGameClient implements NotificationHandler {
                 System.out.println("Error: not your turn.");
                 return "";
             }
+        }
+
+        ChessGame.TeamColor col = null;
+        if (client.playerColor.equals("WHITE")) {
+            col = ChessGame.TeamColor.WHITE;
+        }
+        if (client.playerColor.equals("BLACK")) {
+            col = ChessGame.TeamColor.BLACK;
+        }
+        if (game.isInCheckmate(col)) {
+            System.out.println("Error: you are in checkmate.");
+            return "";
+        }
+        if (game.isInStalemate(col)) {
+            System.out.println("Error: you are in stalemate.");
+            return "";
         }
 
         ChessPosition startPosition = null;
@@ -294,10 +311,9 @@ public class InGameClient implements NotificationHandler {
                 try {
                     // TODO: implement pawn promotion logic too
                     game.makeMove(new ChessMove(startPosition, endPosition, null));
-                    server.updateGame(new UpdateGameRequest(client.authToken, game, gameID, client.username, client.playerColor));
                     webSocketFacade.makeMoveClient(client.authToken, gameID, new ChessMove(startPosition, endPosition, null));
+                    server.updateGame(new UpdateGameRequest(client.authToken, game, gameID, client.username, client.playerColor));
                     return "";
-                    // TODO: how to send the move back to the server?
                 } catch (Exception e) {
                     System.out.println("Error: invalid move.");
                     return "";

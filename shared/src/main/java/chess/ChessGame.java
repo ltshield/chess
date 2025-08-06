@@ -15,6 +15,7 @@ public class ChessGame {
     private TeamColor turn = TeamColor.WHITE;
     public ChessBoard board = new ChessBoard();
     public boolean resigned = false;
+    public boolean ended = false;
 
     public ChessGame() {
         board.resetBoard();
@@ -68,16 +69,17 @@ public class ChessGame {
             for (ChessMove myMove : validOptions) {
                 ChessBoard newBoard = copyBoard(board);
                 Collection<ChessMove> oppMoves = checkFutureBoardState(newBoard, myMove, query);
-                boolean inCheck = false;
+//                boolean inCheck = false;
                 for (ChessMove move : oppMoves) {
                     ChessPosition endPos = move.getEndPosition();
                     if (myMove.getEndPosition().equals(endPos)) {
-                        inCheck = true;
+//                        inCheck = true;
+                        toDelete.add(myMove);
                     }
                 }
-                if (inCheck) {
-                    toDelete.add(myMove);
-                }
+//                if (inCheck) {
+//                    toDelete.add(myMove);
+//                }
             }
 
             for (ChessMove move : toDelete) {
@@ -230,6 +232,7 @@ public class ChessGame {
             }
         }
         if (myMoves.isEmpty() && isInCheck(teamColor)) {
+            ended = true;
             return true;
         }
         return false;
@@ -261,6 +264,7 @@ public class ChessGame {
                 }
             }
             if (myMoves.isEmpty() && !isInCheck(teamColor)) {
+                ended = true;
                 return true;
             } else {
                 return false;
