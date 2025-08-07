@@ -49,7 +49,7 @@ public class WebSocketFacade extends Endpoint {
                 }
             });
         } catch (Exception e) {
-            throw new DataAccessException("Error: whoops");
+            ;
         }
     }
 
@@ -63,8 +63,7 @@ public class WebSocketFacade extends Endpoint {
             var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
-//            throwErrorClient(ex.getMessage());
-            System.out.println("I am in the enter game client.");
+            ;
         }
     }
 
@@ -73,7 +72,7 @@ public class WebSocketFacade extends Endpoint {
             MakeMoveCommand makeMoveCommand = new MakeMoveCommand(move, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(makeMoveCommand));
         } catch (Exception e) {
-            System.out.println("I am in the make move client.");
+            ;
         }
     }
 
@@ -82,7 +81,6 @@ public class WebSocketFacade extends Endpoint {
             UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (Exception e) {
-            System.out.println("I am in the resign game client.");
         }
     }
 
@@ -92,8 +90,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
             this.session.close();
         } catch (IOException ex) {
-//            throwErrorClient(ex.getMessage());
-            System.out.println("I am in the leave game client.");
+            ;
         }
     }
 
@@ -101,7 +98,7 @@ public class WebSocketFacade extends Endpoint {
         try {
             this.session.getBasicRemote().sendText(message);
         } catch (Exception e) {
-            throw new DataAccessException("Error");
+            ;
         }
     }
 

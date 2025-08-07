@@ -14,13 +14,12 @@ public class ChessGame {
 
     private TeamColor turn = TeamColor.WHITE;
     public ChessBoard board = new ChessBoard();
-    public boolean resigned = false;
-    public boolean ended = false;
+    public boolean resigned;
+    public boolean ended;
 
     public ChessGame() {
         board.resetBoard();
     }
-
     /**
      * @return Which team's turn it is
      */

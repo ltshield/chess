@@ -99,12 +99,15 @@ public class UserService {
     public JoinGameResponse joinGame(JoinGameRequest gameRequest) throws DataAccessException {
         try {
             if (server.db.gameDataDAO.checkIfInGame(gameRequest.authToken(), gameRequest.gameID(), gameRequest.playerColor())) {
-                    return new JoinGameResponse(gameRequest.gameID(), getGameBoard(gameRequest.gameID()));
+                return new JoinGameResponse(gameRequest.gameID(), getGameBoard(gameRequest.gameID()));
             } else {
                 server.db.gameDataDAO.addUserToGame(gameRequest.authToken(), gameRequest.gameID(), gameRequest.playerColor());
                 return new JoinGameResponse(gameRequest.gameID(), getGameBoard(gameRequest.gameID()));
             }
         } catch (DataAccessException e) {
+            if (gameRequest.playerColor() != null && gameRequest.playerColor().equals("OBSERVING")) {
+                return new JoinGameResponse(gameRequest.gameID(), getGameBoard(gameRequest.gameID()));
+            }
             throw e;
         }
     }

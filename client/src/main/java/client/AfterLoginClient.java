@@ -1,11 +1,8 @@
 package client;
 
-import chess.ChessGame;
 import dataexception.DataAccessException;
 import service.*;
-import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
-import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,7 +10,6 @@ import java.util.Collection;
 public class AfterLoginClient {
     private final ServerFacade server;
     private final BaseClient client;
-    public InGameClient inGameClient;
     private int numGames;
 
     public AfterLoginClient(ServerFacade serverFacade, BaseClient ogClient) {
@@ -68,7 +64,15 @@ public class AfterLoginClient {
                 }
                 client.playerColor = "OBSERVING";
                 client.inGameClient.gameID = iD;
+                String authToken = client.authToken;
+                String playerColor = client.playerColor;
+                int gameID = client.inGameClient.gameID;
+                JoinGameResponse resp = server.joinGame(new JoinGameRequest(authToken, playerColor, gameID));
+                client.inGameClient.game = resp.game();
                 client.switchState("INGAME");
+                client.inGameClient.webSocketFacade = new WebSocketFacade(server.serverUrl, client.inGameClient);
+                client.inGameClient.webSocketFacade.enterGameClient(client.authToken, iD);
+
                 return "Successfully viewing game.";
             }
         }

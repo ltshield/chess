@@ -240,6 +240,7 @@ public class SQLGameData extends SQLBase {
             Collection<String> availableColors = new ArrayList<>();
             availableColors.add("WHITE");
             availableColors.add("BLACK");
+
             AuthData user = null;
             try {
                 user = server.db.authDataDAO.getAuth(authToken);

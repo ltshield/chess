@@ -24,33 +24,34 @@ public class WebSocketHandler {
             if (command.commandType.equals(UserGameCommand.CommandType.MAKE_MOVE)) {
                 MakeMoveCommand makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
                 String username = getUsername(makeMoveCommand.getAuthToken());
-//                String username = authData.username();
-                boolean legal = true;
 
                 // check it is that player's turn
                 Integer gameID = command.gameID;
                 String playerColor = getPlayerColor(username, gameID, makeMoveCommand.authToken);
-                if (!rightTurn(playerColor, gameID)) {
-                    legal = false;
-                    sendErrorMessage(session, new DataAccessException("Error: not your turn."));
+                if (inCheckmateOrStalemate(playerColor, gameID)) {
+                    sendErrorMessage(session, new DataAccessException("Sorry, game has ended."));
                     return;
                 }
-                if (inCheckmateOrStalemate(playerColor, gameID)) {
-                    legal = false;
-                    sendErrorMessage(session, new DataAccessException("Error: game is over."));
+                if (isResigned(gameID)) {
+                    sendErrorMessage(session, new DataAccessException("Sorry, this game has been resigned."));
+                    return;
+                }
+                if (playerColor.equals("OBSERVER")) {
+                    sendErrorMessage(session, new DataAccessException("Sorry, you are only observing."));
+                    return;
+                }
+                if (!rightTurn(playerColor, gameID)) {
+                    sendErrorMessage(session, new DataAccessException("Sorry, it is not your turn."));
                     return;
                 }
                 // check if it is valid
                 if (!validMove(gameID, makeMoveCommand.move)) {
-                    legal = false;
-                    sendErrorMessage(session, new DataAccessException("Error: not valid move."));
+                    sendErrorMessage(session, new DataAccessException("Sorry, that is not a valid move."));
                     return;
                 }
                 // check if they are moving their own piece
-                if (legal == true) {
-                    // then make the move
-                    makeMove(username, makeMoveCommand.gameID, makeMoveCommand.move);
-                }
+                // then make the move
+                makeMove(username, makeMoveCommand.gameID, makeMoveCommand.move);
             }
             else {
                 String username = getUsername(command.getAuthToken());
@@ -62,7 +63,7 @@ public class WebSocketHandler {
 
                 int i = getNumGames(command.authToken, gameID);
                 if (command.gameID > i) {
-                    sendErrorMessage(session, new DataAccessException("Error: not a valid ID."));
+                    sendErrorMessage(session, new DataAccessException("Sorry, that is not a valid ID."));
                 }
                 else {
                     switch (command.getCommandType()) {
@@ -73,50 +74,48 @@ public class WebSocketHandler {
                 }
             }
         } catch (Exception e) {
-            sendErrorMessage(session, new DataAccessException("Error: unauthorized"));
+            sendErrorMessage(session, new DataAccessException(e.getMessage()));
         }
     }
-    private void resignHelper(ResultSet rs, int gameID) throws DataAccessException {
-        try {
-            if (rs.next()) {
-                ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
-                gem.resigned = true;
-                try (var conn2 = DatabaseManager.getConnection()) {
-                    String statement2 = "UPDATE game SET game=? WHERE id=?";
-                    try (var ps2 = conn2.prepareStatement(statement2)) {
-                        var json = new Gson().toJson(gem);
-                        ps2.setString(1, json);
-                        ps2.setInt(2, gameID);
-                        ps2.executeUpdate();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new DataAccessException("Error: whoops");
-        }
-    }
+
     private void resign(Session session, String username, int gameID, String authToken) throws DataAccessException {
         if (isResigned(gameID)) {
-            sendErrorMessage(session, new DataAccessException("Error: game is already resigned."));
+            sendErrorMessage(session, new DataAccessException("Sorry, game has already been resigned."));
             return;
         }
         // if username not in the valid usernames for the game, cannot resign
         if (getPlayerColor(username, gameID, authToken).equals("OBSERVER")) {
-            sendErrorMessage(session, new DataAccessException("Error: observers cannot resign."));
+            sendErrorMessage(session, new DataAccessException("Sorry, observers cannot resign."));
         }
         else {
+            ChessGame gem = null;
             String message = String.format("%s has resigned. The game is now over.", username);
             try (var conn = DatabaseManager.getConnection()) {
                 var statement = "SELECT game FROM game WHERE id=?";
                 try (var ps = conn.prepareStatement(statement)) {
                     ps.setInt(1, gameID);
                     try (var rs = ps.executeQuery()) {
-                        resignHelper(rs, gameID);
+                        if (rs.next()) {
+                            gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
+                            gem.resigned = true;
+                        }
                     }
                 }
             } catch (Exception e) {
-                throw new DataAccessException("Error: updating game");
+                throw new DataAccessException(e.getMessage());
             }
+            try (var conn = DatabaseManager.getConnection()) {
+                String statement = "UPDATE game SET game=? WHERE id=?";
+                try (var ps = conn.prepareStatement(statement)) {
+                    var json = new Gson().toJson(gem);
+                    ps.setString(1, json);
+                    ps.setInt(2, gameID);
+                    ps.executeUpdate();
+                }
+            } catch (Exception e) {
+                throw new DataAccessException(e.getMessage());
+            }
+
             NotificationMessage notification = new NotificationMessage(message);
             try {
                 connectionManager.broadcast(username, notification, gameID);
@@ -130,14 +129,15 @@ public class WebSocketHandler {
         try {
             if (rs.next()) {
                 ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
-                if (gem.resigned == true) {
+                if (gem.resigned) {
                     return true;
                 }
+                return false;
             }
         } catch (Exception e) {
             throw new DataAccessException("Error: whoops");
         }
-        throw new DataAccessException("Error");
+        throw new DataAccessException("Whoops");
     }
     private boolean isResigned(int gameID) {
         try (var conn = DatabaseManager.getConnection()) {
@@ -153,13 +153,14 @@ public class WebSocketHandler {
             return false;
         }
     }
+
+
     private boolean checkmateHelper(ResultSet rs, String playerColor) throws DataAccessException {
         try {
             if (rs.next()) {
                 ChessGame gem = new Gson().fromJson(rs.getString("game"), ChessGame.class);
-                ChessGame.TeamColor turnColor = gem.getTeamTurn();
                 if (playerColor.equals("WHITE")) {
-                    if (gem.isInCheckmate(turnColor) || gem.isInStalemate(turnColor)) {
+                    if (gem.ended) {
                         return true;
                     }
                     else {
@@ -167,7 +168,7 @@ public class WebSocketHandler {
                     }
                 }
                 if (playerColor.equals("BLACK")) {
-                    if (gem.isInStalemate(turnColor) || gem.isInStalemate(turnColor)) {
+                    if (gem.ended) {
                         return true;
                     }
                     else {
@@ -177,10 +178,10 @@ public class WebSocketHandler {
                 return false;
             }
             else {
-                throw new DataAccessException("Error: not authorized");
+                throw new DataAccessException("No more moves can be made. Game is finished.");
             }
         } catch (Exception e) {
-            throw new DataAccessException("Error: whoops");
+            throw new DataAccessException("No more moves can be made. Game is finished.");
         }
     }
     private boolean inCheckmateOrStalemate(String playerColor, int gameID) throws DataAccessException {
@@ -212,7 +213,7 @@ public class WebSocketHandler {
                 return false;
             }
         } catch (Exception e) {
-            throw new DataAccessException("Error: whoops");
+            throw new DataAccessException("Sorry, that is not a valid move.");
         }
         return false;
     }
@@ -269,10 +270,8 @@ public class WebSocketHandler {
                     return rightHelper(rs, playerColor);
                 }
             }
-        } catch (DataAccessException e) {
-            throw e;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error: internal error");
+        } catch (Exception e) {
+            throw new DataAccessException("Sorry, it is not your turn.");
         }
     }
     private void makeMoveHelper(ResultSet rs, ChessMove move, int gameID) throws DataAccessException {
@@ -290,7 +289,7 @@ public class WebSocketHandler {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException("Error: message");
+            throw new DataAccessException("Sorry, that's not a valid move.");
         }
     }
     private void makeMove(String username, Integer gameID, ChessMove move) throws DataAccessException {
@@ -305,7 +304,7 @@ public class WebSocketHandler {
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException("Error: updating game");
+            throw new DataAccessException(e.getMessage());
         }
 
         String message = String.format("%s has moved %s.", username, move);
@@ -320,6 +319,74 @@ public class WebSocketHandler {
 
         } catch (Exception e) {
             throw new DataAccessException("Error: broadcasting went wrong.");
+        }
+
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT whiteUsername, blackUsername, game FROM game WHERE id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        try {
+                            String whiteUsername = rs.getString("whiteUsername");
+                            String blackUsername = rs.getString("blackUsername");
+                            String gameString = rs.getString("game");
+                            ChessGame game = new Gson().fromJson(gameString, ChessGame.class);
+                            if (game.isInCheckmate(game.getTeamTurn())) {
+                                game.ended = true;
+                                if (game.getTeamTurn().equals(ChessGame.TeamColor.WHITE)) {
+                                    String message2 = String.format("%s has checkmated %s.", blackUsername, whiteUsername);
+                                    NotificationMessage notification2 = new NotificationMessage(message2);
+                                    connectionManager.broadcast(username, notification2, gameID);
+                                    connectionManager.sendMessage(username, notification2, gameID);
+                                }
+                                if (game.getTeamTurn().equals(ChessGame.TeamColor.BLACK)) {
+                                    String message2 = String.format("%s has checkmated %s.", blackUsername, whiteUsername);
+                                    NotificationMessage notification2 = new NotificationMessage(message2);
+                                    connectionManager.broadcast(username, notification2, gameID);
+                                    connectionManager.sendMessage(username, notification2, gameID);
+                                }
+                            }
+                            if (!game.isInCheckmate(game.getTeamTurn())) {
+                                if (game.isInCheck(game.getTeamTurn())) {
+                                    if (game.getTeamTurn().equals(ChessGame.TeamColor.WHITE)) {
+                                        String message2 = String.format("%s has put %s in check.", blackUsername, whiteUsername);
+                                        NotificationMessage notification2 = new NotificationMessage(message2);
+                                        connectionManager.broadcast(username, notification2, gameID);
+                                        connectionManager.sendMessage(username, notification2, gameID);
+                                    }
+                                    if (game.getTeamTurn().equals(ChessGame.TeamColor.BLACK)) {
+                                        String message2 = String.format("%s has put %s in check.", blackUsername, whiteUsername);
+                                        NotificationMessage notification2 = new NotificationMessage(message2);
+                                        connectionManager.broadcast(username, notification2, gameID);
+                                        connectionManager.sendMessage(username, notification2, gameID);
+                                    }
+                                }
+                            }
+                            if (game.isInStalemate(game.getTeamTurn())) {
+                                game.ended = true;
+                                String message2 = String.format("The game has ended in a stalemate.");
+                                NotificationMessage notification2 = new NotificationMessage(message2);
+                                connectionManager.broadcast(username, notification2, gameID);
+                                connectionManager.sendMessage(username, notification2, gameID);
+                            }
+                            String jsonString = new Gson().toJson(game);
+                            try (var conn2 = DatabaseManager.getConnection()) {
+                                String statement2 = "UPDATE game SET game=? WHERE id=?";
+                                try (var ps2 = conn2.prepareStatement(statement2)) {
+                                    ps2.setString(1, jsonString);
+                                    ps2.setInt(2, gameID);
+                                    ps2.executeUpdate();
+                                }
+                            }
+                        } catch (Exception e) {
+                            throw new DataAccessException("Sorry, that's not a valid move.");
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(e.getMessage());
         }
     }
     public void helperWhite(int gameID) throws DataAccessException{

@@ -86,7 +86,7 @@ public class BoardUI {
         // 8 x 8 grid, black on bottom left
         ChessBoard grid = game.board;
         for (int i=8; i >= 1; i--) {
-            handleBoardDrawing(out, i, grid, toHighlight);
+            handleBoardDrawingWhite(out, i, grid, toHighlight);
         }
 
         // FOOTER
@@ -94,27 +94,7 @@ public class BoardUI {
         drawHeader(out, headerItems);
     }
 
-    public static void draw1(PrintStream out, Collection<ChessPosition> highlight, ChessPiece piece, ChessPosition pos) {
-        if (highlight != null && highlight.contains(pos)) {
-            out.print(SET_BG_COLOR_YELLOW);
-            printPieces(out, piece);
-        } else {
-            out.print(SET_BG_COLOR_WHITE);
-            printPieces(out, piece);
-        }
-    }
-
-    public static void draw2(PrintStream out, Collection<ChessPosition> highlight, ChessPiece piece, ChessPosition pos) {
-        if (highlight != null && highlight.contains(pos)) {
-            out.print(SET_BG_COLOR_YELLOW);
-            printPieces(out, piece);
-        } else {
-            out.print(SET_BG_COLOR_BLACK);
-            printPieces(out, piece);
-        }
-    }
-
-    public static void handleBoardDrawing(PrintStream out, int i, ChessBoard grid, Collection<ChessPosition> toHighlight) {
+    public static void handleBoardDrawingWhite(PrintStream out, int i, ChessBoard grid, Collection<ChessPosition> toHighlight) {
 
         out.print(SET_BG_COLOR_MAGENTA);
         out.print(EMPTY);
@@ -124,16 +104,153 @@ public class BoardUI {
             ChessPosition testPos = new ChessPosition(i, j);
             ChessPiece piece = grid.getPiece(new ChessPosition(i,j));
             if (j % 2 != 0 && i % 2 == 0) {
-                draw1(out, toHighlight, piece, testPos);
+                if (toHighlight != null && toHighlight.contains(testPos)) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                    printPieces(out, piece);
+                } else {
+                    out.print(SET_BG_COLOR_WHITE);
+                    printPieces(out, piece);
+                }
             }
             if (j % 2 == 0 && i % 2 == 0) {
-                draw2(out, toHighlight, piece, testPos);
+                if (toHighlight != null && toHighlight.contains(testPos)) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                    printPieces(out, piece);
+                } else {
+                    out.print(SET_BG_COLOR_BLACK);
+                    printPieces(out, piece);
+                }
             }
             if (j % 2 == 0 && i % 2 != 0) {
-                draw1(out, toHighlight, piece, testPos);
+                if (toHighlight != null && toHighlight.contains(testPos)) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                    printPieces(out, piece);
+                } else {
+                    out.print(SET_BG_COLOR_WHITE);
+                    printPieces(out, piece);
+                }
             }
             if (j % 2 != 0 && i % 2 != 0) {
-                draw2(out, toHighlight, piece, testPos);
+                if (toHighlight != null && toHighlight.contains(testPos)) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                    printPieces(out, piece);
+                } else {
+                    out.print(SET_BG_COLOR_BLACK);
+                    printPieces(out, piece);
+                }
+            }
+        }
+        out.print(SET_BG_COLOR_MAGENTA);
+        out.print(EMPTY);
+        out.print(RESET_TEXT_COLOR);
+        out.print(i);
+        out.print(EMPTY);
+        out.print(RESET_BG_COLOR);
+        out.print("\n");
+    }
+
+    public static ChessPosition convertPositionsBackwards(ChessPosition position) {
+        int row = position.getRow();
+        int col = position.getColumn();
+        Integer newRow = null;
+        Integer newCol = null;
+//        if(row==1) {
+//            newRow = 8;
+//        }
+//        if(row==2) {
+//            newRow = 7;
+//        }
+//        if(row==3) {
+//            newRow = 6;
+//        }
+//        if(row==4) {
+//            newRow = 5;
+//        }
+//        if(row==5) {
+//            newRow = 4;
+//        }
+//        if(row==6) {
+//            newRow = 3;
+//        }
+//        if(row==7) {
+//            newRow = 2;
+//        }
+//        if(row==8) {
+//            newRow = 1;
+//        }
+        if(col==1) {
+            newCol = 8;
+        }
+        if(col==2) {
+            newCol = 7;
+        }
+        if(col==3) {
+            newCol = 6;
+        }
+        if(col==4) {
+            newCol = 5;
+        }
+        if(col==5) {
+            newCol = 4;
+        }
+        if(col==6) {
+            newCol = 3;
+        }
+        if(col==7) {
+            newCol = 2;
+        }
+        if(col==8) {
+            newCol = 1;
+        }
+        return new ChessPosition(row, newCol);
+    }
+    public static void handleBoardDrawingBlack(PrintStream out, int i, ChessBoard grid, Collection<ChessPosition> toHighlight) {
+
+        out.print(SET_BG_COLOR_MAGENTA);
+        out.print(EMPTY);
+        out.print(i);
+        out.print(EMPTY);
+        for (int j = 1; j <= 8; j++) {
+            ChessPosition testPos = new ChessPosition(i, j);
+            ChessPosition inverted = convertPositionsBackwards(testPos);
+            int row = inverted.getRow();
+            int col = inverted.getColumn();
+            ChessPiece piece = grid.getPiece(new ChessPosition(row,col));
+            if (j % 2 != 0 && i % 2 == 0) {
+                if (toHighlight != null && toHighlight.contains(testPos)) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                    printPieces(out, piece);
+                } else {
+                    out.print(SET_BG_COLOR_BLACK);
+                    printPieces(out, piece);
+                }
+            }
+            if (j % 2 == 0 && i % 2 == 0) {
+                if (toHighlight != null && toHighlight.contains(testPos)) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                    printPieces(out, piece);
+                } else {
+                    out.print(SET_BG_COLOR_WHITE);
+                    printPieces(out, piece);
+                }
+            }
+            if (j % 2 == 0 && i % 2 != 0) {
+                if (toHighlight != null && toHighlight.contains(testPos)) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                    printPieces(out, piece);
+                } else {
+                    out.print(SET_BG_COLOR_BLACK);
+                    printPieces(out, piece);
+                }
+            }
+            if (j % 2 != 0 && i % 2 != 0) {
+                if (toHighlight != null && toHighlight.contains(testPos)) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                    printPieces(out, piece);
+                } else {
+                    out.print(SET_BG_COLOR_WHITE);
+                    printPieces(out, piece);
+                }
             }
         }
         out.print(SET_BG_COLOR_MAGENTA);
@@ -174,7 +291,7 @@ public class BoardUI {
         // 8 x 8 grid, black on bottom left
         ChessBoard grid = game.board;
         for (int i=1; i <= 8; i++) {
-            handleBoardDrawing(out, i, grid, highlightThese);
+            handleBoardDrawingBlack(out, i, grid, highlightThese);
         }
 
         // FOOTER
@@ -195,11 +312,31 @@ public class BoardUI {
         out.print("\n");
     }
 
-    public static void drawHighlightedBoard(String playerColor, ChessPosition position) {
+    public static void drawHighlightedBoardBoth(String playerColor, ChessPosition position) {
+        if (playerColor.equals("WHITE")) {
+            drawHighlightedBoardWhite(playerColor, position);
+        }
+        if (playerColor.equals("BLACK")) {
+            drawHighlightedBoardBlack(playerColor, position);
+        }
+        if (playerColor.equals("OBSERVING")) {
+            drawHighlightedBoardWhite(playerColor, position);
+        }
+    }
+    public static void drawHighlightedBoardWhite(String playerColor, ChessPosition position) {
         Collection<ChessMove> possibleMoves = game.validMoves(position);
         Collection<ChessPosition> possibleSpaces = new ArrayList<>();
         for (ChessMove move: possibleMoves) {
             possibleSpaces.add(move.getEndPosition());
+        }
+        drawBoard(playerColor, possibleSpaces);
+    }
+
+    public static void drawHighlightedBoardBlack(String playerColor, ChessPosition position) {
+        Collection<ChessMove> possibleMoves = game.validMoves(position);
+        Collection<ChessPosition> possibleSpaces = new ArrayList<>();
+        for (ChessMove move: possibleMoves) {
+            possibleSpaces.add(convertPositionsBackwards(move.getEndPosition()));
         }
         drawBoard(playerColor, possibleSpaces);
     }
