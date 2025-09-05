@@ -297,8 +297,7 @@ public class InGameClient implements NotificationHandler {
             webSocketFacade = null;
             server.updateGame(new UpdateGameRequest(client.authToken, game, gameID, null, client.playerColor));
         } catch (Exception e) {
-//            webSocketFacade.throwErrorClient(e.getMessage());
-//            System.out.println("I am in the exitgame function for ingame client.");
+            ;
         }
         return client.eval("list");
     }
@@ -307,9 +306,8 @@ public class InGameClient implements NotificationHandler {
         try {
             JoinGameResponse resp = server.joinGame(new JoinGameRequest(client.authToken, client.playerColor, gameID));
             this.game = resp.game();
-//            System.out.println("Refreshed game!");
         } catch (Exception e) {
-//            System.out.println("Error refreshing game.");
+            ;
         }
     }
 
@@ -319,8 +317,4 @@ public class InGameClient implements NotificationHandler {
         board.drawBoard(client.playerColor, null);
         return "";
     }
-
-    // highlight for black not working
-    // observe bugs
-    // gameboard edits result in edits to all games?
 }
